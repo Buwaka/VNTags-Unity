@@ -9,11 +9,10 @@ namespace VNTags
 {
     class ConfirmTag : IVNTag
     {
-
-        public ConfirmTag()
+        public string GetTagID()
         {
+            throw new NotImplementedException();
         }
-
 
         public void Execute(VNTagContext context, out bool isFinished)
         {

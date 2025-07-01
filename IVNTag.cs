@@ -19,6 +19,15 @@ namespace VNTags
 
     public interface IVNTag
     {
+        
+        void Init(string parameters) {}
+        
+        /// <summary>
+        /// Get the tag ID to search for when parsing, case insensitive
+        /// </summary>
+        /// <returns></returns>
+        string GetTagID();
+        
         void Execute(VNTagContext context, out bool isFinished);
     }
 }

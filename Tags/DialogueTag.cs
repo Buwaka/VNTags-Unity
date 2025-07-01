@@ -15,6 +15,11 @@ namespace VNTags
         {
             Dialogue = dialogue;
         }
+        
+        public string GetTagID()
+        {
+            return "";
+        }
 
 
         public void Execute(VNTagContext context, out bool isFinished)

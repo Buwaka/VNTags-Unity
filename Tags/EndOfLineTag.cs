@@ -13,6 +13,11 @@ namespace VNTags
         public EndOfLineTag()
         {
         }
+        
+        public string GetTagID()
+        {
+            return "EOL";
+        }
 
 
         public void Execute(VNTagContext context, out bool isFinished)
