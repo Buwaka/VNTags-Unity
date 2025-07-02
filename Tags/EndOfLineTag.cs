@@ -7,13 +7,18 @@ using UnityEngine;
 
 namespace VNTags
 {
-    class EndOfLineTag : IVNTag
+    public class EndOfLineTag : IVNTag
     {
 
         public EndOfLineTag()
         {
         }
-        
+
+        public void Init(string parameters, VNTagLineContext context)
+        {
+            
+        }
+
         public string GetTagID()
         {
             return "EOL";
@@ -22,9 +27,9 @@ namespace VNTags
 
         public void Execute(VNTagContext context, out bool isFinished)
         {
-            if(context.Text != null)
+            if(context.TextBox != null)
             {
-                context.Text.text = "";
+                context.TextBox.text = "";
             }
             else
             {

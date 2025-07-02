@@ -7,11 +7,16 @@ using UnityEngine;
 
 namespace VNTags
 {
-    class ConfirmTag : IVNTag
+    public class ConfirmTag : IVNTag
     {
-        public string GetTagID()
+        public void Init(string parameters, VNTagLineContext context)
         {
             throw new NotImplementedException();
+        }
+
+        public string GetTagID()
+        {
+            return "Confirm";
         }
 
         public void Execute(VNTagContext context, out bool isFinished)

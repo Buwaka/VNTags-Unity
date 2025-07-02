@@ -7,15 +7,15 @@ using UnityEngine;
 
 namespace VNTags
 {
-    class DialogueTag : IVNTag
+    public class DialogueTag : IVNTag
     {
-        string Dialogue = "";
+        public string Dialogue = "";
 
-        public DialogueTag(string dialogue)
+        public void Init(string parameters, VNTagLineContext context)
         {
-            Dialogue = dialogue;
+            Dialogue = parameters;
         }
-        
+
         public string GetTagID()
         {
             return "";
@@ -24,9 +24,9 @@ namespace VNTags
 
         public void Execute(VNTagContext context, out bool isFinished)
         {
-            if(context.Text != null)
+            if(context.TextBox != null)
             {
-                context.Text.text = Dialogue;
+                context.TextBox.text = Dialogue;
             }
             else
             {

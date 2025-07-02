@@ -1,8 +1,10 @@
 ﻿namespace VNTags
 {
-    public class CostumeTag : IVNTag
+    public class OutfitTag : IVNTag
     {
-        public void Init(string parameters)
+        public  VNOutfit Outfit;
+        
+        public void Init(string parameters, VNTagLineContext context)
         {
             // todo
         }

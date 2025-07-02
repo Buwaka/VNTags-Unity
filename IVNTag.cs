@@ -11,16 +11,33 @@ namespace VNTags
 
     public struct VNTagContext
     {
-        public Text CharacterName;
-        public TMPro.TMP_Text Text;
-        public GameObject DialogueBox;
+        public Text CharacterNameBox;
+        public TMPro.TMP_Text TextBox;
+        public GameObject DialogueWindow;
+    }
+
+    public struct VNTagLineContext
+    {
+        public int LineNumber;
+        public string FullLine;
+
+        public VNTagLineContext(int num, string line)
+        {
+            LineNumber = num;
+            FullLine = line;
+        }
+
+        public override string ToString()
+        {
+            return LineNumber + ": " + FullLine;
+        }
     }
 
 
     public interface IVNTag
     {
-        
-        void Init(string parameters) {}
+
+        void Init(string parameters, VNTagLineContext context);
         
         /// <summary>
         /// Get the tag ID to search for when parsing, case insensitive

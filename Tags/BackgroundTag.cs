@@ -1,8 +1,8 @@
 ﻿namespace VNTags
 {
-    public class ExpressionTag : IVNTag
+    public class BackgroundTag : IVNTag
     {
-        public VNExpression Expression;
+        public VNBackground Background;
         
         public void Init(string parameters, VNTagLineContext context)
         {
@@ -11,7 +11,7 @@
 
         public string GetTagID()
         {
-            return "Expression";
+            return "Background";
         }
 
         public void Execute(VNTagContext context, out bool isFinished)

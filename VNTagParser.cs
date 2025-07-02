@@ -8,6 +8,11 @@ namespace VNTags
     // based on markdown
     public class VNTagParser
     {
+        
+        public static bool isSignificant(string text)
+        {
+            return !string.IsNullOrEmpty(text) && text.Trim(' ').Length > 0;
+        }
 
         /// <summary>
         /// The primary function to process pure text into VNTags
@@ -19,14 +24,18 @@ namespace VNTags
             Queue<IVNTag> tagQueue = new Queue<IVNTag>();
             var lines = text.Split(
                 new string[] { "\r\n", "\r", "\n" },
-                StringSplitOptions.RemoveEmptyEntries
+                StringSplitOptions.None
             );
             
-            foreach (var line in lines)
+            for(var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
-                //if(line is empty) skip
+                var line = lines[lineIndex];
+                if (!isSignificant(line))
+                {
+                    continue;
+                }
                 
-                foreach (var tag in ParseLine(line))
+                foreach (var tag in ParseLine(line, lineIndex + 1))
                 {
                     tagQueue.Enqueue(tag);
                 }
@@ -44,8 +53,10 @@ namespace VNTags
         /// </summary>
         /// <param name="line">A single line of the script</param>
         /// <returns>a collection of VNTags</returns>
-        public static ICollection<IVNTag> ParseLine(string line)
+        public static ICollection<IVNTag> ParseLine(string line, int lineNumber)
         {
+            VNTagLineContext context = new VNTagLineContext(lineNumber, line);
+            
             List<IVNTag> tags = new List<IVNTag>();
 
             int start = 0;
@@ -59,6 +70,17 @@ namespace VNTags
                     index++;
                     continue;
                 }
+                
+                // end of a character name
+                if (c == ';')
+                {
+                    var CharacterName = line.Substring(start, index - start);
+                    CharacterTag cTag = new CharacterTag();
+                    cTag.Init(CharacterName, context);
+                    tags.Add(cTag);
+                    start = index + 1;
+                    continue;
+                }
 
                 // start of a tag
                 if (c == '{')
@@ -66,7 +88,9 @@ namespace VNTags
                     // process dialogue before tag
                     if (index > 0)
                     {
-                        DialogueTag dialogue = new DialogueTag(line.Substring(start, index - 1));
+                        var RawDialogue = line.Substring(start, index - 1);
+                        DialogueTag dialogue = new DialogueTag();
+                        dialogue.Init(RawDialogue, context);
                         tags.Add(dialogue);
                     }
                     
@@ -87,13 +111,15 @@ namespace VNTags
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                     }
+                    continue;
                 }
             }
 
             // process the dialogue after all the last tag, or if no tag is present
             if (start < line.Length)
             {
-                DialogueTag dialogue = new DialogueTag(line.Substring(start));
+                DialogueTag dialogue = new DialogueTag();
+                dialogue.Init(line.Substring(start), context);
                 tags.Add(dialogue);
             }
 
