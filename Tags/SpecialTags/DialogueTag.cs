@@ -11,9 +11,14 @@ namespace VNTags
     {
         public string Dialogue = "";
 
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
             Dialogue = parameters;
+        }
+
+        public string Serialize()
+        {
+            return Dialogue;
         }
 
         public string GetTagID()

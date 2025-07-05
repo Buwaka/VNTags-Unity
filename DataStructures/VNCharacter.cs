@@ -11,7 +11,7 @@ namespace VNTags
     /// please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [System.Serializable]
-    public struct VNCharacter
+    public class VNCharacter
     {
         [Tooltip("Name that will be rendered, case insensitive")]
         public string Name;
@@ -24,7 +24,7 @@ namespace VNTags
         public VNOutfit[] Outfits;
         
         
-        public VNExpression? GetExpressionByIndex(int index)
+        public VNExpression GetExpressionByIndex(int index)
         {
             if (index > 0 && index <= Expressions.Length)
             {
@@ -34,7 +34,7 @@ namespace VNTags
             return null;
         }
         
-        public VNOutfit? GetOutfitByIndex(int index)
+        public VNOutfit GetOutfitByIndex(int index)
         {
             if (index > 0 && index <= Outfits.Length)
             {
@@ -95,7 +95,7 @@ namespace VNTags
     /// Expression gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [System.Serializable]
-    public struct VNExpression
+    public class VNExpression
     {
         public string Name;
         public GameObject Expression;
@@ -106,7 +106,7 @@ namespace VNTags
     /// Outfit gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [System.Serializable]
-    public struct VNOutfit
+    public class VNOutfit
     {
         public string Name;
         public GameObject Outfit;

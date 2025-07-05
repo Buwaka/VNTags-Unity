@@ -4,14 +4,19 @@
     {
         public  VNOutfit Outfit;
         
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
             // todo
         }
 
+        public string Serialize()
+        {
+            return Outfit != null ?  IVNTag.SerializeHelper(GetTagID(), Outfit.Name) : "";
+        }
+
         public string GetTagID()
         {
-            return "Expression";
+            return "Outfit";
         }
 
         public void Execute(VNTagContext context, out bool isFinished)

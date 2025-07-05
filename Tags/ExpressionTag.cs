@@ -2,11 +2,16 @@
 {
     public class ExpressionTag : IVNTag
     {
-        public VNExpression Expression;
+        public VNExpression? Expression;
         
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
             // todo
+        }
+
+        public string Serialize()
+        {
+            return Expression != null ?  IVNTag.SerializeHelper(GetTagID(), Expression.Name) : "";
         }
 
         public string GetTagID()

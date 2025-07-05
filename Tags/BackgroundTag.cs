@@ -4,9 +4,14 @@
     {
         public VNBackground Background;
         
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
             // todo
+        }
+
+        public string Serialize()
+        {
+            throw new System.NotImplementedException();
         }
 
         public string GetTagID()

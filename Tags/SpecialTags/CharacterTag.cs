@@ -10,17 +10,22 @@ namespace VNTags
     public class CharacterTag : IVNTag
     {
         public string RawString = "";
-        public VNCharacter? Character;
+        public VNCharacter Character;
 
-        public void Init(string Name, VNTagLineContext context)
+        public void Deserialize(string name, VNTagLineContext context)
         {
-            RawString = Name;
-            Character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(Name);
+            RawString = name;
+            Character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(name);
 
-            if (!Character.HasValue)
+            if (Character == null)
             {
-                Debug.LogError("CharacterTag: Init: Failed to find Character with name '" + Name + "', " + context);
+                Debug.LogError("CharacterTag: Init: Failed to find Character with name '" + name + "', " + context);
             }
+        }
+
+        public string Serialize()
+        {
+            return Character != null ?  IVNTag.SerializeHelper(GetTagID(), Character.Name) : "";
         }
 
         public string GetTagID()
@@ -35,13 +40,13 @@ namespace VNTags
             {
                 Debug.LogError("CharacterTag: Execute: No Character Namebox present in VNTagContext");
             }
-            else if (!Character.HasValue)
+            else if (Character == null)
             {
                 Debug.LogError("CharacterTag: Execute: No Character present in CharacterTag, '" + RawString + "'");
             }
             else
             {
-                context.CharacterNameBox.text = Character.Value.Name;
+                context.CharacterNameBox.text = Character.Name;
             }
             isFinished = true;
         }

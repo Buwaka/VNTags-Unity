@@ -14,9 +14,14 @@ namespace VNTags
         {
         }
 
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
             
+        }
+
+        public string Serialize()
+        {
+            return String.Empty;
         }
 
         public string GetTagID()

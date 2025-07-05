@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = System.Object;
 
 namespace VNTags
 {
@@ -36,8 +37,6 @@ namespace VNTags
 
     public interface IVNTag
     {
-
-        void Init(string parameters, VNTagLineContext context);
         
         /// <summary>
         /// Get the tag ID to search for when parsing, case insensitive
@@ -46,5 +45,14 @@ namespace VNTags
         string GetTagID();
         
         void Execute(VNTagContext context, out bool isFinished);
+        
+        void Deserialize(string parameters, VNTagLineContext context);
+
+        string Serialize();
+
+        protected internal static string SerializeHelper(string tagID, params Object[] parameters)
+        {
+            return "{" + tagID + ";" + string.Join(";", parameters) + "}";
+        }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace VNTags
 {
     // based on markdown
-    public class VNTagParser
+    public class VNTagDeserializer
     {
         
         public static bool isSignificant(string text)
@@ -15,7 +15,8 @@ namespace VNTags
         }
 
         /// <summary>
-        /// The primary function to process pure text into VNTags
+        /// The primary function to process pure text into VNTags,
+        /// note: adds a confirm and EoL tag to the end of every line
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>
@@ -45,13 +46,15 @@ namespace VNTags
             
             return tagQueue;
         }
-        
-        
+
+
         /// <summary>
         /// sub function of Parse(string) where each character will be evaluated,
         /// splitting the line into individual tags
         /// </summary>
         /// <param name="line">A single line of the script</param>
+        /// <param name="lineNumber">Line number in source script, mainly for editor and debugging purposes,
+        /// potentially for choices later on</param>
         /// <returns>a collection of VNTags</returns>
         public static ICollection<IVNTag> ParseLine(string line, int lineNumber)
         {
@@ -76,7 +79,7 @@ namespace VNTags
                 {
                     var CharacterName = line.Substring(start, index - start);
                     CharacterTag cTag = new CharacterTag();
-                    cTag.Init(CharacterName, context);
+                    cTag.Deserialize(CharacterName, context);
                     tags.Add(cTag);
                     start = index + 1;
                     continue;
@@ -90,7 +93,7 @@ namespace VNTags
                     {
                         var RawDialogue = line.Substring(start, index - 1);
                         DialogueTag dialogue = new DialogueTag();
-                        dialogue.Init(RawDialogue, context);
+                        dialogue.Deserialize(RawDialogue, context);
                         tags.Add(dialogue);
                     }
                     
@@ -110,6 +113,7 @@ namespace VNTags
                         var tag = ParseTag(tagString);
                         tags.Add(tag);
                         start = endBracketIndex + 1;
+                        index = endBracketIndex;
                     }
                     continue;
                 }
@@ -119,7 +123,7 @@ namespace VNTags
             if (start < line.Length)
             {
                 DialogueTag dialogue = new DialogueTag();
-                dialogue.Init(line.Substring(start), context);
+                dialogue.Deserialize(line.Substring(start), context);
                 tags.Add(dialogue);
             }
 

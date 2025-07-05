@@ -15,9 +15,15 @@ namespace VNTags
         
         [SerializeField]
         public VNBackground[] Backgrounds;
+        
+        [SerializeField]
+        public VNSound[] SoundEffects;
+        
+        [SerializeField]
+        public VNMusic[] Musics;
 
 
-        public VNCharacter? GetCharacterByNameOrAlias(string CharacterName)
+        public VNCharacter GetCharacterByNameOrAlias(string CharacterName)
         {
             foreach (var character in Characters)
             {
@@ -31,7 +37,7 @@ namespace VNTags
             return null;
         }
         
-        public VNCharacter? GetCharacterByIndex(int index)
+        public VNCharacter GetCharacterByIndex(int index)
         {
             if (index > 0 && index <= Characters.Length)
             {
@@ -91,6 +97,26 @@ namespace VNTags
             for (int i = 0; i < Characters.Length; i++)
             {
                 result[i + 1] = new GUIContent(Characters[i].Name);
+            }
+
+            return result;
+        }
+        
+        /// <summary>
+        /// Is used in the script editor inspector script,
+        /// 0 is always nullValue
+        /// </summary>
+        /// <returns></returns>
+        public GUIContent[] GetBackgroundNamesGUI(string nullValue)
+        {
+            int total = Backgrounds.Length + 1;
+            GUIContent[] result = new GUIContent[total];
+            
+            result[0] = new GUIContent(nullValue);
+            
+            for (int i = 0; i < Backgrounds.Length; i++)
+            {
+                result[i + 1] = new GUIContent(Backgrounds[i].Name);
             }
 
             return result;

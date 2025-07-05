@@ -9,9 +9,14 @@ namespace VNTags
 {
     public class ConfirmTag : IVNTag
     {
-        public void Init(string parameters, VNTagLineContext context)
+        public void Deserialize(string parameters, VNTagLineContext context)
         {
-            throw new NotImplementedException();
+            // todo
+        }
+
+        public string Serialize()
+        {
+            return IVNTag.SerializeHelper(GetTagID());
         }
 
         public string GetTagID()
