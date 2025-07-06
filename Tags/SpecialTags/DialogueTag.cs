@@ -11,9 +11,14 @@ namespace VNTags
     {
         public string Dialogue = "";
 
-        public void Deserialize(string parameters, VNTagLineContext context)
+        public void Deserialize(VNTagLineContext context, params string[] parameters)
         {
-            Dialogue = parameters;
+            if (parameters == null || parameters.Length <= 0)
+            {
+                Debug.LogError("DialogueTag: Deserialize: No parameters provided '" + context + "'");
+                return;
+            }
+            Dialogue = parameters[0];
         }
 
         public string Serialize()

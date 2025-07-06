@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace VNTags
@@ -12,14 +13,20 @@ namespace VNTags
         public string RawString = "";
         public VNCharacter Character;
 
-        public void Deserialize(string name, VNTagLineContext context)
+        public void Deserialize(VNTagLineContext context, params string[] Parameters)
         {
-            RawString = name;
-            Character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(name);
+            if (Parameters == null || Parameters.Length <= 0)
+            {
+                Debug.LogError("CharacterTag: Deserialize: No parameters provided '" + context + "'");
+                return;
+            }
+            
+            RawString = Parameters[0];
+            Character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(Parameters[0]);
 
             if (Character == null)
             {
-                Debug.LogError("CharacterTag: Init: Failed to find Character with name '" + name + "', " + context);
+                Debug.LogError("CharacterTag: Deserialize: Failed to find Character with name '" + Parameters + "', " + context);
             }
         }
 

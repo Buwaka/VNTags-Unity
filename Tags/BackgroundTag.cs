@@ -4,7 +4,7 @@
     {
         public VNBackground Background;
         
-        public void Deserialize(string parameters, VNTagLineContext context)
+        public void Deserialize(VNTagLineContext context, params string[] parameters)
         {
             // todo
         }

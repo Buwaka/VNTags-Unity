@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 
@@ -9,6 +11,11 @@ namespace VNTags
     public class VNTagDeserializer
     {
         
+        /// <summary>
+        /// is the text more than just an empty line
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static bool isSignificant(string text)
         {
             return !string.IsNullOrEmpty(text) && text.Trim(' ').Length > 0;
@@ -79,7 +86,7 @@ namespace VNTags
                 {
                     var CharacterName = line.Substring(start, index - start);
                     CharacterTag cTag = new CharacterTag();
-                    cTag.Deserialize(CharacterName, context);
+                    cTag.Deserialize(context, CharacterName);
                     tags.Add(cTag);
                     start = index + 1;
                     continue;
@@ -93,7 +100,7 @@ namespace VNTags
                     {
                         var RawDialogue = line.Substring(start, index - 1);
                         DialogueTag dialogue = new DialogueTag();
-                        dialogue.Deserialize(RawDialogue, context);
+                        dialogue.Deserialize(context, RawDialogue);
                         tags.Add(dialogue);
                     }
                     
@@ -110,7 +117,7 @@ namespace VNTags
                     {
                         // closing bracket is found, and tag will be parsed
                         var tagString = line.Substring(index + 1, endBracketIndex - index - 1);
-                        var tag = ParseTag(tagString);
+                        var tag = ParseTag(tagString, context);
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
@@ -123,16 +130,91 @@ namespace VNTags
             if (start < line.Length)
             {
                 DialogueTag dialogue = new DialogueTag();
-                dialogue.Deserialize(line.Substring(start), context);
+                dialogue.Deserialize(context, line.Substring(start));
                 tags.Add(dialogue);
             }
 
             return tags;
         }
 
-        public static IVNTag ParseTag(string line)
+        private static Dictionary<string, IVNTag> TagLibrary = InitTagLibrary();
+
+        private static Dictionary<string, IVNTag> InitTagLibrary()
         {
-            //todo
+            Dictionary<string, IVNTag> Out = new Dictionary<string, IVNTag>();
+            
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (typeof(IVNTag).IsAssignableFrom(type) && // Check if the type implements or inherits the interface
+                    type.IsClass && // Ensure it's a class (not an interface itself or a struct)
+                    !type.IsAbstract && // Exclude abstract classes
+                    !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
+                {
+                    var tag = (IVNTag) Activator.CreateInstance(type);
+                    Out.Add(tag.GetTagID(), tag);
+                }
+            }
+
+            return Out;
+        }
+        
+        
+        /// <summary>
+        /// parse string representation of a tag,
+        /// note: do not include the curly brackets {}
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        public static IVNTag ParseTag(string line, VNTagLineContext context)
+        {
+            List<string> tokens = new List<string>();
+
+            int start = 0;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+
+                if (c == '"' && (i + 1) < line.Length)
+                {
+                    var closingQuoteIndex = line.IndexOf("\"", i + 1, StringComparison.OrdinalIgnoreCase);
+                    
+                    // if not closing bracket is found
+                    if (closingQuoteIndex == -1)
+                    {
+                        Debug.LogError("VNTagParser: ParseTag: did not find closing bracket for bracket at position " + i + ", for line '" + line + "'");
+                        continue;
+                    }
+                    tokens.Add(line.Substring(start, closingQuoteIndex - start - 1));
+                    i = closingQuoteIndex;
+                }
+                else if (c == ';')
+                {
+                    tokens.Add(line.Substring(start, i - start - 1));
+                }
+            }
+            
+            if (start < line.Length)
+            {
+                tokens.Add(line.Substring(start));
+            }
+
+            if (tokens.Count > 0)
+            {
+                var tagID = tokens[0];
+
+                if (!TagLibrary.ContainsKey(tagID))
+                {
+                    Debug.LogError("VNTagParser: ParseTag: did not find any tag class with ID '" + tagID + "'");
+                    return null;
+                }
+
+                var tagType = TagLibrary[tagID];
+
+               var newInst = (IVNTag)  Activator.CreateInstance(tagType.GetType());
+               newInst.Deserialize(context, tokens.Skip(1).ToArray());
+               return newInst;
+            }
+
             return null;
         }
 

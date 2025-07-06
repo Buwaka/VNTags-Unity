@@ -46,7 +46,7 @@ namespace VNTags
         
         void Execute(VNTagContext context, out bool isFinished);
         
-        void Deserialize(string parameters, VNTagLineContext context);
+        void Deserialize(VNTagLineContext context, params string[] parameters);
 
         string Serialize();
 
