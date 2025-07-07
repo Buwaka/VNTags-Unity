@@ -65,7 +65,7 @@ namespace VNTags
         /// <returns>a collection of VNTags</returns>
         public static ICollection<IVNTag> ParseLine(string line, int lineNumber)
         {
-            VNTagLineContext context = new VNTagLineContext(lineNumber, line);
+            VNTagDeserializationContext context = new VNTagDeserializationContext(lineNumber, line);
             
             List<IVNTag> tags = new List<IVNTag>();
 
@@ -96,9 +96,9 @@ namespace VNTags
                 if (c == '{')
                 {
                     // process dialogue before tag
-                    if (index > 0)
+                    if (index > start)
                     {
-                        var RawDialogue = line.Substring(start, index - 1);
+                        var RawDialogue = line.Substring(start, index);
                         DialogueTag dialogue = new DialogueTag();
                         dialogue.Deserialize(context, RawDialogue);
                         tags.Add(dialogue);
@@ -116,13 +116,12 @@ namespace VNTags
                     else
                     {
                         // closing bracket is found, and tag will be parsed
-                        var tagString = line.Substring(index + 1, endBracketIndex - index - 1);
+                        var tagString = line.Substring(index + 1, (endBracketIndex - 1) - index);
                         var tag = ParseTag(tagString, context);
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
                     }
-                    continue;
                 }
             }
 
@@ -165,7 +164,7 @@ namespace VNTags
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        public static IVNTag ParseTag(string line, VNTagLineContext context)
+        public static IVNTag ParseTag(string line, VNTagDeserializationContext context)
         {
             List<string> tokens = new List<string>();
 
@@ -184,12 +183,14 @@ namespace VNTags
                         Debug.LogError("VNTagParser: ParseTag: did not find closing bracket for bracket at position " + i + ", for line '" + line + "'");
                         continue;
                     }
-                    tokens.Add(line.Substring(start, closingQuoteIndex - start - 1));
+                    tokens.Add(line.Substring(start, closingQuoteIndex - start));
                     i = closingQuoteIndex;
+                    start = i + 1;
                 }
                 else if (c == ';')
                 {
-                    tokens.Add(line.Substring(start, i - start - 1));
+                    tokens.Add(line.Substring(start, i - start));
+                    start = i + 1;
                 }
             }
             

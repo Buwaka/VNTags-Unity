@@ -17,12 +17,12 @@ namespace VNTags
         public GameObject DialogueWindow;
     }
 
-    public struct VNTagLineContext
+    public struct VNTagDeserializationContext
     {
         public int LineNumber;
         public string FullLine;
 
-        public VNTagLineContext(int num, string line)
+        public VNTagDeserializationContext(int num, string line)
         {
             LineNumber = num;
             FullLine = line;
@@ -32,6 +32,29 @@ namespace VNTags
         {
             return LineNumber + ": " + FullLine;
         }
+    }
+    
+    public struct VNTagSerializationContext
+    {
+        public ICollection<IVNTag> Tags;
+        public VNTagSerializationContext(ICollection<IVNTag> tags)
+        {
+            Tags = tags;
+        }
+
+        public VNCharacter GetMainCharacter()
+        {
+            foreach (var tag in Tags)
+            {
+                if (tag is CharacterTag cTag)
+                {
+                    return cTag.Character;
+                }
+            }
+
+            return null;
+        }
+        
     }
 
 
@@ -45,13 +68,26 @@ namespace VNTags
         string GetTagID();
         
         void Execute(VNTagContext context, out bool isFinished);
-        
-        void Deserialize(VNTagLineContext context, params string[] parameters);
 
-        string Serialize();
+        protected internal static bool ExecuteHelper(bool? result)
+        {
+            if (!result.HasValue || result.Value)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        void Deserialize(VNTagDeserializationContext context, params string[] parameters);
+
+        string Serialize(VNTagSerializationContext context);
 
         protected internal static string SerializeHelper(string tagID, params Object[] parameters)
         {
+            // todo put string values in quotes
             return "{" + tagID + ";" + string.Join(";", parameters) + "}";
         }
     }

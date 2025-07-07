@@ -2,14 +2,16 @@
 {
     public class BackgroundTag : IVNTag
     {
-        public VNBackground Background;
-        
-        public void Deserialize(VNTagLineContext context, params string[] parameters)
+        private VNBackground _background;
+
+        public VNBackground Background => _background;
+
+        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             // todo
         }
 
-        public string Serialize()
+        public string Serialize(VNTagSerializationContext context)
         {
             throw new System.NotImplementedException();
         }

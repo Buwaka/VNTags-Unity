@@ -14,12 +14,12 @@ namespace VNTags
         {
         }
 
-        public void Deserialize(VNTagLineContext context, params string[] parameters)
+        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             
         }
 
-        public string Serialize()
+        public string Serialize(VNTagSerializationContext context)
         {
             return String.Empty;
         }

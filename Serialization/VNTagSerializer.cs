@@ -5,11 +5,10 @@ namespace VNTags
 {
     public class VNTagSerializer
     {
-
-
         public static string SerializeLine(ICollection<IVNTag> tags)
         {
             StringBuilder outLine = new StringBuilder("");
+            VNTagSerializationContext context = new VNTagSerializationContext(tags);
             
             CharacterTag mainCharacter = null;
 
@@ -30,7 +29,7 @@ namespace VNTags
                 }
                 else if (tag != null)
                 {
-                    outLine.Append(tag.Serialize());
+                    outLine.Append(tag.Serialize(context));
                 }
             }
 
@@ -46,7 +45,7 @@ namespace VNTags
                 do
                 {
                     IVNTag tag = index.Current;
-                    outLine.Append(tag.Serialize());
+                    outLine.Append(tag.Serialize(context));
                 }while (index.MoveNext());
             }
             

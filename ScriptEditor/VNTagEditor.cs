@@ -133,8 +133,8 @@ namespace VNTags
         
         public void InvalidateCharacter()
         {
-            ExpressionChangeTag.Expression = null;
-            OutfitChangeTag.Outfit = null;
+            ExpressionChangeTag.GetOutfitRef() = null;
+            OutfitChangeTag.GetOutfitRef() = null;
             ExpressionIndex = 0;
             OutfitIndex = 0;
             Invalidate();
@@ -157,22 +157,22 @@ namespace VNTags
         {
             if (_characterChangeTag != null && _characterChangeTag.Character != null)
             {
-                var names = VNTagsConfig.GetConfig().GetCharacterNamesGUI("");
-                for (int i = 0; i < names.Length; i++)
+                var characterNames = VNTagsConfig.GetConfig().GetCharacterNamesGUI("");
+                for (int i = 0; i < characterNames.Length; i++)
                 {
-                    if (names[i].text == _characterChangeTag.Character.Name)
+                    if (characterNames[i].text.Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
                     {
                         NameIndex = i;
                         break;
                     }
                 }
 
-
+                var expressionNames = _characterChangeTag.Character.GetExpressionNamesGUI("");
                 if (_expressionChangeTag != null && _expressionChangeTag.Expression != null)
                 {
-                    for (int i = 0; i < _characterChangeTag.Character.Expressions.Length; i++)
+                    for (int i = 0; i < expressionNames.Length; i++)
                     {
-                        if (_characterChangeTag.Character.Expressions[i].Name == _expressionChangeTag.Expression.Name)
+                        if (expressionNames[i].text.Equals(_expressionChangeTag.Expression.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             ExpressionIndex = i;
                             break;
@@ -180,11 +180,12 @@ namespace VNTags
                     }
                 }
 
+                var outfitNames = _characterChangeTag.Character.GetOutfitNamesGUI("");
                 if (_outfitChangeTag != null && _outfitChangeTag.Outfit != null)
                 {
-                    for (int i = 0; i < _characterChangeTag.Character.Outfits.Length; i++)
+                    for (int i = 0; i < outfitNames.Length; i++)
                     {
-                        if (_characterChangeTag.Character.Outfits[i].Name == _outfitChangeTag.Outfit.Name)
+                        if (outfitNames[i].text.Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             OutfitIndex = i;
                             break;
@@ -195,6 +196,7 @@ namespace VNTags
 
             if (_backgroundChangeTag != null)
             {
+                //todo
                 var backgrounds = VNTagsConfig.GetConfig().Backgrounds;
                 for (int i = 0; i < backgrounds.Length; i++)
                 {
@@ -363,14 +365,14 @@ namespace VNTags
             //dialogue
             foreach (var dialogueTag in line.DialogueTags)
             {
-                dialogueTag.Dialogue = EditorGUILayout.TextArea(dialogueTag.Dialogue);
+                dialogueTag.SetDialogue(EditorGUILayout.TextArea(dialogueTag.Dialogue));
             }
             
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             // Name
             RenderPopup("Character", VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator"),
-                ref line.NameIndex, VNTagsConfig.GetConfig().GetCharacterByIndex, ref line.CharacterChangeTag.Character,
+                ref line.NameIndex, VNTagsConfig.GetConfig().GetCharacterByIndex, ref line.CharacterChangeTag.GetCharacterRef(),
                 line.InvalidateCharacter);
             
             // EditorGUILayout.PrefixLabel("Character");
@@ -407,7 +409,7 @@ namespace VNTags
                 // Expression
                 EditorGUILayout.BeginVertical();
                 RenderPopup("Expression", line.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
-                    ref line.ExpressionIndex, line.CharacterChangeTag.Character.GetExpressionByIndex, ref line.ExpressionChangeTag.Expression,
+                    ref line.ExpressionIndex, line.CharacterChangeTag.Character.GetExpressionByIndex, ref line.ExpressionChangeTag.GetOutfitRef(),
                     line.Invalidate);
                 
                 // EditorGUILayout.PrefixLabel("Expression");
@@ -430,7 +432,7 @@ namespace VNTags
                 //Outfit
                 EditorGUILayout.BeginVertical();
                 RenderPopup("Outfit", line.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
-                    ref line.OutfitIndex, line.CharacterChangeTag.Character.GetOutfitByIndex, ref line.OutfitChangeTag.Outfit,
+                    ref line.OutfitIndex, line.CharacterChangeTag.Character.GetOutfitByIndex, ref line.OutfitChangeTag.GetOutfitRef(),
                     line.Invalidate);
                 
                 // EditorGUILayout.PrefixLabel("Outfit");

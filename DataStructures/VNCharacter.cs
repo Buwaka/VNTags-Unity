@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags
@@ -34,11 +35,39 @@ namespace VNTags
             return null;
         }
         
+        public VNExpression GetExpressionByName(string name)
+        {
+            foreach (var expression in Expressions)
+            {
+                if (expression != null &&
+                    String.Equals(expression.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return expression;
+                }
+            }
+
+            return null;
+        }
+        
         public VNOutfit GetOutfitByIndex(int index)
         {
             if (index > 0 && index <= Outfits.Length)
             {
                 return Outfits[index - 1];
+            }
+
+            return null;
+        }
+        
+        public VNOutfit GetOutfitByName(string name)
+        {
+            foreach (var outfit in Outfits)
+            {
+                if (outfit != null &&
+                    String.Equals(outfit.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return outfit;
+                }
             }
 
             return null;
@@ -87,7 +116,6 @@ namespace VNTags
             return result;
         }
 #endif
-
     }
 
     /// <summary>
