@@ -12,7 +12,7 @@ namespace VNTags
 
     public struct VNTagContext
     {
-        public Text CharacterNameBox;
+        public TMPro.TMP_Text CharacterNameBox;
         public TMPro.TMP_Text TextBox;
         public GameObject DialogueWindow;
     }
