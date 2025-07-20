@@ -27,9 +27,9 @@ namespace VNTags
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>
-        public static Queue<IVNTag> Parse(string text)
+        public static LinkedList<IVNTag> Parse(string text)
         {
-            Queue<IVNTag> tagQueue = new Queue<IVNTag>();
+            LinkedList<IVNTag> tagQueue = new LinkedList<IVNTag>();
             var lines = text.Split(
                 new string[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None
@@ -45,10 +45,10 @@ namespace VNTags
                 
                 foreach (var tag in ParseLine(line, lineIndex + 1))
                 {
-                    tagQueue.Enqueue(tag);
+                    tagQueue.AddLast(tag);
                 }
-                tagQueue.Enqueue(new ConfirmTag());
-                tagQueue.Enqueue(new EndOfLineTag());
+                tagQueue.AddLast(new ConfirmTag());
+                tagQueue.AddLast(new EndOfLineTag());
             }
             
             return tagQueue;

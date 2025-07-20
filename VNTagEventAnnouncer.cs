@@ -20,5 +20,6 @@ namespace VNTags
         public static DialogueHandler onDialogueChange;
         public static ExpressionHandler onExpressionChange;
         public static OutfitHandler onOutfitChange;
+        public static ChoiceHandler onChoice;
     }
 }

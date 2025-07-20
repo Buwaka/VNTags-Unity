@@ -21,6 +21,9 @@ namespace VNTags
         
         [SerializeField]
         public VNMusic[] Musics;
+        
+        [SerializeField]
+        public VNScene[] Scenes;
 
 
         public VNCharacter GetCharacterByNameOrAlias(string CharacterName)

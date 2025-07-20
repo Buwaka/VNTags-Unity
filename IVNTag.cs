@@ -10,6 +10,7 @@ using Object = System.Object;
 namespace VNTags
 {
 
+    // todo honestly this should be reworked, is way too game dependant
     public struct VNTagContext
     {
         public TMPro.TMP_Text CharacterNameBox;
