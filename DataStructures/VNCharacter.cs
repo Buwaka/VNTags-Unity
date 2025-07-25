@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utility;
 
 namespace VNTags
 {
@@ -18,11 +19,13 @@ namespace VNTags
         public string Name;
         [Tooltip("Alternative names for writing convenience, case insensitive")]
         public string[] Alias;
-        public GameObject Body;
-        [Tooltip("Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object")]
+        [Tooltip("Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
         public VNExpression[] Expressions;
-        [Tooltip("Name for the expression, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object")]
+        [Tooltip("Name for the Outfit, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
         public VNOutfit[] Outfits;
+
+        private Pair<VNOutfit, GameObject> _currentOutfit;
+        private Pair<VNExpression, GameObject> _currentExpression;
         
         
         public VNExpression GetExpressionByIndex(int index)
@@ -71,6 +74,38 @@ namespace VNTags
             }
 
             return null;
+        }
+        
+        public void Init(GameObject parentObject)
+        {
+            if (parentObject == null)
+            {
+                Debug.LogError("VNCharacter: Init: provided parent is null, exiting");
+                return;
+            }
+
+            if (Expressions.Length > 0 && Expressions[0] != null)
+            {
+                VNExpression defaultExpression = Expressions[0];
+                _currentExpression = new Pair<VNExpression, GameObject>(defaultExpression,
+                    GameObject.Instantiate(defaultExpression.Expression, parentObject.transform));
+            }
+            else
+            {
+                Debug.LogWarning("VNCharacter: Init: This character has no expressions or the first expression is null");
+            }
+            
+            if (Outfits.Length > 0 && Outfits[0] != null)
+            {
+                VNOutfit defaultOutfit = Outfits[0];
+                _currentOutfit = new Pair<VNOutfit, GameObject>(defaultOutfit,
+                    GameObject.Instantiate(defaultOutfit.Outfit, parentObject.transform));
+            }
+            else
+            {
+                Debug.LogWarning("VNCharacter: Init: This character has no outfits or the first outfit is null");
+            }
+            
         }
 
 
