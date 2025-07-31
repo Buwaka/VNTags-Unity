@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VNTags
 {
     public class EndOfLineTag : IVNTag
     {
-
-        public EndOfLineTag()
-        {
-        }
-
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
-        {
-            
-        }
+        public void Deserialize(VNTagDeserializationContext context, params string[] parameters) { }
 
         public string Serialize(VNTagSerializationContext context)
         {
-            return String.Empty;
+            return string.Empty;
         }
 
         public string GetTagID()
@@ -32,7 +19,7 @@ namespace VNTags
 
         public void Execute(VNTagContext context, out bool isFinished)
         {
-            if(context.TextBox != null)
+            if (context.TextBox != null)
             {
                 context.TextBox.text = "";
             }
@@ -40,6 +27,7 @@ namespace VNTags
             {
                 Debug.LogError("DialogueTag: Execute: TextWindow in VNTagContext is null");
             }
+
             isFinished = true;
         }
     }

@@ -1,10 +1,10 @@
-﻿namespace VNTags
+﻿using System;
+
+namespace VNTags
 {
     public class BackgroundTag : IVNTag
     {
-        private VNBackground _background;
-
-        public VNBackground Background => _background;
+        public VNBackground Background { get; }
 
         public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
@@ -13,7 +13,7 @@
 
         public string Serialize(VNTagSerializationContext context)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public string GetTagID()

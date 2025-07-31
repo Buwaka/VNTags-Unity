@@ -1,5 +1,4 @@
 ﻿using Eflatun.SceneReference;
-using UnityEditor;
 using UnityEngine;
 
 namespace VNTags
@@ -7,8 +6,8 @@ namespace VNTags
     public class VNScene
     {
         // todo
-        public string Name;
-        public Texture Thumbnail;
+        public string         Name;
         public SceneReference Scene;
+        public Texture        Thumbnail;
     }
 }

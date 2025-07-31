@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Windows;
 using File = System.IO.File;
+using Object = UnityEngine.Object;
 
 #if UNITY_EDITOR
 
@@ -15,82 +13,38 @@ namespace VNTags
 {
     public class VNTagEditLine
     {
-        public string RawLine;
+        private readonly LinkedList<IVNTag> Tags;
+        private          BackgroundTag      _backgroundChangeTag;
+
+
+        private CharacterTag      _characterChangeTag;
+        private ExpressionTag     _expressionChangeTag;
+        private OutfitTag         _outfitChangeTag;
+        public  int               BackgroundIndex;
+        public  int               BGMIndex     = 0;
+        public  List<DialogueTag> DialogueTags = new();
+        public  int               ExpressionIndex;
+        public  bool              Foldout;
+
+
+        public int    NameIndex;
+        public int    OutfitIndex;
         public string Preview = "";
+        public string RawLine;
         public string SerializedPreview = "";
-        public List<DialogueTag> DialogueTags = new List<DialogueTag>();
-
-        
-        private CharacterTag _characterChangeTag = null;
-        private ExpressionTag _expressionChangeTag = null;
-        private OutfitTag _outfitChangeTag = null;
-        private BackgroundTag _backgroundChangeTag = null;
-        public CharacterTag CharacterChangeTag
-        {
-            get
-            {
-                if (_characterChangeTag == null)
-                {
-                    _characterChangeTag = new CharacterTag();
-                    Tags.AddFirst(_characterChangeTag);
-                }
-                return _characterChangeTag;
-            }
-        }
-
-        public ExpressionTag ExpressionChangeTag
-        {
-            get             
-            {
-                if (_expressionChangeTag == null)
-                {
-                    _expressionChangeTag = new ExpressionTag();
-                    Tags.AddFirst(_expressionChangeTag);
-                }
-                return _expressionChangeTag;
-            }
-        }
-
-        public OutfitTag OutfitChangeTag
-        {
-            get             
-            {
-                if (_outfitChangeTag == null)
-                {
-                    _outfitChangeTag = new OutfitTag();
-                    Tags.AddFirst(_outfitChangeTag);
-                }
-                return _outfitChangeTag;
-            }
-        }
-
-        public BackgroundTag BackgroundChangeTag
-        {
-            get 
-            {
-                if (_backgroundChangeTag == null)
-                {
-                    _backgroundChangeTag = new BackgroundTag();
-                    Tags.AddFirst(_backgroundChangeTag);
-                }
-                return _backgroundChangeTag;
-            }
-        }
-
-        
-        LinkedList<IVNTag> Tags = null;
+        public int    SFXIndex          = 0;
 
         public VNTagEditLine(string rawLine, int lineNumber)
         {
             Preview = lineNumber + ": ";
             RawLine = rawLine;
-            Tags = new LinkedList<IVNTag>(VNTagDeserializer.ParseLine(RawLine, lineNumber));
+            Tags    = new LinkedList<IVNTag>(VNTagDeserializer.ParseLine(RawLine, lineNumber));
 
 
             // filter out starter tags
-            foreach (var tag in Tags)
+            foreach (IVNTag tag in Tags)
             {
-                if (tag is CharacterTag characterTag && this._characterChangeTag == null)
+                if (tag is CharacterTag characterTag && (_characterChangeTag == null))
                 {
                     _characterChangeTag = characterTag;
                     if (_characterChangeTag.Character != null)
@@ -115,13 +69,13 @@ namespace VNTags
                     break;
                 }
             }
-            
+
             // get all the dialogue tags
-            foreach (var tag in Tags)
+            foreach (IVNTag tag in Tags)
             {
                 if (tag is DialogueTag)
                 {
-                    DialogueTag dTag = (DialogueTag)tag;
+                    var dTag = (DialogueTag)tag;
                     Preview += dTag.Dialogue;
                     DialogueTags.Add(dTag);
                 }
@@ -130,37 +84,87 @@ namespace VNTags
             SetIndieces();
             Invalidate();
         }
-        
+
+        public CharacterTag CharacterChangeTag
+        {
+            get
+            {
+                if (_characterChangeTag == null)
+                {
+                    _characterChangeTag = new CharacterTag();
+                    Tags.AddFirst(_characterChangeTag);
+                }
+
+                return _characterChangeTag;
+            }
+        }
+
+        public ExpressionTag ExpressionChangeTag
+        {
+            get
+            {
+                if (_expressionChangeTag == null)
+                {
+                    _expressionChangeTag = new ExpressionTag();
+                    Tags.AddFirst(_expressionChangeTag);
+                }
+
+                return _expressionChangeTag;
+            }
+        }
+
+        public OutfitTag OutfitChangeTag
+        {
+            get
+            {
+                if (_outfitChangeTag == null)
+                {
+                    _outfitChangeTag = new OutfitTag();
+                    Tags.AddFirst(_outfitChangeTag);
+                }
+
+                return _outfitChangeTag;
+            }
+        }
+
+        public BackgroundTag BackgroundChangeTag
+        {
+            get
+            {
+                if (_backgroundChangeTag == null)
+                {
+                    _backgroundChangeTag = new BackgroundTag();
+                    Tags.AddFirst(_backgroundChangeTag);
+                }
+
+                return _backgroundChangeTag;
+            }
+        }
+
         public void InvalidateCharacter()
         {
             ExpressionChangeTag.GetOutfitRef() = null;
-            OutfitChangeTag.GetOutfitRef() = null;
-            ExpressionIndex = 0;
-            OutfitIndex = 0;
+            OutfitChangeTag.GetOutfitRef()     = null;
+            ExpressionIndex                    = 0;
+            OutfitIndex                        = 0;
             Invalidate();
         }
-        
+
         public void Invalidate()
         {
             SerializedPreview = VNTagSerializer.SerializeLine(Tags);
         }
 
-        
-        public int NameIndex = 0;
-        public int ExpressionIndex = 0;
-        public int OutfitIndex = 0;
-        public int BackgroundIndex = 0;
-        public int SFXIndex = 0;
-        public int BGMIndex = 0;
-        public bool Foldout = false;
         public void SetIndieces()
         {
-            if (_characterChangeTag != null && _characterChangeTag.Character != null)
+            if ((_characterChangeTag != null) && (_characterChangeTag.Character != null))
             {
                 var characterNames = VNTagsConfig.GetConfig().GetCharacterNamesGUI("");
                 for (int i = 0; i < characterNames.Length; i++)
                 {
-                    if (characterNames[i].text.Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
+                    if (characterNames[i]
+                       .text
+                       .Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
                     {
                         NameIndex = i;
                         break;
@@ -168,11 +172,13 @@ namespace VNTags
                 }
 
                 var expressionNames = _characterChangeTag.Character.GetExpressionNamesGUI("");
-                if (_expressionChangeTag != null && _expressionChangeTag.Expression != null)
+                if ((_expressionChangeTag != null) && (_expressionChangeTag.Expression != null))
                 {
                     for (int i = 0; i < expressionNames.Length; i++)
                     {
-                        if (expressionNames[i].text.Equals(_expressionChangeTag.Expression.Name, StringComparison.OrdinalIgnoreCase))
+                        if (expressionNames[i]
+                           .text.Equals(_expressionChangeTag.Expression.Name,
+                                        StringComparison.OrdinalIgnoreCase))
                         {
                             ExpressionIndex = i;
                             break;
@@ -181,11 +187,13 @@ namespace VNTags
                 }
 
                 var outfitNames = _characterChangeTag.Character.GetOutfitNamesGUI("");
-                if (_outfitChangeTag != null && _outfitChangeTag.Outfit != null)
+                if ((_outfitChangeTag != null) && (_outfitChangeTag.Outfit != null))
                 {
                     for (int i = 0; i < outfitNames.Length; i++)
                     {
-                        if (outfitNames[i].text.Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
+                        if (outfitNames[i]
+                           .text
+                           .Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             OutfitIndex = i;
                             break;
@@ -207,26 +215,34 @@ namespace VNTags
                     }
                 }
             }
-
         }
 
         public string Serialize()
         {
             return VNTagSerializer.SerializeLine(Tags);
         }
-
-
     }
 
     [CustomEditor(typeof(TextAsset))]
     public class VNTagEditor : Editor
     {
-        bool isTargetFile = true;
+        private static readonly Dictionary<Object, VNTagEditLine[]> EditingLines = new();
+        private                 bool                                isTargetFile = true;
 
-        static Dictionary<UnityEngine.Object, VNTagEditLine[]> EditingLines = new Dictionary<UnityEngine.Object, VNTagEditLine[]>();
-        
-
-
+        private void OnEnable()
+        {
+            string path = AssetDatabase.GetAssetPath(target);
+            // Check if md file
+            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            {
+                isTargetFile = true;
+                LoadFile();
+            }
+            else
+            {
+                isTargetFile = false;
+            }
+        }
 
 
         public void LoadFile(bool reload = false)
@@ -234,11 +250,11 @@ namespace VNTags
             if (target is TextAsset)
             {
                 string data = ((TextAsset)target).text;
-                
-                var lines = data.Split(
-                    new string[] { "\r\n", "\r", "\n" },
-                    StringSplitOptions.None
-                );
+
+                string[] lines = data.Split(
+                                            new[] { "\r\n", "\r", "\n" },
+                                            StringSplitOptions.None
+                                           );
 
                 VNTagEditLine[] editLines;
 
@@ -248,34 +264,18 @@ namespace VNTags
                 }
                 else
                 {
-                    editLines = new VNTagEditLine[lines.Length];
+                    editLines            = new VNTagEditLine[lines.Length];
                     EditingLines[target] = editLines;
                 }
 
-                for(var index = 0; index < lines.Length; index++)
+                for (int index = 0; index < lines.Length; index++)
                 {
-                    var line = lines[index];
+                    string line = lines[index];
                     if (VNTagDeserializer.isSignificant(line))
                     {
                         editLines[index] = new VNTagEditLine(line, index + 1);
                     }
                 }
-                
-            }
-        }
-        
-        private void OnEnable()
-        {
-            var path = AssetDatabase.GetAssetPath(target);
-            // Check if md file
-            if (path.EndsWith(".md", System.StringComparison.OrdinalIgnoreCase))
-            {
-                isTargetFile = true;
-                LoadFile();
-            }
-            else
-            {
-                isTargetFile = false;
             }
         }
 
@@ -300,13 +300,14 @@ namespace VNTags
             {
                 SerializeLines();
             }
+
             GUILayout.FlexibleSpace();
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            
+
             EditorGUILayout.Separator();
 
-            foreach (var line in EditingLines[target])
+            foreach (VNTagEditLine line in EditingLines[target])
             {
                 if (line != null)
                 {
@@ -316,6 +317,7 @@ namespace VNTags
                     {
                         RenderLine(line);
                     }
+
                     // EditorGUILayout.EndFoldoutHeaderGroup();
                     EditorGUILayout.EndToggleGroup();
                     EditorGUILayout.Separator();
@@ -323,7 +325,12 @@ namespace VNTags
             }
         }
 
-        private void RenderPopup<T>(string label, GUIContent[] options, ref int index, Func<int, T>fetcher, ref T target, Action post)
+        private void RenderPopup<T>(string       label,
+                                    GUIContent[] options,
+                                    ref int      index,
+                                    Func<int, T> fetcher,
+                                    ref T        target,
+                                    Action       post)
         {
             EditorGUILayout.PrefixLabel(label);
 
@@ -334,47 +341,53 @@ namespace VNTags
             {
                 return;
             }
-            
+
             T temp = fetcher(index);
             if (temp != null)
             {
                 target = temp;
             }
-            else if(index != 0)
+            else if (index != 0)
             {
-                Debug.LogError("VNTagEditor: RenderPopup: Option has no value, '" + options[index] + "' with index " + index);
+                Debug.LogError("VNTagEditor: RenderPopup: Option has no value, '"
+                             + options[index]
+                             + "' with index "
+                             + index);
             }
             else
             {
-                target = default(T);
+                target = default;
             }
+
             post();
         }
 
         private void RenderEmptyPopup(string label)
         {
-            GUIContent[] nullVal = Array.Empty<GUIContent>();
+            var nullVal = Array.Empty<GUIContent>();
             EditorGUILayout.PrefixLabel(label);
             EditorGUILayout.Popup(0, nullVal);
         }
 
-        
 
         private void RenderLine(VNTagEditLine line)
         {
             //dialogue
-            foreach (var dialogueTag in line.DialogueTags)
+            foreach (DialogueTag dialogueTag in line.DialogueTags)
             {
                 dialogueTag.SetDialogue(EditorGUILayout.TextArea(dialogueTag.Dialogue));
             }
-            
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             // Name
-            RenderPopup("Character", VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator"),
-                ref line.NameIndex, VNTagsConfig.GetConfig().GetCharacterByIndex, ref line.CharacterChangeTag.GetCharacterRef(),
-                line.InvalidateCharacter);
-            
+            RenderPopup("Character",
+                        VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator"),
+                        ref line.NameIndex,
+                        VNTagsConfig.GetConfig().GetCharacterByIndex,
+                        ref line.CharacterChangeTag.GetCharacterRef(),
+                        line.InvalidateCharacter);
+
             // EditorGUILayout.PrefixLabel("Character");
             // GUIContent[] names = VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator");
             // line.NameIndex = EditorGUILayout.Popup(line.NameIndex, names);
@@ -390,7 +403,7 @@ namespace VNTags
             // }
 
             EditorGUILayout.EndVertical();
-            
+
             EditorGUI.BeginDisabledGroup(line.CharacterChangeTag.Character == null);
             if (line.CharacterChangeTag.Character == null)
             {
@@ -398,7 +411,7 @@ namespace VNTags
                 EditorGUILayout.BeginVertical();
                 RenderEmptyPopup("Expression");
                 EditorGUILayout.EndVertical();
-                
+
                 //Outfit
                 EditorGUILayout.BeginVertical();
                 RenderEmptyPopup("Outfit");
@@ -408,10 +421,13 @@ namespace VNTags
             {
                 // Expression
                 EditorGUILayout.BeginVertical();
-                RenderPopup("Expression", line.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
-                    ref line.ExpressionIndex, line.CharacterChangeTag.Character.GetExpressionByIndex, ref line.ExpressionChangeTag.GetOutfitRef(),
-                    line.Invalidate);
-                
+                RenderPopup("Expression",
+                            line.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
+                            ref line.ExpressionIndex,
+                            line.CharacterChangeTag.Character.GetExpressionByIndex,
+                            ref line.ExpressionChangeTag.GetOutfitRef(),
+                            line.Invalidate);
+
                 // EditorGUILayout.PrefixLabel("Expression");
                 // var expressions = line.CharacterChangeTag.Character.Value.GetExpressionNamesGUI("No Expression Change");
                 // line.ExpressionIndex = EditorGUILayout.Popup(line.ExpressionIndex, expressions);
@@ -431,10 +447,13 @@ namespace VNTags
 
                 //Outfit
                 EditorGUILayout.BeginVertical();
-                RenderPopup("Outfit", line.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
-                    ref line.OutfitIndex, line.CharacterChangeTag.Character.GetOutfitByIndex, ref line.OutfitChangeTag.GetOutfitRef(),
-                    line.Invalidate);
-                
+                RenderPopup("Outfit",
+                            line.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
+                            ref line.OutfitIndex,
+                            line.CharacterChangeTag.Character.GetOutfitByIndex,
+                            ref line.OutfitChangeTag.GetOutfitRef(),
+                            line.Invalidate);
+
                 // EditorGUILayout.PrefixLabel("Outfit");
                 // var outfits = line.CharacterChangeTag.Character.Value.GetOutfitNamesGUI("No Outfit Change");
                 // line.OutfitIndex = EditorGUILayout.Popup(line.OutfitIndex, outfits);
@@ -451,21 +470,24 @@ namespace VNTags
 
                 EditorGUILayout.EndVertical();
             }
+
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.EndHorizontal();
 
-            
+
             EditorGUILayout.BeginHorizontal();
-            
+
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PrefixLabel("Background");
-            line.BackgroundIndex = EditorGUILayout.Popup(line.BackgroundIndex, VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background Change"));
+            line.BackgroundIndex = EditorGUILayout.Popup(line.BackgroundIndex,
+                                                         VNTagsConfig.GetConfig()
+                                                                     .GetBackgroundNamesGUI("No Background Change"));
             EditorGUILayout.EndVertical();
-            
+
             EditorGUILayout.BeginVertical();
             RenderEmptyPopup("Sound Effect");
             EditorGUILayout.EndVertical();
-            
+
             EditorGUILayout.BeginVertical();
             RenderEmptyPopup("Music");
             EditorGUILayout.EndVertical();
@@ -477,18 +499,18 @@ namespace VNTags
             // EditorGUI.EndDisabledGroup();
         }
 
-        void SerializeLines()
+        private void SerializeLines()
         {
-            var path = AssetDatabase.GetAssetPath(target);
-            
+            string path = AssetDatabase.GetAssetPath(target);
+
             if (!string.IsNullOrEmpty(path) && EditingLines.ContainsKey(target))
             {
                 try
                 {
                     // Get the content from the SerializedProperty
-                    var lines = EditingLines[target];
-                    StringBuilder script = new StringBuilder();
-                    foreach (var line in lines)
+                    var lines  = EditingLines[target];
+                    var script = new StringBuilder();
+                    foreach (VNTagEditLine line in lines)
                     {
                         if (line == null)
                         {
@@ -496,7 +518,7 @@ namespace VNTags
                         }
                         else
                         {
-                            script.AppendLine(line.Serialize()); 
+                            script.AppendLine(line.Serialize());
                         }
                     }
 
@@ -516,31 +538,26 @@ namespace VNTags
             }
             else
             {
-                Debug.LogError($"Could not get asset path for the target or script has no contents");
+                Debug.LogError("Could not get asset path for the target or script has no contents");
             }
         }
-        
-        
-        
 
-    // [MenuItem("Assets/Edit VNTags Script",false,10)]
-    // static void VNTagsContextMenu(MenuCommand command)
-    // {
-    //     Rigidbody body = (Rigidbody)command.context;
-    //     body.mass = body.mass * 2;
-    //     Debug.Log("Doubled Rigidbody's Mass to " + body.mass + " from Context Menu.");
-    //
-    // }
-    //
-    // [MenuItem("Assets/Edit VNTags Script",true,10)]
-    // static bool VNTagsContextMenu_Validate()
-    // {
-    //     return Selection.activeObject.GetType() == typeof(UnityEngine.TextAsset);
-    // }
 
-    
-    
-}
+        // [MenuItem("Assets/Edit VNTags Script",false,10)]
+        // static void VNTagsContextMenu(MenuCommand command)
+        // {
+        //     Rigidbody body = (Rigidbody)command.context;
+        //     body.mass = body.mass * 2;
+        //     Debug.Log("Doubled Rigidbody's Mass to " + body.mass + " from Context Menu.");
+        //
+        // }
+        //
+        // [MenuItem("Assets/Edit VNTags Script",true,10)]
+        // static bool VNTagsContextMenu_Validate()
+        // {
+        //     return Selection.activeObject.GetType() == typeof(UnityEngine.TextAsset);
+        // }
+    }
 }
 
 #endif

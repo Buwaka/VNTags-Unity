@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Object = System.Object;
 
 namespace VNTags
 {
-
     // todo honestly this should be reworked, is way too game dependant
     public struct VNTagContext
     {
-        public TMPro.TMP_Text CharacterNameBox;
-        public TMPro.TMP_Text TextBox;
+        public TMP_Text   CharacterNameBox;
+        public TMP_Text   TextBox;
         public GameObject DialogueWindow;
     }
 
     public struct VNTagDeserializationContext
     {
-        public int LineNumber;
+        public int    LineNumber;
         public string FullLine;
 
         public VNTagDeserializationContext(int num, string line)
         {
             LineNumber = num;
-            FullLine = line;
+            FullLine   = line;
         }
 
         public override string ToString()
@@ -34,10 +29,11 @@ namespace VNTags
             return LineNumber + ": " + FullLine;
         }
     }
-    
+
     public struct VNTagSerializationContext
     {
         public ICollection<IVNTag> Tags;
+
         public VNTagSerializationContext(ICollection<IVNTag> tags)
         {
             Tags = tags;
@@ -45,7 +41,7 @@ namespace VNTags
 
         public VNCharacter GetMainCharacter()
         {
-            foreach (var tag in Tags)
+            foreach (IVNTag tag in Tags)
             {
                 if (tag is CharacterTag cTag)
                 {
@@ -55,19 +51,17 @@ namespace VNTags
 
             return null;
         }
-        
     }
 
 
     public interface IVNTag
     {
-        
         /// <summary>
-        /// Get the tag ID to search for when parsing, case insensitive
+        ///     Get the tag ID to search for when parsing, case insensitive
         /// </summary>
         /// <returns></returns>
         string GetTagID();
-        
+
         void Execute(VNTagContext context, out bool isFinished);
 
         protected internal static bool ExecuteHelper(bool? result)
@@ -76,12 +70,10 @@ namespace VNTags
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
-        
+
         void Deserialize(VNTagDeserializationContext context, params string[] parameters);
 
         string Serialize(VNTagSerializationContext context);

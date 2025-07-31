@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VNTags
 {
-    [System.Serializable]
+    [Serializable]
     public class VNBackground
     {
-        public string Name;
+        public string     Name;
         public GameObject Body;
     }
-    
 }
