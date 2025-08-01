@@ -2,13 +2,13 @@
 
 namespace VNTags
 {
-    public delegate bool CharacterHandler(VNTagContext context, VNCharacter character);
+    public delegate bool CharacterHandler(VNTagContext context, VNCharacterData character);
 
     public class CharacterTag : IVNTag
     {
-        private VNCharacter _character;
+        private VNCharacterData _character;
 
-        public VNCharacter Character
+        public VNCharacterData Character
         {
             get { return _character; }
         }
@@ -64,12 +64,12 @@ namespace VNTags
         }
 
 #if UNITY_EDITOR
-        public void SetCharacter(VNCharacter character)
+        public void SetCharacter(VNCharacterData character)
         {
             _character = character;
         }
 
-        public ref VNCharacter GetCharacterRef()
+        public ref VNCharacterData GetCharacterRef()
         {
             return ref _character;
         }

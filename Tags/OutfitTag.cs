@@ -2,15 +2,15 @@
 
 namespace VNTags
 {
-    public delegate bool OutfitHandler(VNTagContext context, VNCharacter character, VNOutfit expression);
+    public delegate bool OutfitHandler(VNTagContext context, VNCharacterData character, VNOutfitData expression);
 
     public class OutfitTag : IVNTag
     {
-        private VNOutfit _outfit;
+        private VNOutfitData _outfit;
 
-        public VNCharacter TargetCharacter { get; private set; }
+        public VNCharacterData TargetCharacter { get; private set; }
 
-        public VNOutfit Outfit
+        public VNOutfitData Outfit
         {
             get { return _outfit; }
         }
@@ -73,7 +73,7 @@ namespace VNTags
         }
 
 #if UNITY_EDITOR
-        public ref VNOutfit GetOutfitRef()
+        public ref VNOutfitData GetOutfitRef()
         {
             return ref _outfit;
         }

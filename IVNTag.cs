@@ -39,7 +39,7 @@ namespace VNTags
             Tags = tags;
         }
 
-        public VNCharacter GetMainCharacter()
+        public VNCharacterData GetMainCharacter()
         {
             foreach (IVNTag tag in Tags)
             {

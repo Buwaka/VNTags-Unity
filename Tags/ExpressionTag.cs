@@ -2,15 +2,17 @@
 
 namespace VNTags
 {
-    public delegate bool ExpressionHandler(VNTagContext context, VNCharacter character, VNExpression expression);
+    public delegate bool ExpressionHandler(VNTagContext     context,
+                                           VNCharacterData  character,
+                                           VNExpressionData expression);
 
     public class ExpressionTag : IVNTag
     {
-        private VNExpression _expression;
+        private VNExpressionData _expression;
 
-        public VNCharacter TargetCharacter { get; private set; }
+        public VNCharacterData TargetCharacter { get; private set; }
 
-        public VNExpression Expression
+        public VNExpressionData Expression
         {
             get { return _expression; }
         }
@@ -76,7 +78,7 @@ namespace VNTags
         }
 
 #if UNITY_EDITOR
-        public ref VNExpression GetOutfitRef()
+        public ref VNExpressionData GetOutfitRef()
         {
             return ref _expression;
         }

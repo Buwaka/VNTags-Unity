@@ -10,7 +10,7 @@ namespace VNTags
     {
         private static VNTagsConfig config;
 
-        [SerializeField] public VNCharacter[] Characters;
+        [SerializeField] public VNCharacterData[] Characters;
 
         [SerializeField] public VNBackground[] Backgrounds;
 
@@ -21,9 +21,9 @@ namespace VNTags
         [SerializeField] public VNScene[] Scenes;
 
 
-        public VNCharacter GetCharacterByNameOrAlias(string CharacterName)
+        public VNCharacterData GetCharacterByNameOrAlias(string CharacterName)
         {
-            foreach (VNCharacter character in Characters)
+            foreach (VNCharacterData character in Characters)
             {
                 if (character.Name.Equals(CharacterName, StringComparison.OrdinalIgnoreCase)
                  || character.Alias.Any(chara => chara.Equals(CharacterName, StringComparison.OrdinalIgnoreCase)))
@@ -35,7 +35,7 @@ namespace VNTags
             return null;
         }
 
-        public VNCharacter GetCharacterByIndex(int index)
+        public VNCharacterData GetCharacterByIndex(int index)
         {
             if ((index > 0) && (index <= Characters.Length))
             {

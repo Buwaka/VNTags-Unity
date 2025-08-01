@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Utility;
 
 namespace VNTags
 {
@@ -11,7 +10,7 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNCharacter
+    public class VNCharacterData
     {
         [Tooltip("Name that will be rendered, case insensitive")]
         public string Name;
@@ -21,18 +20,46 @@ namespace VNTags
 
         [Tooltip(
                     "Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        public VNExpression[] Expressions;
+        public VNExpressionData[] Expressions;
 
         [Tooltip(
                     "Name for the Outfit, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        public VNOutfit[] Outfits;
-
-        private Pair<VNExpression, GameObject> _currentExpression;
-
-        private Pair<VNOutfit, GameObject> _currentOutfit;
+        public VNOutfitData[] Outfits;
 
 
-        public VNExpression GetExpressionByIndex(int index)
+        private VNExpressionData _defaultExpression;
+        private VNOutfitData     _defaultOutfit;
+
+        public VNExpressionData DefaultExpression
+        {
+            get
+            {
+                if ((_defaultExpression == null) && (Expressions[0] != null))
+                {
+                    _defaultExpression = Expressions[0];
+                }
+
+                return _defaultExpression;
+            }
+            set { _defaultExpression = value; }
+        }
+
+        public VNOutfitData DefaultOutfit
+        {
+            get
+            {
+                if ((_defaultOutfit == null) && (Outfits[0] != null))
+                {
+                    _defaultOutfit = Outfits[0];
+                }
+
+                return _defaultOutfit;
+            }
+            set { _defaultOutfit = value; }
+        }
+
+
+        public VNExpressionData GetExpressionByIndex(int index)
         {
             if ((index > 0) && (index <= Expressions.Length))
             {
@@ -42,9 +69,9 @@ namespace VNTags
             return null;
         }
 
-        public VNExpression GetExpressionByName(string name)
+        public VNExpressionData GetExpressionByName(string name)
         {
-            foreach (VNExpression expression in Expressions)
+            foreach (VNExpressionData expression in Expressions)
             {
                 if ((expression != null) && string.Equals(expression.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -55,7 +82,7 @@ namespace VNTags
             return null;
         }
 
-        public VNOutfit GetOutfitByIndex(int index)
+        public VNOutfitData GetOutfitByIndex(int index)
         {
             if ((index > 0) && (index <= Outfits.Length))
             {
@@ -65,9 +92,9 @@ namespace VNTags
             return null;
         }
 
-        public VNOutfit GetOutfitByName(string name)
+        public VNOutfitData GetOutfitByName(string name)
         {
-            foreach (VNOutfit outfit in Outfits)
+            foreach (VNOutfitData outfit in Outfits)
             {
                 if ((outfit != null) && string.Equals(outfit.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -76,41 +103,6 @@ namespace VNTags
             }
 
             return null;
-        }
-
-        public void Init(GameObject parentObject)
-        {
-            if (parentObject == null)
-            {
-                Debug.LogError("VNCharacter: Init: provided parent is null, exiting");
-                return;
-            }
-
-            if ((Expressions.Length > 0) && (Expressions[0] != null))
-            {
-                VNExpression defaultExpression = Expressions[0];
-                _currentExpression = new Pair<VNExpression, GameObject>(defaultExpression,
-                                                                        GameObject.Instantiate(defaultExpression
-                                                                            .Expression,
-                                                                         parentObject.transform));
-            }
-            else
-            {
-                Debug.LogWarning(
-                                 "VNCharacter: Init: This character has no expressions or the first expression is null");
-            }
-
-            if ((Outfits.Length > 0) && (Outfits[0] != null))
-            {
-                VNOutfit defaultOutfit = Outfits[0];
-                _currentOutfit = new Pair<VNOutfit, GameObject>(defaultOutfit,
-                                                                GameObject.Instantiate(defaultOutfit.Outfit,
-                                                                 parentObject.transform));
-            }
-            else
-            {
-                Debug.LogWarning("VNCharacter: Init: This character has no outfits or the first outfit is null");
-            }
         }
 
 
@@ -163,10 +155,14 @@ namespace VNTags
     ///     Expression gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [Serializable]
-    public class VNExpression
+    public class VNExpressionData
     {
-        public string     Name;
-        public GameObject Expression;
+        public string Name;
+
+        [Tooltip("Alternative names for writing convenience, case insensitive")]
+        public string[] Alias;
+
+        public GameObject Object;
     }
 
     /// <summary>
@@ -174,9 +170,13 @@ namespace VNTags
     ///     Outfit gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [Serializable]
-    public class VNOutfit
+    public class VNOutfitData
     {
-        public string     Name;
-        public GameObject Outfit;
+        public string Name;
+
+        [Tooltip("Alternative names for writing convenience, case insensitive")]
+        public string[] Alias;
+
+        public GameObject Object;
     }
 }
