@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace VNTags
@@ -9,14 +10,14 @@ namespace VNTags
     // based on markdown
     public class VNTagDeserializer
     {
-        private static readonly Dictionary<string, IVNTag> TagLibrary = InitTagLibrary();
+        private static readonly Dictionary<string, VNTag> TagLibrary = InitTagLibrary();
 
         /// <summary>
         ///     is the text more than just an empty line
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static bool isSignificant(string text)
+        public static bool IsSignificant(string text)
         {
             return !string.IsNullOrEmpty(text) && (text.Trim(' ').Length > 0);
         }
@@ -24,12 +25,15 @@ namespace VNTags
         /// <summary>
         ///     The primary function to process pure text into VNTags,
         ///     note: adds a confirm and EoL tag to the end of every line
+        ///     todo: make it possible to decide if and what gets added at the end.
+        /// 
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>
-        public static LinkedList<IVNTag> Parse(string text)
+        [NotNull]
+        public static VNTagQueue Parse(string text)
         {
-            var tagQueue = new LinkedList<IVNTag>();
+            var tagQueue = new VNTagQueue();
             string[] lines = text.Split(
                                         new[] { "\r\n", "\r", "\n" },
                                         StringSplitOptions.None
@@ -38,12 +42,12 @@ namespace VNTags
             for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
                 string line = lines[lineIndex];
-                if (!isSignificant(line))
+                if (!IsSignificant(line))
                 {
                     continue;
                 }
 
-                foreach (IVNTag tag in ParseLine(line, lineIndex + 1))
+                foreach (VNTag tag in ParseLine(line, lineIndex + 1))
                 {
                     tagQueue.AddLast(tag);
                 }
@@ -66,11 +70,11 @@ namespace VNTags
         ///     potentially for choices later on
         /// </param>
         /// <returns>a collection of VNTags</returns>
-        public static ICollection<IVNTag> ParseLine(string line, int lineNumber)
+        public static ICollection<VNTag> ParseLine(string line, int lineNumber)
         {
             var context = new VNTagDeserializationContext(lineNumber, line);
 
-            var tags = new List<IVNTag>();
+            var tags = new List<VNTag>();
 
             int start = 0;
             for (int index = 0; index < line.Length; index++)
@@ -87,9 +91,9 @@ namespace VNTags
                 // end of a character name
                 if (c == ';')
                 {
-                    string CharacterName = line.Substring(start, index - start);
+                    string characterName = line.Substring(start, index - start);
                     var    cTag          = new CharacterTag();
-                    cTag.Deserialize(context, CharacterName);
+                    cTag.Deserialize(context, characterName);
                     tags.Add(cTag);
                     start = index + 1;
                     continue;
@@ -101,9 +105,9 @@ namespace VNTags
                     // process dialogue before tag
                     if (index > start)
                     {
-                        string RawDialogue = line.Substring(start, index);
+                        string rawDialogue = line.Substring(start, index - start);
                         var    dialogue    = new DialogueTag();
-                        dialogue.Deserialize(context, RawDialogue);
+                        dialogue.Deserialize(context, rawDialogue);
                         tags.Add(dialogue);
                     }
 
@@ -124,7 +128,7 @@ namespace VNTags
                     {
                         // closing bracket is found, and tag will be parsed
                         string tagString = line.Substring(index + 1, endBracketIndex - 1 - index);
-                        IVNTag tag       = ParseTag(tagString, context);
+                        VNTag tag       = ParseTag(tagString, context);
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
@@ -143,13 +147,13 @@ namespace VNTags
             return tags;
         }
 
-        private static Dictionary<string, IVNTag> InitTagLibrary()
+        private static Dictionary<string, VNTag> InitTagLibrary()
         {
-            var Out = new Dictionary<string, IVNTag>();
+            var Out = new Dictionary<string, VNTag>(StringComparer.OrdinalIgnoreCase);
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                if (typeof(IVNTag).IsAssignableFrom(type)
+                if (typeof(VNTag).IsAssignableFrom(type)
                  && // Check if the type implements or inherits the interface
                     type.IsClass
                  && // Ensure it's a class (not an interface itself or a struct)
@@ -157,12 +161,46 @@ namespace VNTags
 &&                                                 // Exclude abstract classes
                     !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
                 {
-                    var tag = (IVNTag)Activator.CreateInstance(type);
-                    Out.Add(tag.GetTagID(), tag);
+                    var tag = (VNTag)Activator.CreateInstance(type);
+                    Out.Add(tag.GetTagName(), tag);
                 }
             }
 
             return Out;
+        }
+
+        private static string ExtractToken(string token)
+        {
+            for (int i = 0; i < token.Length; i++)
+            {
+                char c = token[i];
+
+                switch (c)
+                {
+                    case '\\':
+                        continue;
+                    case '"':
+                    {
+                        int closingQuoteIndex = token.IndexOf("\"", i + 1, StringComparison.OrdinalIgnoreCase);
+
+                        // if not closing bracket is found
+                        if (closingQuoteIndex == -1)
+                        {
+                            Debug.LogError("VNTagParser: ExtractToken: did not find closing bracket for bracket at position "
+                                         + i
+                                         + ", for token '"
+                                         + token
+                                         + "'");
+                            continue;
+                        }
+
+                        return token.Substring(i + 1, closingQuoteIndex - i - 1);
+                    }
+                }
+            }
+            // Debug.LogWarning("VNTagParser: ExtractToken: could not properly extract token, forwarding the whole token, '" + token + "'");
+
+            return token;
         }
 
 
@@ -171,45 +209,29 @@ namespace VNTags
         ///     note: do not include the curly brackets {}
         /// </summary>
         /// <param name="line"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public static IVNTag ParseTag(string line, VNTagDeserializationContext context)
+        public static VNTag ParseTag(string line, VNTagDeserializationContext context)
         {
-            var tokens = new List<string>();
-
-            int start = 0;
-            for (int i = 0; i < line.Length; i++)
+            var    tokens   = new List<string>();
+            string workLine = line;
+            
+            while (workLine.Contains(';'))
             {
-                char c = line[i];
-
-                if ((c == '"') && (i + 1 < line.Length))
+                int semicolonIndex = workLine.IndexOf(";", StringComparison.OrdinalIgnoreCase);
+                var token          = ExtractToken(workLine.Substring(0, semicolonIndex));
+                tokens.Add(token);
+                if (semicolonIndex + 1 >= workLine.Length)
                 {
-                    int closingQuoteIndex = line.IndexOf("\"", i + 1, StringComparison.OrdinalIgnoreCase);
-
-                    // if not closing bracket is found
-                    if (closingQuoteIndex == -1)
-                    {
-                        Debug.LogError("VNTagParser: ParseTag: did not find closing bracket for bracket at position "
-                                     + i
-                                     + ", for line '"
-                                     + line
-                                     + "'");
-                        continue;
-                    }
-
-                    tokens.Add(line.Substring(start, closingQuoteIndex - start));
-                    i     = closingQuoteIndex;
-                    start = i + 1;
+                    workLine = null;
+                    break;
                 }
-                else if (c == ';')
-                {
-                    tokens.Add(line.Substring(start, i - start));
-                    start = i + 1;
-                }
+                workLine = workLine.Substring(semicolonIndex + 1);
             }
 
-            if (start < line.Length)
+            if (workLine != null)
             {
-                tokens.Add(line.Substring(start));
+                tokens.Add(ExtractToken(workLine));
             }
 
             if (tokens.Count > 0)
@@ -222,9 +244,9 @@ namespace VNTags
                     return null;
                 }
 
-                IVNTag tagType = TagLibrary[tagID];
+                VNTag tagType = TagLibrary[tagID];
 
-                var newInst = (IVNTag)Activator.CreateInstance(tagType.GetType());
+                var newInst = (VNTag)Activator.CreateInstance(tagType.GetType());
                 newInst.Deserialize(context, tokens.Skip(1).ToArray());
                 return newInst;
             }

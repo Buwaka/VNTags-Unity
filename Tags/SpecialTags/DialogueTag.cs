@@ -4,11 +4,11 @@ namespace VNTags
 {
     public delegate bool DialogueHandler(VNTagContext context, string dialogue);
 
-    public class DialogueTag : IVNTag
+    public class DialogueTag : VNTag
     {
         public string Dialogue { get; private set; } = "";
 
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if ((parameters == null) || (parameters.Length <= 0))
             {
@@ -19,20 +19,20 @@ namespace VNTags
             Dialogue = parameters[0];
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
             return Dialogue;
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "";
         }
 
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = IVNTag.ExecuteHelper(VNTagEventAnnouncer.onDialogueChange?.Invoke(context, Dialogue));
+            isFinished = VNTag.ExecuteHelper(VNTagEventAnnouncer.onDialogueChange?.Invoke(context, Dialogue));
             // if(context.TextBox != null)
             // {
             //     context.TextBox.text = Dialogue;

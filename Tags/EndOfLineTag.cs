@@ -2,22 +2,22 @@
 
 namespace VNTags
 {
-    public class EndOfLineTag : IVNTag
+    public class EndOfLineTag : VNTag
     {
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters) { }
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters) { }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
             return string.Empty;
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "EOL";
         }
 
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
             if (context.TextBox != null)
             {

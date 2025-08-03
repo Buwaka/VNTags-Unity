@@ -164,6 +164,12 @@ namespace VNTags.Components
                 return;
             }
 
+            if (expression == CurrentExpression)
+            {
+                Debug.Log("VNCharacter: ChangeExpression: this expression is already active, aborting, " + expression);
+                return;
+            }
+
             GameObject obj = _expressionObjects.GetValueOrDefault(expression, Load(expression));
             if (obj != null)
             {

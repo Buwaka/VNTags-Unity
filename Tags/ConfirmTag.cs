@@ -2,24 +2,24 @@
 
 namespace VNTags
 {
-    public class ConfirmTag : IVNTag
+    public class ConfirmTag : VNTag
     {
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             // todo
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
-            return IVNTag.SerializeHelper(GetTagID());
+            return VNTag.SerializeHelper(GetTagName());
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "Confirm";
         }
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
             // todo find a better way to proceed
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))

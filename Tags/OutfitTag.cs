@@ -4,7 +4,7 @@ namespace VNTags
 {
     public delegate bool OutfitHandler(VNTagContext context, VNCharacterData character, VNOutfitData expression);
 
-    public class OutfitTag : IVNTag
+    public class OutfitTag : VNTag
     {
         private VNOutfitData _outfit;
 
@@ -15,7 +15,7 @@ namespace VNTags
             get { return _outfit; }
         }
 
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if (parameters.Length >= 2)
             {
@@ -49,7 +49,7 @@ namespace VNTags
             }
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
             if (TargetCharacter == null)
             {
@@ -57,19 +57,19 @@ namespace VNTags
             }
 
             return (_outfit != null) && (TargetCharacter != null)
-                ? IVNTag.SerializeHelper(GetTagID(), TargetCharacter.Name, Outfit.Name)
+                ? VNTag.SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name)
                 : "";
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "Outfit";
         }
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                IVNTag.ExecuteHelper(VNTagEventAnnouncer.onOutfitChange?.Invoke(context, TargetCharacter, Outfit));
+                VNTag.ExecuteHelper(VNTagEventAnnouncer.onOutfitChange?.Invoke(context, TargetCharacter, Outfit));
         }
 
 #if UNITY_EDITOR

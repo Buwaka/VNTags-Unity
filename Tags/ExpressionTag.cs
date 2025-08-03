@@ -6,7 +6,7 @@ namespace VNTags
                                            VNCharacterData  character,
                                            VNExpressionData expression);
 
-    public class ExpressionTag : IVNTag
+    public class ExpressionTag : VNTag
     {
         private VNExpressionData _expression;
 
@@ -17,7 +17,7 @@ namespace VNTags
             get { return _expression; }
         }
 
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if (parameters.Length >= 2)
             {
@@ -51,7 +51,7 @@ namespace VNTags
             }
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
             if (TargetCharacter == null)
             {
@@ -59,19 +59,19 @@ namespace VNTags
             }
 
             return (_expression != null) && (TargetCharacter != null)
-                ? IVNTag.SerializeHelper(GetTagID(), TargetCharacter.Name, _expression.Name)
+                ? VNTag.SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name)
                 : "";
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "Expression";
         }
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                IVNTag.ExecuteHelper(
+                VNTag.ExecuteHelper(
                                      VNTagEventAnnouncer.onExpressionChange?.Invoke(context,
                                       TargetCharacter,
                                       Expression));

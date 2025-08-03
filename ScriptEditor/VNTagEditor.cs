@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using VNTags.Utility;
 using File = System.IO.File;
 using Object = UnityEngine.Object;
 
@@ -13,7 +15,7 @@ namespace VNTags
 {
     public class VNTagEditLine
     {
-        private readonly LinkedList<IVNTag> Tags;
+        private readonly LinkedList<VNTag> Tags;
         private          BackgroundTag      _backgroundChangeTag;
 
 
@@ -38,11 +40,11 @@ namespace VNTags
         {
             Preview = lineNumber + ": ";
             RawLine = rawLine;
-            Tags    = new LinkedList<IVNTag>(VNTagDeserializer.ParseLine(RawLine, lineNumber));
+            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, lineNumber));
 
 
             // filter out starter tags
-            foreach (IVNTag tag in Tags)
+            foreach (VNTag tag in Tags)
             {
                 if (tag is CharacterTag characterTag && (_characterChangeTag == null))
                 {
@@ -71,7 +73,7 @@ namespace VNTags
             }
 
             // get all the dialogue tags
-            foreach (IVNTag tag in Tags)
+            foreach (VNTag tag in Tags)
             {
                 if (tag is DialogueTag)
                 {
@@ -226,62 +228,71 @@ namespace VNTags
     [CustomEditor(typeof(TextAsset))]
     public class VNTagEditor : Editor
     {
-        private static readonly Dictionary<Object, VNTagEditLine[]> EditingLines = new();
-        private                 bool                                isTargetFile = true;
+        private static readonly Dictionary<Object, VNTagEditLine[]> EditingLines  = new();
+        private                 bool                                _isTargetFile = true;
+        private                 bool                                _invalidate   = true;
+        
+        public override         VisualElement                       CreateInspectorGUI()
+        {
+            AssetWatcher.WatchAsset(target, InvalidateTarget);
+            return base.CreateInspectorGUI();
+        }
+
+        ~VNTagEditor()
+        {
+            AssetWatcher.UnwatchAsset(target, InvalidateTarget);
+        }
+
+        public void InvalidateTarget()
+        {
+            _invalidate = true;
+        }
 
         private void OnEnable()
         {
             string path = AssetDatabase.GetAssetPath(target);
+            
             // Check if md file
-            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase) && _invalidate)
             {
-                isTargetFile = true;
+                _isTargetFile = true;
                 LoadFile();
             }
             else
             {
-                isTargetFile = false;
+                _isTargetFile = false;
             }
         }
 
 
-        public void LoadFile(bool reload = false)
+        public void LoadFile()
         {
-            if (target is TextAsset)
+            if (target is TextAsset asset)
             {
-                string data = ((TextAsset)target).text;
+                string data = asset.text;
 
                 string[] lines = data.Split(
                                             new[] { "\r\n", "\r", "\n" },
                                             StringSplitOptions.None
                                            );
-
-                VNTagEditLine[] editLines;
-
-                if (EditingLines.ContainsKey(target) && !reload)
-                {
-                    editLines = EditingLines[target];
-                }
-                else
-                {
-                    editLines            = new VNTagEditLine[lines.Length];
-                    EditingLines[target] = editLines;
-                }
+                
+                EditingLines[target] = new VNTagEditLine[lines.Length];
 
                 for (int index = 0; index < lines.Length; index++)
                 {
                     string line = lines[index];
-                    if (VNTagDeserializer.isSignificant(line))
+                    if (VNTagDeserializer.IsSignificant(line))
                     {
-                        editLines[index] = new VNTagEditLine(line, index + 1);
+                        EditingLines[target][index] = new VNTagEditLine(line, index + 1);
                     }
                 }
+                Repaint();
             }
         }
 
         public override void OnInspectorGUI()
         {
-            if (isTargetFile)
+            if (_isTargetFile)
             {
                 VNTagInspectorGUI();
             }
@@ -528,6 +539,7 @@ namespace VNTags
                     // Tell Unity to re-import the asset so the changes are reflected
                     AssetDatabase.ImportAsset(path);
                     AssetDatabase.Refresh(); // Refresh the AssetDatabase to ensure consistency
+                    InvalidateTarget();
 
                     Debug.Log($"VNTagEditor: SerializeLines: Successfully overwrote Script at: {path}");
                 }

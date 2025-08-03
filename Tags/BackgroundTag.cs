@@ -2,26 +2,26 @@
 
 namespace VNTags
 {
-    public class BackgroundTag : IVNTag
+    public class BackgroundTag : VNTag
     {
         public VNBackground Background { get; }
 
-        public void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             // todo
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
             throw new NotImplementedException();
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "Background";
         }
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
             // todo
             isFinished = true;

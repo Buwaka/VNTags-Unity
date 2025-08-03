@@ -2,9 +2,15 @@
 
 namespace VNTags
 {
-    public delegate bool CharacterHandler(VNTagContext context, VNCharacterData character);
+    public delegate bool CharacterHandler(VNTagContext context, VNCharacterData character, CharacterAction action);
 
-    public class CharacterTag : IVNTag
+    public enum CharacterAction
+    {
+        AddedToScene,
+        RemovedFromScene
+    }
+
+    public class CharacterTag : VNTag
     {
         private VNCharacterData _character;
 
@@ -13,17 +19,14 @@ namespace VNTags
             get { return _character; }
         }
 
-        public string RawString { get; private set; } = "";
-
-        public void Deserialize(VNTagDeserializationContext context, params string[] Parameters)
+        public override void Deserialize(VNTagDeserializationContext context, params string[] Parameters)
         {
             if ((Parameters == null) || (Parameters.Length <= 0))
             {
                 Debug.LogError("CharacterTag: Deserialize: No parameters provided '" + context + "'");
                 return;
             }
-
-            RawString  = Parameters[0];
+            
             _character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(Parameters[0]);
 
             if (Character == null)
@@ -35,19 +38,22 @@ namespace VNTags
             }
         }
 
-        public string Serialize(VNTagSerializationContext context)
+        public override string Serialize(VNTagSerializationContext context)
         {
-            return Character != null ? IVNTag.SerializeHelper(GetTagID(), Character.Name) : "";
+            return Character != null ? VNTag.SerializeHelper(GetTagName(), Character.Name) : "";
         }
 
-        public string GetTagID()
+        public override string GetTagName()
         {
             return "Character";
         }
 
-        public void Execute(VNTagContext context, out bool isFinished)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = IVNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterChange?.Invoke(context, Character));
+            isFinished =
+                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterChange?.Invoke(context,
+                                      Character,
+                                      CharacterAction.AddedToScene));
             // if (context.CharacterNameBox == null)
             // {
             //     Debug.LogError("CharacterTag: Execute: No Character Namebox present in VNTagContext");
