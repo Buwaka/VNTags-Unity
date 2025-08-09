@@ -39,7 +39,7 @@ namespace VNTags
                                         StringSplitOptions.None
                                        );
 
-            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            for (UInt16 lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
                 string line = lines[lineIndex];
                 if (!IsSignificant(line))
@@ -47,7 +47,8 @@ namespace VNTags
                     continue;
                 }
 
-                foreach (VNTag tag in ParseLine(line, lineIndex + 1))
+                UInt16 CSharpisKindaGayForThisAintGonnaLie = 1;
+                foreach (VNTag tag in ParseLine(line, (ushort)(lineIndex + CSharpisKindaGayForThisAintGonnaLie)))
                 {
                     tagQueue.AddLast(tag);
                 }
@@ -70,10 +71,8 @@ namespace VNTags
         ///     potentially for choices later on
         /// </param>
         /// <returns>a collection of VNTags</returns>
-        public static ICollection<VNTag> ParseLine(string line, int lineNumber)
+        public static ICollection<VNTag> ParseLine(string line, UInt16 lineNumber)
         {
-            var context = new VNTagDeserializationContext(lineNumber, line);
-
             var tags = new List<VNTag>();
 
             int start = 0;
@@ -93,7 +92,7 @@ namespace VNTags
                 {
                     string characterName = line.Substring(start, index - start);
                     var    cTag          = new CharacterTag();
-                    cTag.Deserialize(context, characterName);
+                    cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), characterName);
                     tags.Add(cTag);
                     start = index + 1;
                     continue;
@@ -107,7 +106,7 @@ namespace VNTags
                     {
                         string rawDialogue = line.Substring(start, index - start);
                         var    dialogue    = new DialogueTag();
-                        dialogue.Deserialize(context, rawDialogue);
+                        dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), rawDialogue);
                         tags.Add(dialogue);
                     }
 
@@ -128,7 +127,7 @@ namespace VNTags
                     {
                         // closing bracket is found, and tag will be parsed
                         string tagString = line.Substring(index + 1, endBracketIndex - 1 - index);
-                        VNTag tag       = ParseTag(tagString, context);
+                        VNTag tag       = ParseTag(tagString, new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count));
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
@@ -140,7 +139,8 @@ namespace VNTags
             if (start < line.Length)
             {
                 var dialogue = new DialogueTag();
-                dialogue.Deserialize(context, line.Substring(start));
+                dialogue._init(GenerateTagID(lineNumber, (UInt16)tags.Count), line);
+                dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), line.Substring(start));
                 tags.Add(dialogue);
             }
 
@@ -203,6 +203,13 @@ namespace VNTags
             return token;
         }
 
+        public static UInt32 GenerateTagID(UInt16 lineNumber, UInt16 tagNumber)
+        {
+            UInt32 ID = lineNumber;
+            ID =  ID << 16;
+            ID += tagNumber;
+            return ID;
+        }
 
         /// <summary>
         ///     parse string representation of a tag,
@@ -247,6 +254,7 @@ namespace VNTags
                 VNTag tagType = TagLibrary[tagID];
 
                 var newInst = (VNTag)Activator.CreateInstance(tagType.GetType());
+                newInst._init(GenerateTagID(context.LineNumber, context.TagNumber), line);
                 newInst.Deserialize(context, tokens.Skip(1).ToArray());
                 return newInst;
             }

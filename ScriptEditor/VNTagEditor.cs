@@ -40,7 +40,7 @@ namespace VNTags
         {
             Preview = lineNumber + ": ";
             RawLine = rawLine;
-            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, lineNumber));
+            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, (UInt16) lineNumber));
 
 
             // filter out starter tags

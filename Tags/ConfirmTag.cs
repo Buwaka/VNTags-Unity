@@ -1,17 +1,50 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq.Expressions;
+using Serialize.Linq.Serializers;
+using UnityEngine;
 
 namespace VNTags
 {
+    using Condition = Func<bool>;
+
     public class ConfirmTag : VNTag
     {
+        private static readonly ExpressionSerializer _serializer = new(new JsonSerializer());
+
+
+        private       Condition _conditionOverride;
+        public static Condition DefaultCondition { get; set; } = null;
+
+
         public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            // todo
+            // only when there is an extra condition provided, otherwise it will just use the default condition
+            if ((parameters != null) && (parameters.Length > 0))
+            {
+                try
+                {
+                    string conditionData = parameters[0];
+                    var    expr          = (Expression<Func<bool>>)_serializer.DeserializeText(conditionData);
+                    _conditionOverride = expr.Compile();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("ConfirmTag: Deserialize: failed to deserialize condition, '" + context + "', exception: " + e);
+                }
+            }
         }
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return VNTag.SerializeHelper(GetTagName());
+            if (_conditionOverride == null)
+            {
+                return SerializeHelper(GetTagName());
+            }
+
+            Expression<Func<bool>> exprCondition       = () => _conditionOverride.Invoke();
+            string                 serializedCondition = _serializer.SerializeText(exprCondition);
+
+            return SerializeHelper(GetTagName(), serializedCondition);
         }
 
         public override string GetTagName()
@@ -21,14 +54,13 @@ namespace VNTags
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            // todo find a better way to proceed
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+            if (_conditionOverride != null)
             {
-                isFinished = true;
+                isFinished = _conditionOverride.Invoke();
             }
             else
             {
-                isFinished = false;
+                isFinished = DefaultCondition?.Invoke() ?? true;
             }
         }
     }

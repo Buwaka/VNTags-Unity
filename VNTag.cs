@@ -44,24 +44,30 @@ namespace VNTags
 
         public VNTagContext Instantiate(uint id)
         {
-            return new VNTagContext(this, ID);
+            return new VNTagContext(this, id);
         }
     }
 
     public struct VNTagDeserializationContext
     {
-        public readonly int    LineNumber;
+        public readonly UInt16 LineNumber;
         public readonly string FullLine;
+        public readonly UInt16 TagNumber;
 
-        public VNTagDeserializationContext(int num, string line)
+        public VNTagDeserializationContext(UInt16 num, string line, UInt16 tagNumber)
         {
             LineNumber = num;
             FullLine   = line;
+            TagNumber  = tagNumber;
         }
 
         public override string ToString()
         {
-            return LineNumber + ": " + FullLine;
+            #if DEVELOPMENT_BUILD || UNITY_EDITOR
+            return LineNumber                + ": "            + FullLine + ", #" + TagNumber;
+            #else
+            return "Linenumber: " + LineNumber + ", #" + TagNumber;
+            #endif
         }
     }
 
@@ -91,10 +97,10 @@ namespace VNTags
 
     public abstract class VNTag
     {
-        public uint   ID     { get; private set; }
+        public UInt32 ID     { get; private set; }
         public string RawTag { get; private set; }
 
-        public void _init(uint id, string raw)
+        public void _init(UInt32 id, string raw)
         {
             ID     = id;
             RawTag = raw;
