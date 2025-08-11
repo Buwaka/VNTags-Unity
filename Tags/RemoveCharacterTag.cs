@@ -14,7 +14,7 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterChange?.Invoke(context,
+                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
                                           _character,
                                           CharacterAction.RemovedFromScene));
         }

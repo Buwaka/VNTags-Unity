@@ -9,7 +9,7 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNSound
+    public class VNSoundData
     {
         [Tooltip("ID for the sound, case insensitive")]
         public string Name;

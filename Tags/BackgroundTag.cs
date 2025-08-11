@@ -4,7 +4,7 @@ namespace VNTags
 {
     public class BackgroundTag : VNTag
     {
-        public VNBackground Background { get; }
+        public VNBackgroundData Background { get; }
 
         public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {

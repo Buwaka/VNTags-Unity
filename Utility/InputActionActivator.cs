@@ -1,15 +1,11 @@
 using System.Collections;
 using System.Linq;
-using System.Threading;
-using Unity.IntegerTime;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.OnScreen;
 
 public class InputActionActivator : OnScreenControl
 {
-    public  float PressCooldown  = 1.1f;
     private bool  inProgress     = false;
     private int?   performedFrame = null;
 
@@ -57,16 +53,12 @@ public class InputActionActivator : OnScreenControl
             return;
         }
         
-        // actionRef.action.started += ActionOnperformed;
-        
         switch (inputControl.valueType)
         {
             case not null when inputControl.valueType == typeof(float):
                 SendValueToControl(1.0f);
-                // SendValueToControl(0.0f);
                 Debug.Log("Performed " + Time.frameCount);
                 StartCoroutine(DisableValueAfterFrame(0.0f));
-                // StartCoroutine(DisableValueAfterFrame(0.0f));
                 break;
 
             case not null when inputControl.valueType == typeof(double):
@@ -94,19 +86,12 @@ public class InputActionActivator : OnScreenControl
         
         inProgress     = true;
     }
-
-    private void ActionOnperformed(InputAction.CallbackContext obj)
-    {
-        obj.action.started -= ActionOnperformed;
-        Debug.Log("UnPerformed " + Time.frameCount);
-        SentDefaultValueToControl();
-        inProgress     = false;
-        performedFrame = Time.frameCount;
-    }
+    
 
 
     IEnumerator DisableValueAfterFrame<TValue>(TValue value) where TValue : struct
     {
+        //this just skips the current frane
         yield return null;
         Debug.Log("UnPerformed " + Time.frameCount);
         SentDefaultValueToControl();

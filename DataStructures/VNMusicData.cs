@@ -10,7 +10,7 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNMusic
+    public class VNMusicData
     {
         [Tooltip("ID for the music, case insensitive")]
         public string Name;

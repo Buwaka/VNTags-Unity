@@ -1,11 +1,10 @@
-﻿using System;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEditor.VersionControl;
+
 using UnityEngine;
 using Object = UnityEngine.Object;
-
+using UnityEditor;
 namespace VNTags.Utility
 {
    public delegate void AssetChanged();
@@ -80,3 +79,4 @@ namespace VNTags.Utility
         }
     }
 }
+#endif

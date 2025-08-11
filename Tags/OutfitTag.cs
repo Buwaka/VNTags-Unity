@@ -69,7 +69,7 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onOutfitChange?.Invoke(context, TargetCharacter, Outfit));
+                VNTag.ExecuteHelper(VNTagEventAnnouncer.onOutfitTag?.Invoke(context, TargetCharacter, Outfit));
         }
 
 #if UNITY_EDITOR

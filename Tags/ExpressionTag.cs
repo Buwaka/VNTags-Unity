@@ -72,7 +72,7 @@ namespace VNTags
         {
             isFinished =
                 VNTag.ExecuteHelper(
-                                     VNTagEventAnnouncer.onExpressionChange?.Invoke(context,
+                                     VNTagEventAnnouncer.onExpressionTag?.Invoke(context,
                                       TargetCharacter,
                                       Expression));
         }

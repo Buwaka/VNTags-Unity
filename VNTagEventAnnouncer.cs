@@ -13,11 +13,11 @@
     /// </summary>
     public static class VNTagEventAnnouncer
     {
-        public static CharacterHandler     onCharacterChange;
-        public static CharacterMoveHandler onCharacterMove;
-        public static DialogueHandler      onDialogueChange;
-        public static ExpressionHandler    onExpressionChange;
-        public static OutfitHandler        onOutfitChange;
-        public static ChoiceHandler        onChoice;
+        public static CharacterHandler     onCharacterTag;
+        public static CharacterMoveHandler onCharacterMoveTag;
+        public static DialogueHandler      onDialogueTag;
+        public static ExpressionHandler    onExpressionTag;
+        public static OutfitHandler        onOutfitTag;
+        public static ChoiceHandler        onChoiceTag;
     }
 }

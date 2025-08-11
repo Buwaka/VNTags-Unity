@@ -4,7 +4,7 @@ using UnityEngine;
 namespace VNTags
 {
     [Serializable]
-    public class VNBackground
+    public class VNBackgroundData
     {
         public string     Name;
         public GameObject Body;

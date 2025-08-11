@@ -12,11 +12,11 @@ namespace VNTags
 
         [SerializeField] public VNCharacterData[] Characters;
 
-        [SerializeField] public VNBackground[] Backgrounds;
+        [SerializeField] public VNBackgroundData[] Backgrounds;
 
-        [SerializeField] public VNSound[] SoundEffects;
+        [SerializeField] public VNSoundData[] SoundEffects;
 
-        [SerializeField] public VNMusic[] Musics;
+        [SerializeField] public VNMusicData[] Musics;
 
         [SerializeField] public VNScene[] Scenes;
 
@@ -72,6 +72,15 @@ namespace VNTags
             return config;
 #else
             // todo how to access config at runtime
+                    // Load the ScriptableObject from a Resources folder at runtime
+        config = Resources.Load<VNTagsConfig>("VNTagsConfig");
+
+        if (config == null)
+        {
+            Debug.LogError("VNTagsConfig asset not found in any 'Resources' folder. Please ensure the asset is placed in a folder named 'Resources' and that its file name matches 'VNTagsConfig'.");
+        }
+
+        return config;
 #endif
         }
 
