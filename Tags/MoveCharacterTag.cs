@@ -1,17 +1,14 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VNTags
 {
-
     public delegate bool CharacterMoveHandler(VNTagContext context, VNCharacterData character, string position);
-    
+
     public class MoveCharacterTag : VNTag
     {
-        
         private VNCharacterData _character;
-        private string _namedPosition;
-        
+        private string          _namedPosition;
+
         public override string GetTagName()
         {
             return "Move";
@@ -20,9 +17,9 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterMoveTag?.Invoke(context,
-                                      _character,
-                                      _namedPosition));
+                ExecuteHelper(VNTagEventAnnouncer.onCharacterMoveTag?.Invoke(context,
+                                                                             _character,
+                                                                             _namedPosition));
         }
 
         public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
@@ -32,7 +29,7 @@ namespace VNTags
                 Debug.LogError("MoveCharacterTag: Deserialize: Not enough parameters provided '" + context + "'");
                 return;
             }
-            
+
             _character     = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
             _namedPosition = parameters[1];
 
@@ -43,7 +40,7 @@ namespace VNTags
                              + "', "
                              + context);
             }
-            
+
             if (string.IsNullOrEmpty(_namedPosition))
             {
                 Debug.LogError("MoveCharacterTag: Deserialize: provided position is empty or null '"
@@ -55,7 +52,7 @@ namespace VNTags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return _character != null ? VNTag.SerializeHelper(GetTagName(), _character.Name, _namedPosition) : "";
+            return _character != null ? SerializeHelper(GetTagName(), _character.Name, _namedPosition) : "";
         }
     }
 }

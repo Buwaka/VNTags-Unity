@@ -12,12 +12,13 @@ namespace VNTags
     public struct VNTagContext
     {
         /// <summary>
-        /// ID being just an unique identifier to differentiate tags from each other
+        ///     ID being just an unique identifier to differentiate tags from each other
         /// </summary>
-        public uint       ID{ get;                private set; }
-        public TMP_Text   CharacterNameBox { get; private set; }
-        public TMP_Text   TextBox          { get; private set; }
-        public GameObject DialogueWindow   { get; private set; }
+        public uint ID { get; }
+
+        public TMP_Text   CharacterNameBox { get; }
+        public TMP_Text   TextBox          { get; }
+        public GameObject DialogueWindow   { get; }
 
         public VNTagContext(VNTagContext other)
         {
@@ -50,11 +51,11 @@ namespace VNTags
 
     public struct VNTagDeserializationContext
     {
-        public readonly UInt16 LineNumber;
+        public readonly ushort LineNumber;
         public readonly string FullLine;
-        public readonly UInt16 TagNumber;
+        public readonly ushort TagNumber;
 
-        public VNTagDeserializationContext(UInt16 num, string line, UInt16 tagNumber)
+        public VNTagDeserializationContext(ushort num, string line, ushort tagNumber)
         {
             LineNumber = num;
             FullLine   = line;
@@ -63,11 +64,11 @@ namespace VNTags
 
         public override string ToString()
         {
-            #if DEVELOPMENT_BUILD || UNITY_EDITOR
-            return LineNumber                + ": "            + FullLine + ", #" + TagNumber;
-            #else
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+            return LineNumber + ": " + FullLine + ", #" + TagNumber;
+#else
             return "Linenumber: " + LineNumber + ", #" + TagNumber;
-            #endif
+#endif
         }
     }
 
@@ -97,15 +98,15 @@ namespace VNTags
 
     public abstract class VNTag
     {
-        public UInt32 ID     { get; private set; }
+        public uint   ID     { get; private set; }
         public string RawTag { get; private set; }
 
-        public void _init(UInt32 id, string raw)
+        public void _init(uint id, string raw)
         {
             ID     = id;
             RawTag = raw;
         }
-        
+
         /// <summary>
         ///     Get the tag ID to search for when parsing, case insensitive
         /// </summary>
@@ -114,7 +115,7 @@ namespace VNTags
 
         public void BaseExecute(VNTagContext context, out bool isFinished)
         {
-            var instContext = context.Instantiate(ID);
+            VNTagContext instContext = context.Instantiate(ID);
             Execute(instContext, out isFinished);
         }
 

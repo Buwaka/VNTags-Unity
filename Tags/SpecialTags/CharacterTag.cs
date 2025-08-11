@@ -26,7 +26,7 @@ namespace VNTags
                 Debug.LogError("CharacterTag: Deserialize: No parameters provided '" + context + "'");
                 return;
             }
-            
+
             _character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(Parameters[0]);
 
             if (Character == null)
@@ -40,7 +40,7 @@ namespace VNTags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return Character != null ? VNTag.SerializeHelper(GetTagName(), Character.Name) : "";
+            return Character != null ? SerializeHelper(GetTagName(), Character.Name) : "";
         }
 
         public override string GetTagName()
@@ -51,9 +51,9 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
-                                      Character,
-                                      CharacterAction.AddedToScene));
+                ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
+                                                                         Character,
+                                                                         CharacterAction.AddedToScene));
             // if (context.CharacterNameBox == null)
             // {
             //     Debug.LogError("CharacterTag: Execute: No Character Namebox present in VNTagContext");

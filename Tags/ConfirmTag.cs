@@ -29,7 +29,10 @@ namespace VNTags
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("ConfirmTag: Deserialize: failed to deserialize condition, '" + context + "', exception: " + e);
+                    Debug.LogError("ConfirmTag: Deserialize: failed to deserialize condition, '"
+                                 + context
+                                 + "', exception: "
+                                 + e);
                 }
             }
         }

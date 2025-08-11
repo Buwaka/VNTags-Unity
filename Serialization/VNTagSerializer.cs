@@ -23,7 +23,7 @@ namespace VNTags
                 {
                     continue;
                 }
-                
+
                 if (tag is CharacterTag cTag && (cTag.Character != null) && (mainCharacter == null))
                 {
                     mainCharacter = cTag;
@@ -55,6 +55,7 @@ namespace VNTags
                     {
                         continue;
                     }
+
                     outLine.Append(tag.Serialize(context));
                 } while (index.MoveNext());
             }

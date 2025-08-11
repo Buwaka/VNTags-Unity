@@ -57,7 +57,7 @@ namespace VNTags
             }
 
             return (_outfit != null) && (TargetCharacter != null)
-                ? VNTag.SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name)
+                ? SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name)
                 : "";
         }
 
@@ -69,7 +69,7 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onOutfitTag?.Invoke(context, TargetCharacter, Outfit));
+                ExecuteHelper(VNTagEventAnnouncer.onOutfitTag?.Invoke(context, TargetCharacter, Outfit));
         }
 
 #if UNITY_EDITOR

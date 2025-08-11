@@ -32,7 +32,7 @@ namespace VNTags
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = VNTag.ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, Dialogue));
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, Dialogue));
             // if(context.TextBox != null)
             // {
             //     context.TextBox.text = Dialogue;

@@ -59,7 +59,7 @@ namespace VNTags
             }
 
             return (_expression != null) && (TargetCharacter != null)
-                ? VNTag.SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name)
+                ? SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name)
                 : "";
         }
 
@@ -71,10 +71,10 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(
-                                     VNTagEventAnnouncer.onExpressionTag?.Invoke(context,
-                                      TargetCharacter,
-                                      Expression));
+                ExecuteHelper(
+                              VNTagEventAnnouncer.onExpressionTag?.Invoke(context,
+                                                                          TargetCharacter,
+                                                                          Expression));
         }
 
 #if UNITY_EDITOR

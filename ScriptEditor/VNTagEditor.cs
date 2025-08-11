@@ -16,7 +16,7 @@ namespace VNTags
     public class VNTagEditLine
     {
         private readonly LinkedList<VNTag> Tags;
-        private          BackgroundTag      _backgroundChangeTag;
+        private          BackgroundTag     _backgroundChangeTag;
 
 
         private CharacterTag      _characterChangeTag;
@@ -40,7 +40,7 @@ namespace VNTags
         {
             Preview = lineNumber + ": ";
             RawLine = rawLine;
-            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, (UInt16) lineNumber));
+            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, (ushort)lineNumber));
 
 
             // filter out starter tags
@@ -229,10 +229,26 @@ namespace VNTags
     public class VNTagEditor : Editor
     {
         private static readonly Dictionary<Object, VNTagEditLine[]> EditingLines  = new();
-        private                 bool                                _isTargetFile = true;
         private                 bool                                _invalidate   = true;
-        
-        public override         VisualElement                       CreateInspectorGUI()
+        private                 bool                                _isTargetFile = true;
+
+        private void OnEnable()
+        {
+            string path = AssetDatabase.GetAssetPath(target);
+
+            // Check if md file
+            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase) && _invalidate)
+            {
+                _isTargetFile = true;
+                LoadFile();
+            }
+            else
+            {
+                _isTargetFile = false;
+            }
+        }
+
+        public override VisualElement CreateInspectorGUI()
         {
             AssetWatcher.WatchAsset(target, InvalidateTarget);
             return base.CreateInspectorGUI();
@@ -248,22 +264,6 @@ namespace VNTags
             _invalidate = true;
         }
 
-        private void OnEnable()
-        {
-            string path = AssetDatabase.GetAssetPath(target);
-            
-            // Check if md file
-            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase) && _invalidate)
-            {
-                _isTargetFile = true;
-                LoadFile();
-            }
-            else
-            {
-                _isTargetFile = false;
-            }
-        }
-
 
         public void LoadFile()
         {
@@ -275,7 +275,7 @@ namespace VNTags
                                             new[] { "\r\n", "\r", "\n" },
                                             StringSplitOptions.None
                                            );
-                
+
                 EditingLines[target] = new VNTagEditLine[lines.Length];
 
                 for (int index = 0; index < lines.Length; index++)
@@ -286,6 +286,7 @@ namespace VNTags
                         EditingLines[target][index] = new VNTagEditLine(line, index + 1);
                     }
                 }
+
                 Repaint();
             }
         }

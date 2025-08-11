@@ -26,7 +26,6 @@ namespace VNTags
         ///     The primary function to process pure text into VNTags,
         ///     note: adds a confirm and EoL tag to the end of every line
         ///     todo: make it possible to decide if and what gets added at the end.
-        /// 
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>
@@ -39,7 +38,7 @@ namespace VNTags
                                         StringSplitOptions.None
                                        );
 
-            for (UInt16 lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            for (ushort lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
                 string line = lines[lineIndex];
                 if (!IsSignificant(line))
@@ -47,7 +46,7 @@ namespace VNTags
                     continue;
                 }
 
-                UInt16 CSharpisKindaGayForThisAintGonnaLie = 1;
+                ushort CSharpisKindaGayForThisAintGonnaLie = 1;
                 foreach (VNTag tag in ParseLine(line, (ushort)(lineIndex + CSharpisKindaGayForThisAintGonnaLie)))
                 {
                     tagQueue.AddLast(tag);
@@ -71,7 +70,7 @@ namespace VNTags
         ///     potentially for choices later on
         /// </param>
         /// <returns>a collection of VNTags</returns>
-        public static ICollection<VNTag> ParseLine(string line, UInt16 lineNumber)
+        public static ICollection<VNTag> ParseLine(string line, ushort lineNumber)
         {
             var tags = new List<VNTag>();
 
@@ -92,7 +91,8 @@ namespace VNTags
                 {
                     string characterName = line.Substring(start, index - start);
                     var    cTag          = new CharacterTag();
-                    cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), characterName);
+                    cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
+                                     characterName);
                     tags.Add(cTag);
                     start = index + 1;
                     continue;
@@ -106,7 +106,8 @@ namespace VNTags
                     {
                         string rawDialogue = line.Substring(start, index - start);
                         var    dialogue    = new DialogueTag();
-                        dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), rawDialogue);
+                        dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
+                                             rawDialogue);
                         tags.Add(dialogue);
                     }
 
@@ -127,7 +128,8 @@ namespace VNTags
                     {
                         // closing bracket is found, and tag will be parsed
                         string tagString = line.Substring(index + 1, endBracketIndex - 1 - index);
-                        VNTag tag       = ParseTag(tagString, new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count));
+                        VNTag tag = ParseTag(tagString,
+                                             new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count));
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
@@ -139,8 +141,9 @@ namespace VNTags
             if (start < line.Length)
             {
                 var dialogue = new DialogueTag();
-                dialogue._init(GenerateTagID(lineNumber, (UInt16)tags.Count), line);
-                dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (UInt16)tags.Count), line.Substring(start));
+                dialogue._init(GenerateTagID(lineNumber, (ushort)tags.Count), line);
+                dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
+                                     line.Substring(start));
                 tags.Add(dialogue);
             }
 
@@ -158,7 +161,7 @@ namespace VNTags
                     type.IsClass
                  && // Ensure it's a class (not an interface itself or a struct)
                     !type.IsAbstract
-&&                                                 // Exclude abstract classes
+                 &&                                // Exclude abstract classes
                     !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
                 {
                     var tag = (VNTag)Activator.CreateInstance(type);
@@ -203,9 +206,9 @@ namespace VNTags
             return token;
         }
 
-        public static UInt32 GenerateTagID(UInt16 lineNumber, UInt16 tagNumber)
+        public static uint GenerateTagID(ushort lineNumber, ushort tagNumber)
         {
-            UInt32 ID = lineNumber;
+            uint ID = lineNumber;
             ID =  ID << 16;
             ID += tagNumber;
             return ID;
@@ -222,17 +225,18 @@ namespace VNTags
         {
             var    tokens   = new List<string>();
             string workLine = line;
-            
+
             while (workLine.Contains(';'))
             {
-                int semicolonIndex = workLine.IndexOf(";", StringComparison.OrdinalIgnoreCase);
-                var token          = ExtractToken(workLine.Substring(0, semicolonIndex));
+                int    semicolonIndex = workLine.IndexOf(";", StringComparison.OrdinalIgnoreCase);
+                string token          = ExtractToken(workLine.Substring(0, semicolonIndex));
                 tokens.Add(token);
                 if (semicolonIndex + 1 >= workLine.Length)
                 {
                     workLine = null;
                     break;
                 }
+
                 workLine = workLine.Substring(semicolonIndex + 1);
             }
 

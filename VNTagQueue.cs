@@ -6,17 +6,18 @@ namespace VNTags
     {
         public LinkedList<VNTag> GetCollection()
         {
-            return (LinkedList<VNTag>)this;
+            return this;
         }
-        
+
         public void Tick(VNTagContext context)
         {
-            if (Count <= 0 || First.Value == null)
+            if ((Count <= 0) || (First.Value == null))
             {
                 return;
             }
-            var tag = First.Value;
-            
+
+            VNTag tag = First.Value;
+
             tag.BaseExecute(context, out bool isFinished);
 
             if (isFinished)

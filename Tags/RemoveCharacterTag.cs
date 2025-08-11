@@ -14,9 +14,9 @@ namespace VNTags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             isFinished =
-                VNTag.ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
-                                          _character,
-                                          CharacterAction.RemovedFromScene));
+                ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
+                                                                         _character,
+                                                                         CharacterAction.RemovedFromScene));
         }
 
         public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
@@ -26,7 +26,7 @@ namespace VNTags
                 Debug.LogError("RemoveCharacterTag: Deserialize: No parameters provided '" + context + "'");
                 return;
             }
-            
+
             _character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
 
             if (_character == null)
@@ -40,7 +40,7 @@ namespace VNTags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return _character != null ? VNTag.SerializeHelper(GetTagName(), _character.Name) : "";
+            return _character != null ? SerializeHelper(GetTagName(), _character.Name) : "";
         }
     }
 }
