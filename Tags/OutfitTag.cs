@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public delegate bool OutfitHandler(VNTagContext context, VNCharacterData character, VNOutfitData expression);
 

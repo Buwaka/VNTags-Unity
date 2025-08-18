@@ -4,6 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using VNTags.Tags;
 using VNTags.Utility;
 using File = System.IO.File;
 using Object = UnityEngine.Object;
@@ -207,7 +208,7 @@ namespace VNTags
             if (_backgroundChangeTag != null)
             {
                 //todo
-                var backgrounds = VNTagsConfig.GetConfig().Backgrounds;
+                var backgrounds = VNTagsConfig.GetConfig().AllBackgrounds;
                 for (int i = 0; i < backgrounds.Length; i++)
                 {
                     if (backgrounds[i].Name == _backgroundChangeTag.Background.Name)
@@ -393,27 +394,15 @@ namespace VNTags
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             // Name
+            string nullName = line.CharacterChangeTag.Character == null || !line.CharacterChangeTag.Character.IsBlankCharacter()
+                ? "Narrator"
+                : line.CharacterChangeTag.Character.Name;
             RenderPopup("Character",
-                        VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator"),
+                        VNTagsConfig.GetConfig().GetCharacterNamesGUI(nullName),
                         ref line.NameIndex,
                         VNTagsConfig.GetConfig().GetCharacterByIndex,
                         ref line.CharacterChangeTag.GetCharacterRef(),
                         line.InvalidateCharacter);
-
-            // EditorGUILayout.PrefixLabel("Character");
-            // GUIContent[] names = VNTagsConfig.GetConfig().GetCharacterNamesGUI("Narrator");
-            // line.NameIndex = EditorGUILayout.Popup(line.NameIndex, names);
-            // var temp = VNTagsConfig.GetConfig().GetCharacterByIndex(line.NameIndex);
-            // if (temp.HasValue)
-            // {
-            //     line.CharacterChangeTag.Character  = temp.Value;
-            //     line.Invalidate();
-            // }
-            // else if(line.NameIndex != 0)
-            // {
-            //     Debug.LogError("VNTagEditor: VNInspector: Expression has no value, '" + names[line.ExpressionIndex] + "' with index " + line.ExpressionIndex);
-            // }
-
             EditorGUILayout.EndVertical();
 
             EditorGUI.BeginDisabledGroup(line.CharacterChangeTag.Character == null);
@@ -439,21 +428,6 @@ namespace VNTags
                             line.CharacterChangeTag.Character.GetExpressionByIndex,
                             ref line.ExpressionChangeTag.GetOutfitRef(),
                             line.Invalidate);
-
-                // EditorGUILayout.PrefixLabel("Expression");
-                // var expressions = line.CharacterChangeTag.Character.Value.GetExpressionNamesGUI("No Expression Change");
-                // line.ExpressionIndex = EditorGUILayout.Popup(line.ExpressionIndex, expressions);
-                //
-                // var temp1 = line.CharacterChangeTag.Character.Value.GetExpressionByIndex(line.ExpressionIndex);
-                // if (temp1.HasValue)
-                // {
-                //     line.ExpressionChangeTag.Expression  = temp1.Value;
-                //     line.Invalidate();
-                // }
-                // else if(line.ExpressionIndex != 0)
-                // {
-                //     Debug.LogError("VNTagEditor: VNInspector: Expression has no value, '" + expressions[line.ExpressionIndex] + "' with index " + line.ExpressionIndex);
-                // }
                 EditorGUILayout.EndVertical();
 
 
@@ -465,21 +439,6 @@ namespace VNTags
                             line.CharacterChangeTag.Character.GetOutfitByIndex,
                             ref line.OutfitChangeTag.GetOutfitRef(),
                             line.Invalidate);
-
-                // EditorGUILayout.PrefixLabel("Outfit");
-                // var outfits = line.CharacterChangeTag.Character.Value.GetOutfitNamesGUI("No Outfit Change");
-                // line.OutfitIndex = EditorGUILayout.Popup(line.OutfitIndex, outfits);
-                // var temp2 = line.CharacterChangeTag.Character.Value.GetOutfitByIndex(line.OutfitIndex);
-                // if (temp2.HasValue)
-                // {
-                //     line.OutfitChangeTag.Outfit = temp2.Value;
-                //     line.Invalidate();
-                // }
-                // else if(line.OutfitIndex != 0)
-                // {
-                //     Debug.LogError("VNTagEditor: VNInspector: outfit has no value, '" + outfits[line.OutfitIndex] + "' with index " + line.OutfitIndex);
-                // }
-
                 EditorGUILayout.EndVertical();
             }
 

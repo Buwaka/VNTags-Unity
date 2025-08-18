@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using TMPro;
-using UnityEngine;
+using VNTags.Tags;
 using Object = System.Object;
 
 namespace VNTags
 {
-    // todo honestly this should be reworked, is way too game dependant
     public struct VNTagContext
     {
         /// <summary>
@@ -16,31 +14,21 @@ namespace VNTags
         /// </summary>
         public uint ID { get; }
 
-        public TMP_Text   CharacterNameBox { get; }
-        public TMP_Text   TextBox          { get; }
-        public GameObject DialogueWindow   { get; }
+        public static readonly Dictionary<string, Object> Fields = new();
+
+        public VNTagContext(uint id)
+        {
+            ID = id;
+        }
 
         public VNTagContext(VNTagContext other)
         {
-            ID               = other.ID;
-            CharacterNameBox = other.CharacterNameBox;
-            TextBox          = other.TextBox;
-            DialogueWindow   = other.DialogueWindow;
+            ID = other.ID;
         }
 
         public VNTagContext(VNTagContext other, uint id)
         {
-            ID               = id;
-            CharacterNameBox = other.CharacterNameBox;
-            TextBox          = other.TextBox;
-            DialogueWindow   = other.DialogueWindow;
-        }
-
-        public VNTagContext(TMP_Text characterNameBox, TMP_Text textBox, GameObject dialogueWindow) : this()
-        {
-            CharacterNameBox = characterNameBox;
-            TextBox          = textBox;
-            DialogueWindow   = dialogueWindow;
+            ID = id;
         }
 
         public VNTagContext Instantiate(uint id)

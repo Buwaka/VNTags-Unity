@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public delegate bool CharacterMoveHandler(VNTagContext context, VNCharacterData character, string position);
 

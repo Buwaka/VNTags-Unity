@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace VNTags
 {
@@ -8,13 +9,28 @@ namespace VNTags
     ///     Outfit gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [Serializable]
-    public class VNOutfitData
+    public class VNOutfitData : IVNData
     {
-        public string Name;
+        [SerializeField] private string name;
 
         [Tooltip("Alternative names for writing convenience, case insensitive")]
-        public string[] Alias;
+        [SerializeField] private string[] alias;
 
-        public GameObject Object;
+        [SerializeField] private GameObject prefab;
+
+        public GameObject Prefab
+        {
+            get { return prefab; }
+        }
+
+        public string Name
+        {
+            get { return name; }
+        }
+
+        public string[] Alias
+        {
+            get { return alias; }
+        }
     }
 }

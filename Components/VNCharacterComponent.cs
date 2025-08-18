@@ -82,7 +82,7 @@ namespace VNTags.Components
 
         private GameObject Load(VNExpressionData expression, bool reload = false)
         {
-            if ((expression == null) || (expression.Object == null))
+            if ((expression == null) || (expression.Prefab == null))
             {
                 Debug.LogError("VNCharacter: Load: expression or expression object is null, aborting");
                 return null;
@@ -102,14 +102,14 @@ namespace VNTags.Components
                 }
             }
 
-            GameObject newExpr = Instantiate(expression.Object, gameObject.transform);
+            GameObject newExpr = Instantiate(expression.Prefab, gameObject.transform);
             _expressionObjects.Add(expression, newExpr);
             return newExpr;
         }
 
         private GameObject Load(VNOutfitData outfit, bool reload = false)
         {
-            if ((outfit == null) || (outfit.Object == null))
+            if ((outfit == null) || (outfit.Prefab == null))
             {
                 Debug.LogError("VNCharacter: Load: outfit or outfit object is null, aborting");
                 return null;
@@ -129,7 +129,7 @@ namespace VNTags.Components
                 }
             }
 
-            GameObject newExpr = Instantiate(outfit.Object, gameObject.transform);
+            GameObject newExpr = Instantiate(outfit.Prefab, gameObject.transform);
             _outfitObjects.Add(outfit, newExpr);
             return newExpr;
         }
@@ -158,7 +158,7 @@ namespace VNTags.Components
 
         public void ChangeExpression(VNExpressionData expression)
         {
-            if ((expression == null) || (expression.Object == null))
+            if ((expression == null) || (expression.Prefab == null))
             {
                 Debug.LogError("VNCharacter: ChangeExpression: Expression is null, aborting, " + expression);
                 return;
@@ -191,7 +191,7 @@ namespace VNTags.Components
 
         public void ChangeOutfit(VNOutfitData outfit)
         {
-            if ((outfit == null) || (outfit.Object == null))
+            if ((outfit == null) || (outfit.Prefab == null))
             {
                 Debug.LogError("VNCharacter: ChangeOutfit: Outfit is null, aborting, " + outfit);
                 return;

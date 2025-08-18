@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public delegate bool ExpressionHandler(VNTagContext     context,
                                            VNCharacterData  character,

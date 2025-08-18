@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using UnityEngine;
+using VNTags.Tags;
 
 namespace VNTags
 {

@@ -1,4 +1,4 @@
-﻿namespace VNTags
+﻿namespace VNTags.Tags
 {
     public class AnimationTag
     {

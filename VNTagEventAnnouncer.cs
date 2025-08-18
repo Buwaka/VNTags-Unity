@@ -1,4 +1,6 @@
-﻿namespace VNTags
+﻿using VNTags.Tags;
+
+namespace VNTags
 {
     /// <summary>
     ///     This event announcer is the bridge between the VNTags system and the game specific implementation.
@@ -16,8 +18,10 @@
         public static CharacterHandler     onCharacterTag;
         public static CharacterMoveHandler onCharacterMoveTag;
         public static DialogueHandler      onDialogueTag;
+        public static EndOfLineHandler     onEndOfLineTag;
         public static ExpressionHandler    onExpressionTag;
         public static OutfitHandler        onOutfitTag;
         public static ChoiceHandler        onChoiceTag;
+        public static TransitionHandler    onTransitionTag;
     }
 }

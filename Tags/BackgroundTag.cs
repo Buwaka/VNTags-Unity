@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public class BackgroundTag : VNTag
     {

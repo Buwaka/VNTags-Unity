@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace VNTags
 {
@@ -10,22 +11,31 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNCharacterData
+    public class VNCharacterData : IVNData
     {
         [Tooltip("Name that will be rendered, case insensitive")]
-        public string Name;
+        [SerializeField] private string name;
 
         [Tooltip("Alternative names for writing convenience, case insensitive")]
-        public string[] Alias;
-
+        [SerializeField] private string[] alias;
+        
         [Tooltip(
                     "Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        public VNExpressionData[] Expressions;
-
+        [SerializeField] private VNExpressionData[] expressions;
+        
         [Tooltip(
                     "Name for the Outfit, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        public VNOutfitData[] Outfits;
+        [SerializeField] private VNOutfitData[] outfits;
 
+        public VNExpressionData[] Expressions
+        {
+            get { return expressions; }
+        }
+
+        public VNOutfitData[] Outfits
+        {
+            get { return outfits; }
+        }
 
         private VNExpressionData _defaultExpression;
         private VNOutfitData     _defaultOutfit;
@@ -34,9 +44,9 @@ namespace VNTags
         {
             get
             {
-                if ((_defaultExpression == null) && (Expressions[0] != null))
+                if ((_defaultExpression == null) && (expressions[0] != null))
                 {
-                    _defaultExpression = Expressions[0];
+                    _defaultExpression = expressions[0];
                 }
 
                 return _defaultExpression;
@@ -48,9 +58,9 @@ namespace VNTags
         {
             get
             {
-                if ((_defaultOutfit == null) && (Outfits[0] != null))
+                if ((_defaultOutfit == null) && (outfits[0] != null))
                 {
-                    _defaultOutfit = Outfits[0];
+                    _defaultOutfit = outfits[0];
                 }
 
                 return _defaultOutfit;
@@ -59,11 +69,33 @@ namespace VNTags
         }
 
 
+        public string Name
+        {
+            get { return name; }
+        }
+
+        public string[] Alias
+        {
+            get { return alias; }
+        }
+
+        public static VNCharacterData BlankCharacter(string name)
+        {
+            var chara = new VNCharacterData();
+            chara.name = name;
+            return chara;
+        }
+
+        public bool IsBlankCharacter()
+        {
+            return Expressions == null && Outfits == null;
+        }
+        
         public VNExpressionData GetExpressionByIndex(int index)
         {
-            if ((index > 0) && (index <= Expressions.Length))
+            if ((index > 0) && (index <= expressions.Length))
             {
-                return Expressions[index - 1];
+                return expressions[index - 1];
             }
 
             return null;
@@ -71,7 +103,7 @@ namespace VNTags
 
         public VNExpressionData GetExpressionByName(string name)
         {
-            foreach (VNExpressionData expression in Expressions)
+            foreach (VNExpressionData expression in expressions)
             {
                 if ((expression != null) && string.Equals(expression.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -84,9 +116,9 @@ namespace VNTags
 
         public VNOutfitData GetOutfitByIndex(int index)
         {
-            if ((index > 0) && (index <= Outfits.Length))
+            if ((index > 0) && (index <= outfits.Length))
             {
-                return Outfits[index - 1];
+                return outfits[index - 1];
             }
 
             return null;
@@ -94,7 +126,7 @@ namespace VNTags
 
         public VNOutfitData GetOutfitByName(string name)
         {
-            foreach (VNOutfitData outfit in Outfits)
+            foreach (VNOutfitData outfit in outfits)
             {
                 if ((outfit != null) && string.Equals(outfit.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -115,14 +147,19 @@ namespace VNTags
         /// <returns></returns>
         public GUIContent[] GetExpressionNamesGUI(string nullValue)
         {
-            int total  = Expressions.Length + 1;
+            if (IsBlankCharacter())
+            {
+                return Array.Empty<GUIContent>();
+            }
+            
+            int total  = expressions.Length + 1;
             var result = new GUIContent[total];
 
             result[0] = new GUIContent(nullValue);
 
-            for (int i = 0; i < Expressions.Length; i++)
+            for (int i = 0; i < expressions.Length; i++)
             {
-                result[i + 1] = new GUIContent(Expressions[i].Name);
+                result[i + 1] = new GUIContent(expressions[i].Name);
             }
 
             return result;
@@ -135,14 +172,19 @@ namespace VNTags
         /// <returns></returns>
         public GUIContent[] GetOutfitNamesGUI(string nullValue)
         {
-            int total  = Outfits.Length + 1;
+            if (IsBlankCharacter())
+            {
+                return Array.Empty<GUIContent>();
+            }
+            
+            int total  = outfits.Length + 1;
             var result = new GUIContent[total];
 
             result[0] = new GUIContent(nullValue);
 
-            for (int i = 0; i < Outfits.Length; i++)
+            for (int i = 0; i < outfits.Length; i++)
             {
-                result[i + 1] = new GUIContent(Outfits[i].Name);
+                result[i + 1] = new GUIContent(outfits[i].Name);
             }
 
             return result;

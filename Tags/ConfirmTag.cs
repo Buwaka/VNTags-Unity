@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using Serialize.Linq.Serializers;
 using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     using Condition = Func<bool>;
 

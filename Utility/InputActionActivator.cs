@@ -25,7 +25,7 @@ public class InputActionActivator : OnScreenControl
 
         if (actionRef == null)
         {
-            Debug.LogError("InputActionActivator: TriggerInputAction: Action is null, aborting, " + gameObject.name);
+            Debug.LogError($"InputActionActivator: TriggerInputAction: Action is null, aborting,  ${gameObject.name}");
             return;
         }
 
@@ -34,24 +34,21 @@ public class InputActionActivator : OnScreenControl
             InputActionAsset asset = actionRef.asset;
             if (asset == null)
             {
-                Debug.LogError("InputActionActivator: TriggerInputAction: asset inside action is null, aborting, "
-                             + gameObject.name);
+                Debug.LogError($"InputActionActivator: TriggerInputAction: asset inside action is null, aborting, ${gameObject.name}");
                 return;
             }
 
             var bindings = asset.bindings;
             if ((bindings == null) || !bindings.Any())
             {
-                Debug.LogError("InputActionActivator: TriggerInputAction: Action has no bindings, aborting, "
-                             + gameObject.name);
+                Debug.LogError($"InputActionActivator: TriggerInputAction: Action has no bindings, aborting, ${gameObject.name}");
                 return;
             }
 
             controlPath = bindings.First().effectivePath;
             if (controlPath == null)
             {
-                Debug.LogError("InputActionActivator: TriggerInputAction: Failed to set Control Path, aborting, "
-                             + gameObject.name);
+                Debug.LogError($"InputActionActivator: TriggerInputAction: Failed to set Control Path, aborting, ${gameObject.name}");
                 return;
             }
         }
@@ -59,8 +56,7 @@ public class InputActionActivator : OnScreenControl
         InputControl inputControl = InputSystem.FindControl(controlPath);
         if (inputControl == null)
         {
-            Debug.LogError($"InputActionActivator: TriggerInputAction: could not find inputControl for ${controlPath}, aborting, "
-                         + gameObject.name);
+            Debug.LogError($"InputActionActivator: TriggerInputAction: could not find inputControl for ${controlPath}, aborting, ${gameObject.name}");
             return;
         }
 
@@ -89,8 +85,7 @@ public class InputActionActivator : OnScreenControl
                 break;
 
             default:
-                Debug.LogWarning($"InputActionActivator: TriggerInputAction: Value type of button has not been mapped or is invalid, valuetype: ${inputControl.valueType}, "
-                               + gameObject.name);
+                Debug.LogWarning($"InputActionActivator: TriggerInputAction: Value type of button has not been mapped or is invalid, valuetype: ${inputControl.valueType}, ${gameObject.name}");
                 break;
         }
 

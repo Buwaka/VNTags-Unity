@@ -10,11 +10,23 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNMusicData
+    public class VNMusicData : IVNData
     {
         [Tooltip("ID for the music, case insensitive")]
-        public string Name;
+        [SerializeField] private string name;
 
-        public AudioClip SoundAsset;
+        [SerializeField] private string[] alias;
+
+        [SerializeField] private AudioClip soundAsset;
+
+        public string Name
+        {
+            get { return name; }
+        }
+
+        public string[] Alias
+        {
+            get { return alias; }
+        }
     }
 }

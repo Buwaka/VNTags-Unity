@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -10,23 +11,57 @@ namespace VNTags
     {
         private static VNTagsConfig config;
 
-        [SerializeField] public VNCharacterData[] Characters;
+        [SerializeField] private string ConfigName = "VNTagsConfig";
 
-        [SerializeField] public VNBackgroundData[] Backgrounds;
+        [SerializeField] private VNCharacterData[] Characters;
 
-        [SerializeField] public VNSoundData[] SoundEffects;
+        [SerializeField] private VNBackgroundData[] Backgrounds;
 
-        [SerializeField] public VNMusicData[] Musics;
+        [SerializeField] private VNSoundData[] SoundEffects;
 
-        [SerializeField] public VNScene[] Scenes;
+        [SerializeField] private VNMusicData[] Musics;
 
+        [SerializeField] private VNTransition[] Transitions;
 
-        public VNCharacterData GetCharacterByNameOrAlias(string CharacterName)
+        [SerializeField] private VNScene[] Scenes;
+
+        public VNCharacterData[] AllCharacters
         {
-            foreach (VNCharacterData character in Characters)
+            get { return Characters; }
+        }
+
+        public VNBackgroundData[] AllBackgrounds
+        {
+            get { return Backgrounds; }
+        }
+
+        public VNSoundData[] AllSoundEffects
+        {
+            get { return SoundEffects; }
+        }
+
+        public VNMusicData[] AllMusics
+        {
+            get { return Musics; }
+        }
+
+        public VNScene[] AllScenes
+        {
+            get { return Scenes; }
+        }
+
+        public VNTransition[] AllTransitions
+        {
+            get { return Transitions; }
+        }
+
+
+        private IVNData GetDataByNameOrAlias(IReadOnlyList<IVNData> arr, string name)
+        {
+            foreach (IVNData character in arr)
             {
-                if (character.Name.Equals(CharacterName, StringComparison.OrdinalIgnoreCase)
-                 || character.Alias.Any(chara => chara.Equals(CharacterName, StringComparison.OrdinalIgnoreCase)))
+                if (character.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
+                 || character.Alias.Any(chara => chara.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
                     return character;
                 }
@@ -35,15 +70,76 @@ namespace VNTags
             return null;
         }
 
-        public VNCharacterData GetCharacterByIndex(int index)
+        private IVNData GetDataByIndex(IReadOnlyList<IVNData> arr, int index)
         {
-            if ((index > 0) && (index <= Characters.Length))
+            if ((index > 0) && (index <= arr.Count))
             {
-                return Characters[index - 1];
+                return arr[index - 1];
             }
 
             return null;
         }
+
+        public VNCharacterData GetCharacterByNameOrAlias(string name)
+        {
+            return (VNCharacterData)GetDataByNameOrAlias(Characters, name);
+        }
+
+        public VNCharacterData GetCharacterByIndex(int index)
+        {
+            return (VNCharacterData)GetDataByIndex(Characters, index);
+        }
+
+        public VNBackgroundData GetBackgroundByNameOrAlias(string name)
+        {
+            return (VNBackgroundData)GetDataByNameOrAlias(Backgrounds, name);
+        }
+
+        public VNBackgroundData GetBackgroundByIndex(int index)
+        {
+            return (VNBackgroundData)GetDataByIndex(Backgrounds, index);
+        }
+
+        public VNSoundData GetSoundByNameOrAlias(string name)
+        {
+            return (VNSoundData)GetDataByNameOrAlias(SoundEffects, name);
+        }
+
+        public VNSoundData GetSoundByIndex(int index)
+        {
+            return (VNSoundData)GetDataByIndex(SoundEffects, index);
+        }
+
+        public VNMusicData GetMusicByNameOrAlias(string name)
+        {
+            return (VNMusicData)GetDataByNameOrAlias(Musics, name);
+        }
+
+        public VNMusicData GetMusicByIndex(int index)
+        {
+            return (VNMusicData)GetDataByIndex(Musics, index);
+        }
+
+        public VNScene GetSceneByName(string name)
+        {
+            return (VNScene)GetDataByNameOrAlias(Scenes, name);
+        }
+
+        public VNScene GetSceneByIndex(int index)
+        {
+            return (VNScene)GetDataByIndex(Scenes, index);
+        }
+
+        public VNTransition GetTransitionByNameOrAlias(string name)
+        {
+            return (VNTransition)GetDataByNameOrAlias(Transitions, name);
+        }
+
+        public VNTransition GetTransitioByIndex(int index)
+        {
+            return (VNTransition)GetDataByIndex(Transitions, index);
+        }
+
 
         public static VNTagsConfig GetConfig()
         {
@@ -71,9 +167,7 @@ namespace VNTags
 
             return config;
 #else
-            // todo how to access config at runtime
-                    // Load the ScriptableObject from a Resources folder at runtime
-        config = Resources.Load<VNTagsConfig>("VNTagsConfig");
+        config = Resources.Load<VNTagsConfig>(ConfigName);
 
         if (config == null)
         {

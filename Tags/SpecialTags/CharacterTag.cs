@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public delegate bool CharacterHandler(VNTagContext context, VNCharacterData character, CharacterAction action);
 
@@ -31,10 +31,11 @@ namespace VNTags
 
             if (Character == null)
             {
-                Debug.LogError("CharacterTag: Deserialize: Failed to find Character with name '"
-                             + Parameters
-                             + "', "
+                Debug.Log("CharacterTag: Deserialize: Failed to find Character with name '"
+                             + Parameters[0]
+                             + "', using only name instead "
                              + context);
+                _character = VNCharacterData.BlankCharacter(Parameters[0]);
             }
         }
 

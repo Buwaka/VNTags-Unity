@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VNTags
+namespace VNTags.Tags
 {
     public class RemoveCharacterTag : VNTag
     {

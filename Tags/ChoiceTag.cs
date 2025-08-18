@@ -1,4 +1,4 @@
-﻿namespace VNTags
+﻿namespace VNTags.Tags
 {
     public delegate bool ChoiceHandler(VNTagContext context, int choiceIndex, ChoiceContext choiceContext);
 
