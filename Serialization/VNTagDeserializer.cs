@@ -47,8 +47,10 @@ namespace VNTags
                     continue;
                 }
 
-                ushort CSharpisKindaGayForThisAintGonnaLie = 1;
-                foreach (VNTag tag in ParseLine(line, (ushort)(lineIndex + CSharpisKindaGayForThisAintGonnaLie)))
+                string processedLine = TextProcessors.TextProcessors.PreProcessRawScript(line);
+                processedLine = TextProcessors.TextProcessors.PostProcessRawScript(processedLine);
+
+                foreach (VNTag tag in ParseLine(processedLine, (ushort)(lineIndex + 1)))
                 {
                     tagQueue.AddLast(tag);
                 }

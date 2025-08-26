@@ -19,6 +19,9 @@ namespace VNTags
         [Tooltip("Alternative names for writing convenience, case insensitive")]
         [SerializeField] private string[] alias;
         
+        [Tooltip("Optional but useful field, can be used for the CharacterNameColor TextProcessor")]
+        [SerializeField] private Color mainColor;
+        
         [Tooltip(
                     "Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
         [SerializeField] private VNExpressionData[] expressions;
@@ -66,6 +69,11 @@ namespace VNTags
                 return _defaultOutfit;
             }
             set { _defaultOutfit = value; }
+        }
+
+        public Color Color
+        {
+            get { return mainColor; }
         }
 
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using VNTags.TextProcessors;
+
 
 namespace VNTags
 {
@@ -11,8 +13,10 @@ namespace VNTags
     {
         private static VNTagsConfig config;
 
+#pragma warning disable 0414
         [SerializeField] private string ConfigName = "VNTagsConfig";
-
+#pragma warning restore 0414
+        
         [SerializeField] private VNCharacterData[] Characters;
 
         [SerializeField] private VNBackgroundData[] Backgrounds;
@@ -24,6 +28,11 @@ namespace VNTags
         [SerializeField] private VNTransition[] Transitions;
 
         [SerializeField] private VNScene[] Scenes;
+        
+        [SerializeReference]
+        public BaseTextProcessor[] TextProcessors; // do mind this is a SerializeReference, which is necessary for polymorphism
+        
+        
 
         public VNCharacterData[] AllCharacters
         {
@@ -135,7 +144,7 @@ namespace VNTags
             return (VNTransition)GetDataByNameOrAlias(Transitions, name);
         }
 
-        public VNTransition GetTransitioByIndex(int index)
+        public VNTransition GetTransitionByIndex(int index)
         {
             return (VNTransition)GetDataByIndex(Transitions, index);
         }

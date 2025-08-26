@@ -1,6 +1,9 @@
-﻿namespace VNTags.TextProcessors
+﻿using UnityEngine;
+using UnityEngine.Scripting;
+
+namespace VNTags.TextProcessors
 {
-    public abstract class ITextProcessor
+    public abstract class BaseTextProcessor : ScriptableObject
     {
         /// <summary>
         /// change the dialogue before it is processed,
@@ -46,32 +49,6 @@
        /// <param name="text"></param>
        /// <returns></returns>
        public virtual string PostProcessRawScript(string text)
-       {
-           return text;
-       }
-       
-       /// <summary>
-       /// Change the name text before it is processed,
-       /// for example in the name textbox.
-       /// there's no guarantee that your class will be first,
-       /// but by differentiating pre- and post- we can alleviate order-based most issues.
-       /// </summary>
-       /// <param name="text"></param>
-       /// <returns></returns>
-       public virtual string PreProcessName(string text)
-       {
-           return text;
-       }
-        
-       /// <summary>
-       /// Change the name text after it is processed,
-       /// for example in the name textbox
-       /// there's no guarantee that your class will be first,
-       /// but by differentiating pre- and post- we can alleviate order-based most issues.
-       /// </summary>
-       /// <param name="text"></param>
-       /// <returns></returns>
-       public virtual string PostProcessName(string text)
        {
            return text;
        }

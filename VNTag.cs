@@ -13,6 +13,8 @@ namespace VNTags
         ///     ID being just an unique identifier to differentiate tags from each other
         /// </summary>
         public uint ID { get; }
+        
+        //todo something to get the current main character and whatnot
 
         public static readonly Dictionary<string, Object> Fields = new();
 

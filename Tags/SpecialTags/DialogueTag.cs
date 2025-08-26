@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using VNTags.TextProcessors;
 
 namespace VNTags.Tags
 {
@@ -32,7 +33,10 @@ namespace VNTags.Tags
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, Dialogue));
+            string processedDialogue = TextProcessors.TextProcessors.PreProcessDialogue(Dialogue);
+            processedDialogue = TextProcessors.TextProcessors.PostProcessDialogue(processedDialogue);
+            
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, processedDialogue));
             // if(context.TextBox != null)
             // {
             //     context.TextBox.text = Dialogue;
