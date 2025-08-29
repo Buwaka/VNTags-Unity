@@ -7,7 +7,8 @@ namespace VNTags.Tags
 
     public class DialogueTag : VNTag
     {
-        public string Dialogue { get; private set; } = "";
+        public  string Dialogue { get; private set; } = "";
+        private string _processedDialogue = null;
 
         public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
@@ -30,22 +31,21 @@ namespace VNTags.Tags
             return "";
         }
 
+        public void Refresh()
+        {
+            _processedDialogue = TextProcessors.TextProcessors.PreProcessDialogue(Dialogue);
+            _processedDialogue = TextProcessors.TextProcessors.PostProcessDialogue(_processedDialogue);
+        }
+
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            string processedDialogue = TextProcessors.TextProcessors.PreProcessDialogue(Dialogue);
-            processedDialogue = TextProcessors.TextProcessors.PostProcessDialogue(processedDialogue);
+            if (_processedDialogue == null)
+            {
+                Refresh();
+            }
             
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, processedDialogue));
-            // if(context.TextBox != null)
-            // {
-            //     context.TextBox.text = Dialogue;
-            // }
-            // else
-            // {
-            //     Debug.LogError("DialogueTag: Execute: TextWindow in VNTagContext is null");
-            // }
-            // isFinished = true;
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, _processedDialogue));
         }
 
 #if UNITY_EDITOR

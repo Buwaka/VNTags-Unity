@@ -13,29 +13,34 @@ namespace VNTags
         ///     ID being just an unique identifier to differentiate tags from each other
         /// </summary>
         public uint ID { get; }
-        
+
+        public VNTag Tag { get; }
+
         //todo something to get the current main character and whatnot
 
         public static readonly Dictionary<string, Object> Fields = new();
 
-        public VNTagContext(uint id)
+        public VNTagContext(uint id, VNTag tag)
         {
-            ID = id;
+            ID  = id;
+            Tag = tag;
         }
 
         public VNTagContext(VNTagContext other)
         {
-            ID = other.ID;
+            ID  = other.ID;
+            Tag = other.Tag;
         }
 
-        public VNTagContext(VNTagContext other, uint id)
+        private VNTagContext(VNTagContext other, uint id , VNTag tag)
         {
-            ID = id;
+            ID  = id;
+            Tag = tag;
         }
 
-        public VNTagContext Instantiate(uint id)
+        public VNTagContext Instantiate(uint id, VNTag tag)
         {
-            return new VNTagContext(this, id);
+            return new VNTagContext(this, id, tag);
         }
     }
 
@@ -105,7 +110,7 @@ namespace VNTags
 
         public void BaseExecute(VNTagContext context, out bool isFinished)
         {
-            VNTagContext instContext = context.Instantiate(ID);
+            VNTagContext instContext = context.Instantiate(ID, this);
             Execute(instContext, out isFinished);
         }
 
