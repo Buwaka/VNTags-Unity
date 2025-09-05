@@ -12,222 +12,10 @@ using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 
 
-namespace VNTags
+namespace VNTags.Editor
 {
-    public class VNTagEditLine
-    {
-        private readonly LinkedList<VNTag> Tags;
-        private          BackgroundTag     _backgroundChangeTag;
-
-
-        private CharacterTag      _characterChangeTag;
-        private ExpressionTag     _expressionChangeTag;
-        private OutfitTag         _outfitChangeTag;
-        public  int               BackgroundIndex;
-        public  int               BGMIndex     = 0;
-        public  List<DialogueTag> DialogueTags = new();
-        public  int               ExpressionIndex;
-        public  bool              Foldout;
-
-
-        public int    NameIndex;
-        public int    OutfitIndex;
-        public string Preview = "";
-        public string RawLine;
-        public string SerializedPreview = "";
-        public int    SFXIndex          = 0;
-
-        public VNTagEditLine(string rawLine, int lineNumber)
-        {
-            Preview = lineNumber + ": ";
-            RawLine = rawLine;
-            Tags    = new LinkedList<VNTag>(VNTagDeserializer.ParseLine(RawLine, (ushort)lineNumber));
-
-
-            // filter out starter tags
-            foreach (VNTag tag in Tags)
-            {
-                if (tag is CharacterTag characterTag && (_characterChangeTag == null))
-                {
-                    _characterChangeTag = characterTag;
-                    if (_characterChangeTag.Character != null)
-                    {
-                        Preview += _characterChangeTag.Character.Name + ": ";
-                    }
-                }
-                else if (tag is ExpressionTag expressionTag)
-                {
-                    _expressionChangeTag = expressionTag;
-                }
-                else if (tag is OutfitTag outfitTag)
-                {
-                    _outfitChangeTag = outfitTag;
-                }
-                else if (tag is BackgroundTag backgroundTag)
-                {
-                    _backgroundChangeTag = backgroundTag;
-                }
-                else if (tag is DialogueTag)
-                {
-                    break;
-                }
-            }
-
-            // get all the dialogue tags
-            foreach (VNTag tag in Tags)
-            {
-                if (tag is DialogueTag)
-                {
-                    var dTag = (DialogueTag)tag;
-                    Preview += dTag.Dialogue;
-                    DialogueTags.Add(dTag);
-                }
-            }
-
-            SetIndieces();
-            Invalidate();
-        }
-
-        public CharacterTag CharacterChangeTag
-        {
-            get
-            {
-                if (_characterChangeTag == null)
-                {
-                    _characterChangeTag = new CharacterTag();
-                    Tags.AddFirst(_characterChangeTag);
-                }
-
-                return _characterChangeTag;
-            }
-        }
-
-        public ExpressionTag ExpressionChangeTag
-        {
-            get
-            {
-                if (_expressionChangeTag == null)
-                {
-                    _expressionChangeTag = new ExpressionTag();
-                    Tags.AddFirst(_expressionChangeTag);
-                }
-
-                return _expressionChangeTag;
-            }
-        }
-
-        public OutfitTag OutfitChangeTag
-        {
-            get
-            {
-                if (_outfitChangeTag == null)
-                {
-                    _outfitChangeTag = new OutfitTag();
-                    Tags.AddFirst(_outfitChangeTag);
-                }
-
-                return _outfitChangeTag;
-            }
-        }
-
-        public BackgroundTag BackgroundChangeTag
-        {
-            get
-            {
-                if (_backgroundChangeTag == null)
-                {
-                    _backgroundChangeTag = new BackgroundTag();
-                    Tags.AddFirst(_backgroundChangeTag);
-                }
-
-                return _backgroundChangeTag;
-            }
-        }
-
-        public void InvalidateCharacter()
-        {
-            ExpressionChangeTag.GetOutfitRef() = null;
-            OutfitChangeTag.GetOutfitRef()     = null;
-            ExpressionIndex                    = 0;
-            OutfitIndex                        = 0;
-            Invalidate();
-        }
-
-        public void Invalidate()
-        {
-            SerializedPreview = VNTagSerializer.SerializeLine(Tags);
-        }
-
-        public void SetIndieces()
-        {
-            if ((_characterChangeTag != null) && (_characterChangeTag.Character != null))
-            {
-                var characterNames = VNTagsConfig.GetConfig().GetCharacterNamesGUI("");
-                for (int i = 0; i < characterNames.Length; i++)
-                {
-                    if (characterNames[i]
-                       .text
-                       .Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        NameIndex = i;
-                        break;
-                    }
-                }
-
-                var expressionNames = _characterChangeTag.Character.GetExpressionNamesGUI("");
-                if ((_expressionChangeTag != null) && (_expressionChangeTag.Expression != null))
-                {
-                    for (int i = 0; i < expressionNames.Length; i++)
-                    {
-                        if (expressionNames[i]
-                           .text.Equals(_expressionChangeTag.Expression.Name,
-                                        StringComparison.OrdinalIgnoreCase))
-                        {
-                            ExpressionIndex = i;
-                            break;
-                        }
-                    }
-                }
-
-                var outfitNames = _characterChangeTag.Character.GetOutfitNamesGUI("");
-                if ((_outfitChangeTag != null) && (_outfitChangeTag.Outfit != null))
-                {
-                    for (int i = 0; i < outfitNames.Length; i++)
-                    {
-                        if (outfitNames[i]
-                           .text
-                           .Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
-                        {
-                            OutfitIndex = i;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (_backgroundChangeTag != null)
-            {
-                //todo
-                var backgrounds = VNTagsConfig.GetConfig().AllBackgrounds;
-                for (int i = 0; i < backgrounds.Length; i++)
-                {
-                    if (backgrounds[i].Name == _backgroundChangeTag.Background.Name)
-                    {
-                        BackgroundIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        public string Serialize()
-        {
-            return VNTagSerializer.SerializeLine(Tags);
-        }
-    }
-
     [CustomEditor(typeof(TextAsset))]
-    public class VNTagEditor : Editor
+    public class VNTagEditor : UnityEditor.Editor
     {
         private static readonly Dictionary<Object, VNTagEditLine[]> EditingLines  = new();
         private                 bool                                _invalidate   = true;
@@ -284,7 +72,7 @@ namespace VNTags
                     string line = lines[index];
                     if (VNTagDeserializer.IsSignificant(line))
                     {
-                        EditingLines[target][index] = new VNTagEditLine(line, index + 1);
+                        EditingLines[target][index] = new VNTagEditLine(line, (ushort) (index + 1));
                     }
                 }
 
@@ -382,13 +170,31 @@ namespace VNTags
             EditorGUILayout.Popup(0, nullVal);
         }
 
+        private void ShowTextBoxContextMenu(DialogueTag dialogueTag, VNTagEditLine line)
+        {
+            GenericMenu menu = new GenericMenu();
+            
+            menu.AddItem(new GUIContent("Create new Tag"), false, () => CreateTagWindow.ShowWindow(dialogueTag, line));
+            // menu.AddSeparator("");
+            // menu.AddItem(new GUIContent("Do Something Else"), false, () => Debug.Log("Doing something else!"));
+
+
+            menu.ShowAsContext();
+        }
 
         private void RenderLine(VNTagEditLine line)
         {
             //dialogue
             foreach (DialogueTag dialogueTag in line.DialogueTags)
             {
+                EditorGUILayout.BeginHorizontal();
                 dialogueTag.SetDialogue(EditorGUILayout.TextArea(dialogueTag.Dialogue));
+                
+                if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
+                {
+                    ShowTextBoxContextMenu(dialogueTag, line);
+                }
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.BeginHorizontal();

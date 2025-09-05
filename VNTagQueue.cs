@@ -1,9 +1,50 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
+using VNTags.Tags;
 
 namespace VNTags
 {
     public class VNTagQueue : LinkedList<VNTag>
     {
+        private VNCharacterData _currentCharacter = null;
+        
+        public VNTagQueue()
+        {
+            VNTagEventAnnouncer.onCharacterTag += OnCharacterTag;
+        }
+        
+        public VNTagQueue(IEnumerable<VNTag> collection) : base(collection)
+        {
+            VNTagEventAnnouncer.onCharacterTag += OnCharacterTag;
+        }
+
+        public int IndexOf(VNTag tag)
+        {
+            int i = 1;
+            foreach (var iTag in this)
+            {
+                if (iTag == tag)
+                {
+                    return i;
+                }
+                i++;
+            }
+
+            Debug.LogError("VNTagQueue: IndexOf: tag not found, (" + tag  + "), returning -1");
+            
+            return -1;
+        }
+
+        private bool OnCharacterTag(VNTagContext context, VNCharacterData character, CharacterAction action)
+        {
+            if (action == CharacterAction.AddedToScene)
+            {
+                _currentCharacter = character;
+            }
+
+            return true;
+        }
+
         public LinkedList<VNTag> GetCollection()
         {
             return this;
@@ -17,6 +58,7 @@ namespace VNTags
             }
 
             VNTag tag = First.Value;
+            context.SetMainCharacter(_currentCharacter);
 
             tag.BaseExecute(context, out bool isFinished);
 

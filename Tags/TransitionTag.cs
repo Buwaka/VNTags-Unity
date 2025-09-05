@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace VNTags.Tags
 {
@@ -14,20 +16,33 @@ namespace VNTags.Tags
             return "transition";
         }
 
-        protected override void Execute(VNTagContext context, out bool isFinished)
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
         {
-            isFinished =
-                ExecuteHelper(
-                              VNTagEventAnnouncer.onTransitionTag?.Invoke(context,
-                                                                          Transition));
+            return new[]
+            {
+                new VNTagParameter("Transition Name",
+                                   TypeCode.String,
+                                   "Name of the transition to be played",
+                                   null,
+                                   true,
+                                   null,
+                                   VNTagsConfig.GetConfig().AllTransitions.Select(t => t.name).ToArray())
+            };
         }
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            if (parameters != null && parameters.Length > 0)
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, Transition));
+        }
+
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        {
+            if ((parameters != null) && (parameters.Length > 0))
             {
                 Transition = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[0]);
             }
+
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)

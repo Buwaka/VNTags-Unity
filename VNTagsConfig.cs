@@ -67,6 +67,11 @@ namespace VNTags
 
         private IVNData GetDataByNameOrAlias(IReadOnlyList<IVNData> arr, string name)
         {
+            if (name == null)
+            {
+                return null;
+            }
+            
             foreach (IVNData character in arr)
             {
                 if (character.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
@@ -189,6 +194,23 @@ namespace VNTags
 
 
 #if UNITY_EDITOR
+        public string[] GetCharacterNames()
+        {
+            return  Characters.Select((t) => t.Name).ToArray();
+        }
+        
+        public string[] GetOutfitNames(string name)
+        {
+            var character = GetCharacterByNameOrAlias(name);
+            return character?.Outfits.Select((t) => t.Name).ToArray();
+        }
+        
+        public string[] GeExpressionNames(string name)
+        {
+            var character = GetCharacterByNameOrAlias(name);
+            return character?.Expressions.Select((t) => t.Name).ToArray();
+        }
+        
         /// <summary>
         ///     Is used in the script editor inspector script,
         ///     0 is always nullValue

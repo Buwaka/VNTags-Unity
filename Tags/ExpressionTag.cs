@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace VNTags.Tags
 {
-    public delegate bool ExpressionHandler(VNTagContext     context,
-                                           VNCharacterData  character,
-                                           VNExpressionData expression);
+    public delegate bool ExpressionHandler(VNTagContext context, VNCharacterData character, VNExpressionData expression);
 
     public class ExpressionTag : VNTag
     {
@@ -17,7 +17,7 @@ namespace VNTags.Tags
             get { return _expression; }
         }
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if (parameters.Length >= 2)
             {
@@ -25,30 +25,25 @@ namespace VNTags.Tags
                 TargetCharacter = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
                 if (TargetCharacter == null)
                 {
-                    Debug.LogError("ExpressionTag: Deserialize: failed to find character name, "
-                                 + parameters[0]
-                                 + ", context: "
-                                 + context);
-                    return;
+                    Debug.LogError("ExpressionTag: Deserialize: failed to find character name, " + parameters[0] + ", context: " + context);
+                    return false;
                 }
 
                 //outfit ref
                 _expression = TargetCharacter.GetExpressionByName(parameters[1]);
                 if (Expression == null)
                 {
-                    Debug.LogError("ExpressionTag: Deserialize: failed to find corresponding Expression name, "
-                                 + parameters[0]
-                                 + ", context: "
-                                 + context);
+                    Debug.LogError("ExpressionTag: Deserialize: failed to find corresponding Expression name, " + parameters[0] + ", context: " + context);
+                    return false;
                 }
             }
             else
             {
-                Debug.LogError("ExpressionTag: Deserialize: failed to deserialize, not enough parameters, "
-                             + parameters
-                             + ", context: "
-                             + context);
+                Debug.LogError("ExpressionTag: Deserialize: failed to deserialize, not enough parameters, " + parameters + ", context: " + context);
+                return false;
             }
+
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)
@@ -58,9 +53,7 @@ namespace VNTags.Tags
                 TargetCharacter = context.GetMainCharacter();
             }
 
-            return (_expression != null) && (TargetCharacter != null)
-                ? SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name)
-                : "";
+            return (_expression != null) && (TargetCharacter != null) ? SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name) : "";
         }
 
         public override string GetTagName()
@@ -68,13 +61,36 @@ namespace VNTags.Tags
             return "Expression";
         }
 
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        {
+            string character = null;
+            if (currentParameters.Count > 0)
+            {
+                character = (string)currentParameters[0];
+            }
+
+            return new[]
+            {
+                new VNTagParameter("Character",
+                                   TypeCode.String,
+                                   "Character to change the expression of",
+                                   null,
+                                   false,
+                                   null,
+                                   VNTagsConfig.GetConfig().GetCharacterNames()),
+                new VNTagParameter("Expression",
+                                   TypeCode.String,
+                                   "Expression to set the character to",
+                                   null,
+                                   false,
+                                   null,
+                                   VNTagsConfig.GetConfig().GeExpressionNames(character))
+            };
+        }
+
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished =
-                ExecuteHelper(
-                              VNTagEventAnnouncer.onExpressionTag?.Invoke(context,
-                                                                          TargetCharacter,
-                                                                          Expression));
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onExpressionTag?.Invoke(context, TargetCharacter, Expression));
         }
 
 #if UNITY_EDITOR

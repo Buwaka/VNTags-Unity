@@ -33,11 +33,8 @@ namespace VNTags
         [NotNull]
         public static VNTagQueue Parse(string text)
         {
-            var tagQueue = new VNTagQueue();
-            string[] lines = text.Split(
-                                        new[] { "\r\n", "\r", "\n" },
-                                        StringSplitOptions.None
-                                       );
+            var      tagQueue = new VNTagQueue();
+            string[] lines    = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
             for (ushort lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
@@ -94,9 +91,11 @@ namespace VNTags
                 {
                     string characterName = line.Substring(start, index - start);
                     var    cTag          = new CharacterTag();
-                    cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
-                                     characterName);
-                    tags.Add(cTag);
+                    if (cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), characterName))
+                    {
+                        tags.Add(cTag);
+                    }
+
                     start = index + 1;
                     continue;
                 }
@@ -109,9 +108,10 @@ namespace VNTags
                     {
                         string rawDialogue = line.Substring(start, index - start);
                         var    dialogue    = new DialogueTag();
-                        dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
-                                             rawDialogue);
-                        tags.Add(dialogue);
+                        if (dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), rawDialogue))
+                        {
+                            tags.Add(dialogue);
+                        }
                     }
 
                     // look for the closing bracket
@@ -120,19 +120,14 @@ namespace VNTags
                     // if not closing bracket is found
                     if (endBracketIndex == -1)
                     {
-                        Debug.LogError("VNTagParser: ParseLine: did not find closing bracket for bracket at position "
-                                     + index
-                                     + ", for line '"
-                                     + line
-                                     + "'");
+                        Debug.LogError("VNTagParser: ParseLine: did not find closing bracket for bracket at position " + index + ", for line '" + line + "'");
                         start = index + 1;
                     }
                     else
                     {
                         // closing bracket is found, and tag will be parsed
                         string tagString = line.Substring(index + 1, endBracketIndex - 1 - index);
-                        VNTag tag = ParseTag(tagString,
-                                             new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count));
+                        VNTag  tag       = ParseTag(tagString, new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count));
                         tags.Add(tag);
                         start = endBracketIndex + 1;
                         index = endBracketIndex;
@@ -145,9 +140,10 @@ namespace VNTags
             {
                 var dialogue = new DialogueTag();
                 dialogue._init(GenerateTagID(lineNumber, (ushort)tags.Count), line);
-                dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count),
-                                     line.Substring(start));
-                tags.Add(dialogue);
+                if (dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), line.Substring(start)))
+                {
+                    tags.Add(dialogue);
+                }
             }
 
             return tags;
@@ -164,7 +160,7 @@ namespace VNTags
                     type.IsClass
                  && // Ensure it's a class (not an interface itself or a struct)
                     !type.IsAbstract
-                 &&                                // Exclude abstract classes
+&&                                                 // Exclude abstract classes
                     !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
                 {
                     var tag = (VNTag)Activator.CreateInstance(type);
@@ -262,8 +258,8 @@ namespace VNTags
 
                 var newInst = (VNTag)Activator.CreateInstance(tagType.GetType());
                 newInst._init(GenerateTagID(context.LineNumber, context.TagNumber), line);
-                newInst.Deserialize(context, tokens.Skip(1).ToArray());
-                return newInst;
+                bool result = newInst.Deserialize(context, tokens.Skip(1).ToArray());
+                return result ? newInst : null;
             }
 
             return null;

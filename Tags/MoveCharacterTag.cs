@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace VNTags.Tags
 {
@@ -14,20 +16,26 @@ namespace VNTags.Tags
             return "Move";
         }
 
-        protected override void Execute(VNTagContext context, out bool isFinished)
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
         {
-            isFinished =
-                ExecuteHelper(VNTagEventAnnouncer.onCharacterMoveTag?.Invoke(context,
-                                                                             _character,
-                                                                             _namedPosition));
+            return new[]
+            {
+                new VNTagParameter("Character", TypeCode.String, "Character to move", null, false, null, VNTagsConfig.GetConfig().GetCharacterNames()),
+                new VNTagParameter("Position",  TypeCode.String, "Name of the position to move the character to")
+            };
         }
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        protected override void Execute(VNTagContext context, out bool isFinished)
+        {
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onCharacterMoveTag?.Invoke(context, _character, _namedPosition));
+        }
+
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if ((parameters == null) || (parameters.Length <= 1))
             {
                 Debug.LogError("MoveCharacterTag: Deserialize: Not enough parameters provided '" + context + "'");
-                return;
+                return false;
             }
 
             _character     = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
@@ -35,19 +43,17 @@ namespace VNTags.Tags
 
             if (_character == null)
             {
-                Debug.LogError("MoveCharacterTag: Deserialize: Failed to find Character with name '"
-                             + parameters[0]
-                             + "', "
-                             + context);
+                Debug.LogError("MoveCharacterTag: Deserialize: Failed to find Character with name '" + parameters[0] + "', " + context);
+                return false;
             }
 
             if (string.IsNullOrEmpty(_namedPosition))
             {
-                Debug.LogError("MoveCharacterTag: Deserialize: provided position is empty or null '"
-                             + parameters[1]
-                             + "', "
-                             + context);
+                Debug.LogError("MoveCharacterTag: Deserialize: provided position is empty or null '" + parameters[1] + "', " + context);
+                return false;
             }
+
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)

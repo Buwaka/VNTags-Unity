@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Serialize.Linq.Serializers;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace VNTags.Tags
         public static Condition DefaultCondition { get; set; } = null;
 
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             // only when there is an extra condition provided, otherwise it will just use the default condition
             if ((parameters != null) && (parameters.Length > 0))
@@ -29,12 +30,12 @@ namespace VNTags.Tags
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("ConfirmTag: Deserialize: failed to deserialize condition, '"
-                                 + context
-                                 + "', exception: "
-                                 + e);
+                    Debug.LogError("ConfirmTag: Deserialize: failed to deserialize condition, '" + context + "', exception: " + e);
+                    return false;
                 }
             }
+
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)
@@ -53,6 +54,12 @@ namespace VNTags.Tags
         public override string GetTagName()
         {
             return "Confirm";
+        }
+
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        {
+            // todo potentially list all functions and have the user choose, or a string expression that will be evaluated
+            return null;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

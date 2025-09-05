@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace VNTags.Tags
 {
@@ -11,31 +13,42 @@ namespace VNTags.Tags
             return "Remove";
         }
 
-        protected override void Execute(VNTagContext context, out bool isFinished)
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
         {
-            isFinished =
-                ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context,
-                                                                         _character,
-                                                                         CharacterAction.RemovedFromScene));
+            return new[]
+            {
+                new VNTagParameter("Character",
+                                   TypeCode.String,
+                                   "Character to add or remove from the scene",
+                                   null,
+                                   false,
+                                   null,
+                                   VNTagsConfig.GetConfig().GetCharacterNames())
+            };
         }
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        protected override void Execute(VNTagContext context, out bool isFinished)
+        {
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context, _character, CharacterAction.RemovedFromScene));
+        }
+
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if ((parameters == null) || (parameters.Length <= 0))
             {
                 Debug.LogError("RemoveCharacterTag: Deserialize: No parameters provided '" + context + "'");
-                return;
+                return false;
             }
 
             _character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
 
             if (_character == null)
             {
-                Debug.LogError("RemoveCharacterTag: Deserialize: Failed to find Character with name '"
-                             + parameters
-                             + "', "
-                             + context);
+                Debug.LogError("RemoveCharacterTag: Deserialize: Failed to find Character with name '" + parameters + "', " + context);
+                return false;
             }
+
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)

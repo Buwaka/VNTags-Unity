@@ -8,14 +8,15 @@ namespace VNTags.TextProcessors
     [CreateAssetMenu(fileName = "CharacterNameColor", menuName = "ScriptableObjects/TextProcessors/CharacterNameColor")]
     public class CharacterNameColor : BaseTextProcessor
     {
-        private static readonly List<(string SearchWord, string OpeningTag, string ClosingTag)> _characterNames = new();
+        // private static readonly List<(string SearchWord, string OpeningTag, string ClosingTag)> _characterNames = new();
+        private static readonly Dictionary<string, (string OpeningTag, string ClosingTag)>      wordDict        = new (StringComparer.OrdinalIgnoreCase);
 
 
         public static void AddCharacter(string name, Color color)
         {
             string openingTag = $"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>";
             string closingTag = "</color>";
-            _characterNames.Add(new ValueTuple<string, string, string>(name, openingTag, closingTag));
+            wordDict.Add(name, new ValueTuple<string, string>(openingTag, closingTag) );
         }
 
         public static void AddCharacter(VNCharacterData character, Color color)
@@ -43,7 +44,7 @@ namespace VNTags.TextProcessors
 
         public override string PostProcessDialogue(string text)
         {
-            return text.EncloseBatch(_characterNames);
+            return text.EncloseBatch(wordDict);
         }
     }
 }

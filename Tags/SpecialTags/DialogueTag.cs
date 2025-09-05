@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using VNTags.TextProcessors;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace VNTags.Tags
 {
@@ -7,18 +8,29 @@ namespace VNTags.Tags
 
     public class DialogueTag : VNTag
     {
+        private string _processedDialogue;
         public  string Dialogue { get; private set; } = "";
-        private string _processedDialogue = null;
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if ((parameters == null) || (parameters.Length <= 0))
             {
                 Debug.LogError("DialogueTag: Deserialize: No parameters provided '" + context + "'");
-                return;
+                return false;
             }
 
             Dialogue = parameters[0];
+            return true;
+        }
+
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        {
+            return new[] { new VNTagParameter("Dialogue", TypeCode.String, "Text to be rendered as dialogue") };
+        }
+
+        public override bool EditorVisibility()
+        {
+            return false;
         }
 
         public override string Serialize(VNTagSerializationContext context)
@@ -44,7 +56,7 @@ namespace VNTags.Tags
             {
                 Refresh();
             }
-            
+
             isFinished = ExecuteHelper(VNTagEventAnnouncer.onDialogueTag?.Invoke(context, _processedDialogue));
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VNTags.Tags
 {
@@ -6,9 +7,10 @@ namespace VNTags.Tags
     {
         public VNBackgroundData Background { get; }
 
-        public override void Deserialize(VNTagDeserializationContext context, params string[] parameters)
+        public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             // todo
+            return true;
         }
 
         public override string Serialize(VNTagSerializationContext context)
@@ -19,6 +21,11 @@ namespace VNTags.Tags
         public override string GetTagName()
         {
             return "Background";
+        }
+
+        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        {
+            return null;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)
