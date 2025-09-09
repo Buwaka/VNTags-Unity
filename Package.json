@@ -7,8 +7,7 @@
   "changelogUrl": "https://github.com/Buwaka/VNTags-Unity",
   "licensesUrl": "https://github.com/Buwaka/VNTags-Unity/blob/main/LICENSE",
   "dependencies": {
-    "com.eflatun.scenereference": "4.1.1",
-    "org.nuget.serialize.linq": "4.0.16",
+    "com.eflatun.scenereference": "git+https://github.com/starikcetin/Eflatun.SceneReference.git#4.1.1",
 	"com.unity.inputsystem": "1.11.2"
  },
  "keywords": [
