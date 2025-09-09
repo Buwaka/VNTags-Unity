@@ -1,28 +1,22 @@
 {
-  "name": "com.semanresu.vntags",
+  "name": "com.buwaka.vntags",
   "version": "0.0.2",
   "displayName": "VNTags",
   "description": "VN Tag system, data driven VN system",
   "documentationUrl": "https://github.com/Buwaka/VNTags-Unity",
   "changelogUrl": "https://github.com/Buwaka/VNTags-Unity",
   "licensesUrl": "https://github.com/Buwaka/VNTags-Unity/blob/main/LICENSE",
-  "scopedRegistries": [
-    {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.eflatun.scenereference"
-      ]
-    },
   "dependencies": {
-	"com.unity.inputsystem": "1.11.2",
-	"com.eflatun.scenereference": "4.1.1" 
- },
- "keywords": [
+    "com.eflatun.scenereference": "4.1.1",
+    "com.unity.inputsystem": "1.11.2",
+    "com.unity.settings-manager": "2.0.1",
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
+  "keywords": [
     "Visual Novel",
     "VN",
     "VNTags",
-	"Tags"
+    "Tags"
   ],
   "author": {
     "name": "Semanresu",
