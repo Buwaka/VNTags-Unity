@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Unity.Collections;
 using UnityEngine;
+using VNTags.Utility;
 
 namespace VNTags.Components
 {
@@ -19,20 +20,16 @@ namespace VNTags.Components
     [RequireComponent(typeof(Animator))]
     public class VNTransitionComponent : MonoBehaviour
     {
-        [Header("Be sure to add Animation Events that call each respective function in this class,\n"
-              + "Click on the gameObject, go to the animation tab, \nright click on the horizontal bar under the timeline,\n"
-              + "\"add event\", name it as you please \n(I recommend just naming it the same as the function it will call),\n"
-              + "then in the inspector for that event, select the function to assign to that event, \nVNTags will then announce this event through the VNTagAnnouncer.\n\n")]
-        [ReadOnly]
-        [SerializeField] 
-        private string IMPORTANT="Read Above";
-        [Header("Events:\n"
-              + "- StartAnimation: When the animation starts playing\n"
-              + "- FullScreen: when the transition has fully covered the screen, \nthis is the prime moment to change the background or do any kind abrupt scene changes\n"
-              + "- Reveal: when the animation is starting to reveal the scene again, \nthis can be used to pause the animation in case we need more loading time\n"
-              + "- Finished: Animation has fully finished playing, \nnot sure what you'd use this for, but potentially useful\n"
-              + "- Custom: this allows you to pass a string value along with the event, in case the premade events aren't sufficient")]
-        [ReadOnly]
+        [InfoField("Be sure to add Animation Events that call each respective function in this class,\n"
+                 + "Click on the gameObject, go to the animation tab, \nright click on the horizontal bar under the timeline,\n"
+                 + "\"add event\", name it as you please \n(I recommend just naming it the same as the function it will call),\n"
+                 + "then in the inspector for that event, select the function to assign to that event, \nVNTags will then announce this event through the VNTagAnnouncer.\n\n"+"Events:\n"
+                 + "- StartAnimation: When the animation starts playing\n"
+                 + "- FullScreen: when the transition has fully covered the screen, \nthis is the prime moment to change the background or do any kind abrupt scene changes\n"
+                 + "- Reveal: when the animation is starting to reveal the scene again, \nthis can be used to pause the animation in case we need more loading time\n"
+                 + "- Finished: Animation has fully finished playing, \nnot sure what you'd use this for, but potentially useful\n"
+                 + "- Custom: this allows you to pass a string value along with the event, in case the premade events aren't sufficient")]
+        [DisableField]
         [SerializeField] 
         private string EVENTS="Read Above";
         private Animator _animator;
