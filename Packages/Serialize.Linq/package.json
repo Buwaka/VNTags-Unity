@@ -1,0 +1,16 @@
+{
+    "name": "org.nuget.serialize.linq",
+    "version": "4.0.167",
+    "displayName": "Serialize.Linq",
+    "description": "C# library to serialize LINQ expressions",
+    "unity": "2018.3",
+    "keywords": [
+        "linq",
+        "serialize"
+    ],
+    "author": {
+        "name": "Sascha Kiefer",
+        "email": "",
+        "url": "https://github.com/esskar/Serialize.Linq"
+    }
+}
