@@ -2,8 +2,8 @@
     "name": "com.buwaka.vntags",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:8bd2ff53794a3d748803d380c9b8876b"
+        "Unity.InputSystem",
+        "Eflatun.SceneReference"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
