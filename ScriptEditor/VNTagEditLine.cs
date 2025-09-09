@@ -17,17 +17,18 @@ namespace VNTags.Editor
         private OutfitTag     _outfitChangeTag;
         private ushort           _lineNumber;
         
-        public  int               BackgroundIndex;
-        public  int               BGMIndex     = 0;
-        public  List<DialogueTag> DialogueTags = new();
-        public  int               ExpressionIndex;
-        public  bool              Foldout;
-        public  int               NameIndex;
-        public  int               OutfitIndex;
-        public  string            Preview = "";
-        public  string            RawLine;
-        public  string            SerializedPreview = "";
-        public  int               SFXIndex          = 0;
+        public int               NameIndex;
+        public int               ExpressionIndex;
+        public int               OutfitIndex;
+        public int               BackgroundIndex;
+        public int               BGMIndex     = 0;
+        public int               SFXIndex     = 0;
+        public List<DialogueTag> DialogueTags = new();
+        public bool              Foldout;
+        public string            Preview = "";
+        public string            RawLine;
+        public string            SerializedPreview = "";
+
 
 
         public VNTagEditLine(string rawLine, ushort lineNumber)
@@ -36,8 +37,7 @@ namespace VNTags.Editor
             _lineNumber = lineNumber;
             RawLine     = rawLine;
             Tags        = new VNTagQueue(VNTagDeserializer.ParseLine(RawLine, lineNumber));
-
-
+            
             // filter out starter tags
             foreach (VNTag tag in Tags)
             {

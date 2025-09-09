@@ -8,13 +8,17 @@ using VNTags.TextProcessors;
 
 namespace VNTags
 {
+    /// <summary>
+    /// Note: when creating a config in a project, make sure the name is kept to the default, otherwise the config won't be found,
+    /// this implicitly means you can only have 1 config per project!
+    /// </summary>
     [CreateAssetMenu(fileName = "VNTagsConfig", menuName = "ScriptableObjects/VNTagsConfig")]
     public class VNTagsConfig : ScriptableObject
     {
         private static VNTagsConfig config;
 
 #pragma warning disable 0414
-        [SerializeField] private string ConfigName = "VNTagsConfig";
+        const string ConfigName = "VNTagsConfig";
 #pragma warning restore 0414
         
         [SerializeField] private VNCharacterData[] Characters;
@@ -161,7 +165,7 @@ namespace VNTags
             {
                 return config;
             }
-
+            
 #if UNITY_EDITOR
             // 1. Use AssetDatabase.FindAssets with a type filter
             // The filter string uses "t:" followed by the type name.
@@ -193,7 +197,7 @@ namespace VNTags
         }
 
 
-#if UNITY_EDITOR
+
         public string[] GetCharacterNames()
         {
             return  Characters.Select((t) => t.Name).ToArray();
@@ -205,11 +209,18 @@ namespace VNTags
             return character?.Outfits.Select((t) => t.Name).ToArray();
         }
         
-        public string[] GeExpressionNames(string name)
+        public string[] GetExpressionNames(string name)
         {
             var character = GetCharacterByNameOrAlias(name);
             return character?.Expressions.Select((t) => t.Name).ToArray();
         }
+        
+        public string[] GetBackgroundNames()
+        {
+            return  Backgrounds.Select((t) => t.Name).ToArray();
+        }
+        
+#if UNITY_EDITOR
         
         /// <summary>
         ///     Is used in the script editor inspector script,
@@ -251,5 +262,6 @@ namespace VNTags
             return result;
         }
 #endif
+
     }
 }

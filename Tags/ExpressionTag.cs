@@ -84,7 +84,7 @@ namespace VNTags.Tags
                                    null,
                                    false,
                                    null,
-                                   VNTagsConfig.GetConfig().GeExpressionNames(character))
+                                   VNTagsConfig.GetConfig().GetExpressionNames(character))
             };
         }
 

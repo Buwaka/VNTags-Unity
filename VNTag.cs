@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
+using VN;
 using VNTags.Tags;
 using Object = System.Object;
 
@@ -35,21 +36,21 @@ namespace VNTags
         {
             ID               = id;
             Tag              = tag;
-            CurrentCharacter = null;
+            CurrentCharacter = null!;
         }
 
         public VNTagContext(VNTagContext other)
         {
             ID               = other.ID;
             Tag              = other.Tag;
-            CurrentCharacter = null;
+            CurrentCharacter = null!;
         }
 
         private VNTagContext(VNTagContext other, uint id , VNTag tag)
         {
             ID               = id;
             Tag              = tag;
-            CurrentCharacter = null;
+            CurrentCharacter = null!;
         }
 
         public VNTagContext Instantiate(uint id, VNTag tag)
@@ -105,7 +106,7 @@ namespace VNTags
                 }
             }
 
-            return null;
+            return null!;
         }
     }
 
@@ -137,10 +138,10 @@ namespace VNTags
 
     public abstract class VNTag
     {
-        public uint   ID     { get; private set; }
-        public string RawTag { get; private set; }
+        public VNTagID ID     { get; private set; }
+        public string  RawTag { get; private set; } = "";
 
-        public void _init(uint id, string raw)
+        public void _init(VNTagID id, string raw)
         {
             ID     = id;
             RawTag = raw;
