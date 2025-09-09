@@ -35,6 +35,27 @@ namespace VNTags
             return -1;
         }
 
+        /// <summary>
+        /// while it's unlikely for there to be duplicates in the list, in case there are, only the first tag will be swapped
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
+        /// <returns>true if successfully overwritten, false if target couldn't be found</returns>
+        public bool Overwrite(VNTag target, VNTag value)
+        {
+            var node = Find(target);
+
+            if (node == null)
+            {
+                Debug.LogError("VNTagQueue: Overwrite: target tag not found, " + target);
+                return false;
+            }
+            
+            node.Value = value;
+            return true;
+        }
+        
+
         private bool OnCharacterTag(VNTagContext context, VNCharacterData character, CharacterAction action)
         {
             if (action == CharacterAction.AddedToScene)

@@ -1,4 +1,5 @@
-﻿using VNTags.Tags;
+﻿using VNTags.Components;
+using VNTags.Tags;
 
 namespace VNTags
 {
@@ -15,13 +16,15 @@ namespace VNTags
     /// </summary>
     public static class VNTagEventAnnouncer
     {
-        public static CharacterHandler     onCharacterTag;
-        public static CharacterMoveHandler onCharacterMoveTag;
-        public static DialogueHandler      onDialogueTag;
-        public static EndOfLineHandler     onEndOfLineTag;
-        public static ExpressionHandler    onExpressionTag;
-        public static OutfitHandler        onOutfitTag;
-        public static ChoiceHandler        onChoiceTag;
-        public static TransitionHandler    onTransitionTag;
+        public static BackgroundHandler      onBackgroundTag;
+        public static CharacterHandler       onCharacterTag;
+        public static CharacterMoveHandler   onCharacterMoveTag;
+        public static DialogueHandler        onDialogueTag;
+        public static EndOfLineHandler       onEndOfLineTag;
+        public static ExpressionHandler      onExpressionTag;
+        public static OutfitHandler          onOutfitTag;
+        public static ChoiceHandler          onChoiceTag;
+        public static TransitionHandler      onTransitionTag;
+        public static TransitionEventHandler onTransitionEvent;
     }
 }

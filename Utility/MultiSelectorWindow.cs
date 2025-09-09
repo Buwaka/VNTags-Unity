@@ -6,8 +6,9 @@ using System.Collections.Generic;
 
 namespace VNTags.Utility
 {
+    #if UNITY_EDITOR
     /// <summary>
-    /// this is generated and doesn't actually work fully,
+    /// this is AI generated and doesn't actually work fully,
     /// </summary>
     public class MultiSelectorWindow : EditorWindow
     {
@@ -83,4 +84,5 @@ namespace VNTags.Utility
         }
 
     }
+    #endif
 }

@@ -10,6 +10,7 @@ using Object = System.Object;
 
 namespace VNTags.Editor
 {
+#if UNITY_EDITOR
     public class CreateTagWindow : EditorWindow
     {
         private readonly List<Object>                                 _parameters = new();
@@ -24,6 +25,7 @@ namespace VNTags.Editor
         private string        _serializedTag;
         private int           _tagIndex;
         private DialogueTag   _targetTag;
+        private bool          _addNew;
 
         private void OnGUI()
         {
@@ -151,6 +153,14 @@ namespace VNTags.Editor
                     _tags.Add(tag.GetTagName(), tag);
                 }
             }
+
+            if (_addNew)
+            {
+                // todo
+                string sTag = dialogueTag.Serialize(line.SerializationContext);
+                _currentSelectedTag = VNTagDeserializer.ParseTag(sTag, line.CreateDeserializationContext(dialogueTag));
+            }
+            
         }
 
         private string[] GetPotentialTags()
@@ -249,66 +259,52 @@ namespace VNTags.Editor
             {
                 case TypeCode.Boolean:
                     return EditorGUILayout.Toggle((bool)value);
-                    break;
                 case TypeCode.Byte:
                     return (byte)EditorGUILayout.IntField((byte)value);
-                    break;
                 case TypeCode.Char:
                     return EditorGUILayout.TextField((string)value).FirstChar().GetValueOrDefault();
-                    break;
                 case TypeCode.DateTime:
                     return EditorGUILayout.TextField((string)value);
-                    break;
                 case TypeCode.DBNull:
                     Debug.LogWarning("CreateTagWindow: OnGUI: Not sure what this is or what you're trying to do, " + parameter);
                     break;
                 case TypeCode.Decimal:
                     return (decimal)EditorGUILayout.DoubleField((double)value);
-                    break;
                 case TypeCode.Double:
                     return EditorGUILayout.DoubleField((double)value);
-                    break;
                 case TypeCode.Empty:
                     Debug.LogWarning("CreateTagWindow: OnGUI: Not sure what you're trying to do, parameter type is empty, " + parameter);
                     break;
                 case TypeCode.Int16:
                     return (short)EditorGUILayout.IntField((short)value);
-                    break;
                 case TypeCode.Int32:
                     return EditorGUILayout.IntField((int)value);
-                    break;
                 case TypeCode.Int64:
                     return EditorGUILayout.LongField((long)value);
-                    break;
                 case TypeCode.Object:
                     Debug.LogWarning("CreateTagWindow: OnGUI: Object references are unsupported, use a different system to retrieve object instead, "
                                    + parameter);
                     break;
                 case TypeCode.SByte:
                     return (sbyte)EditorGUILayout.IntField((sbyte)value);
-                    break;
                 case TypeCode.Single:
                     return EditorGUILayout.FloatField((float)value);
-                    break;
                 case TypeCode.String:
                     return EditorGUILayout.TextField((string)value);
-                    break;
                 case TypeCode.UInt16:
                     return EditorGUILayout.IntField((int)value);
-                    break;
                 case TypeCode.UInt32:
                     return EditorGUILayout.IntField((int)value);
-                    break;
                 case TypeCode.UInt64:
                     ulong.TryParse(EditorGUILayout.TextField(((ulong)value).ToString()), out ulong result);
                     return result;
-                    break;
                 default:
                     Debug.LogWarning("CreateTagWindow: OnGUI: Unrecognised typecode, " + parameter);
                     break;
             }
 
-            return default;
+            return null;
         }
     }
+    #endif
 }

@@ -8,7 +8,9 @@ namespace VNTags
     [Serializable]
     public class VNTransition : IVNData
     {
-        public string   name;
+        [Header("Make sure the prefab contains")]
+        public string name;
+
         public string[] alias;
 
         [PropertyRequireComponent(typeof(VNTransitionComponent))]

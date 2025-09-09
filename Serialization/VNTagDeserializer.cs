@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using UnityEngine;
+using VN;
 using VNTags.Tags;
 
 namespace VNTags
@@ -205,12 +206,17 @@ namespace VNTags
             return token;
         }
 
-        public static uint GenerateTagID(ushort lineNumber, ushort tagNumber)
+        /// <summary>
+        /// the ID is a 32 bit number,
+        /// the first 16 bits are the line number,
+        /// the following 16 bits are the tag number
+        /// </summary>
+        /// <param name="lineNumber"></param>
+        /// <param name="tagNumber"></param>
+        /// <returns></returns>
+        public static VNTagID GenerateTagID(ushort lineNumber, ushort tagNumber)
         {
-            uint ID = lineNumber;
-            ID =  ID << 16;
-            ID += tagNumber;
-            return ID;
+            return new VNTagID(lineNumber, tagNumber);
         }
 
         /// <summary>
