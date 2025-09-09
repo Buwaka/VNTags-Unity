@@ -6,9 +6,17 @@
   "documentationUrl": "https://github.com/Buwaka/VNTags-Unity",
   "changelogUrl": "https://github.com/Buwaka/VNTags-Unity",
   "licensesUrl": "https://github.com/Buwaka/VNTags-Unity/blob/main/LICENSE",
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.eflatun.scenereference"
+      ]
+    },
   "dependencies": {
-    "com.eflatun.scenereference": "git+https://github.com/starikcetin/Eflatun.SceneReference.git#4.1.1",
-	"com.unity.inputsystem": "1.11.2"
+	"com.unity.inputsystem": "1.11.2",
+	"com.eflatun.scenereference": "4.1.1" 
  },
  "keywords": [
     "Visual Novel",
