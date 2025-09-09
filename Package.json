@@ -1,0 +1,24 @@
+{
+  "name": "com.semanresu.vntags",
+  "version": "0.0.2",
+  "displayName": "VNTags",
+  "description": "VN Tag system, data driven VN system",
+  "documentationUrl": "https://github.com/Buwaka/VNTags-Unity",
+  "changelogUrl": "https://github.com/Buwaka/VNTags-Unity",
+  "licensesUrl": "https://github.com/Buwaka/VNTags-Unity/blob/main/LICENSE",
+  "dependencies": {
+    "com.eflatun.scenereference": "4.1.1",
+    "org.nuget.serialize.linq": "4.0.16",
+	"com.unity.inputsystem": "1.11.2"
+ },
+ "keywords": [
+    "Visual Novel",
+    "VN",
+    "VNTags",
+	"Tags"
+  ],
+  "author": {
+    "name": "Semanresu",
+    "url": "https://github.com/Buwaka"
+  }
+}
