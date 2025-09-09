@@ -17,7 +17,7 @@ namespace Eflatun.SceneReference
     [PublicAPI]
     public class SceneReferenceUnityEventAdapter : MonoBehaviour
     {
-        [SerializeField] private SceneReference scene;
+        [SerializeField] private SceneReference scene = null;
 
         /// <summary>
         /// Will be invoked with the assigned <see cref="SceneReference"/> when <see cref="Raise"/> is called.
