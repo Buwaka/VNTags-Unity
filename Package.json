@@ -4,10 +4,8 @@
   "displayName": "VNTags",
   "description": "VN Tag system, data driven VN system",
   "documentationUrl": "https://github.com/Buwaka/VNTags-Unity",
-  "changelogUrl": "https://github.com/Buwaka/VNTags-Unity",
   "licensesUrl": "https://github.com/Buwaka/VNTags-Unity/blob/main/LICENSE",
   "dependencies": {
-    "com.eflatun.scenereference": "4.1.1",
     "com.unity.inputsystem": "1.11.2",
     "com.unity.settings-manager": "2.0.1",
     "com.unity.nuget.newtonsoft-json": "3.0.2"
