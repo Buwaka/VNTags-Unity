@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace VNTags.Tags
 {
-    public delegate bool TransitionHandler(VNTagContext context, VNTransition expression);
+    public delegate bool TransitionHandler(VNTagContext context, VNTransition transition);
 
     public class TransitionTag : VNTag
     {
-        public static VNTransition DefaultTransition { get; set; } = null;
-        public        VNTransition Transition        { get; private set; }
+        public static VNTransition DefaultTransition { get; set; }         = null;
+        public        VNTransition Transition        { get; private set; } = null;
 
         public override string GetTagName()
         {
@@ -32,7 +32,8 @@ namespace VNTags.Tags
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, Transition));
+            var trans = Transition ?? DefaultTransition;
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, trans));
         }
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)

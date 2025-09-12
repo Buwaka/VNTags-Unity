@@ -8,7 +8,6 @@ namespace VNTags
     [Serializable]
     public class VNTransition : IVNData
     {
-        [Header("Make sure the prefab contains")]
         public string name;
 
         public string[] alias;

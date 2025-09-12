@@ -1,5 +1,4 @@
-﻿# if UNITY_EDITOR
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace VNTags.Utility
@@ -32,4 +31,3 @@ namespace VNTags.Utility
         }
     }
 }
-#endif

@@ -1,0 +1,19 @@
+{
+    "name": "VNTag_Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.buwaka.vntags",
+        "Utility_Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

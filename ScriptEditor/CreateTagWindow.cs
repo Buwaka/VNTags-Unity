@@ -10,7 +10,7 @@ using Object = System.Object;
 
 namespace VNTags.Editor
 {
-#if UNITY_EDITOR
+
     public class CreateTagWindow : EditorWindow
     {
         private readonly List<Object>                                 _parameters = new();
@@ -191,7 +191,7 @@ namespace VNTags.Editor
         {
             object value = _parameters[index];
 
-            EditorGUILayout.BeginFoldoutHeaderGroup(true, parameter.Name);
+            EditorGUILayout.BeginFoldoutHeaderGroup(true, parameter.Name + (parameter.Optional ? "" : "*"));
 
             if ((parameter.EnumType != null) && parameter.EnumType.IsEnum)
             {
@@ -306,5 +306,4 @@ namespace VNTags.Editor
             return null;
         }
     }
-    #endif
 }

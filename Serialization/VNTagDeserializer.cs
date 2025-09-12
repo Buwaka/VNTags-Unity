@@ -9,7 +9,6 @@ using VNTags.Tags;
 
 namespace VNTags
 {
-    // based on markdown
     public class VNTagDeserializer
     {
         private static readonly Dictionary<string, VNTag> TagLibrary = InitTagLibrary();
@@ -28,6 +27,7 @@ namespace VNTags
         ///     The primary function to process pure text into VNTags,
         ///     note: adds a confirm and EoL tag to the end of every line
         ///     todo: make it possible to decide if and what gets added at the end.
+        /// 
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>

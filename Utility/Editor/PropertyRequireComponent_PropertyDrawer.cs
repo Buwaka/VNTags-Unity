@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System;
+﻿using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -77,4 +75,3 @@ namespace VNTags.Utility
         }
     }
 }
-#endif

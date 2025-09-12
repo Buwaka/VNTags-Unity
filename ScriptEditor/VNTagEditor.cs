@@ -9,8 +9,6 @@ using VNTags.Utility;
 using File = System.IO.File;
 using Object = UnityEngine.Object;
 
-#if UNITY_EDITOR
-
 
 namespace VNTags.Editor
 {
@@ -337,5 +335,3 @@ namespace VNTags.Editor
         // }
     }
 }
-
-#endif

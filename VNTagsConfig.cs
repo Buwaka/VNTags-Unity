@@ -16,10 +16,9 @@ namespace VNTags
     public class VNTagsConfig : ScriptableObject
     {
         private static VNTagsConfig config;
-
-#pragma warning disable 0414
+        
         const string ConfigName = "VNTagsConfig";
-#pragma warning restore 0414
+
         
         [SerializeField] private VNCharacterData[] Characters;
 
@@ -189,7 +188,7 @@ namespace VNTags
 
         if (config == null)
         {
-            Debug.LogError("VNTagsConfig asset not found in any 'Resources' folder. Please ensure the asset is placed in a folder named 'Resources' and that its file name matches 'VNTagsConfig'.");
+            Debug.LogError("VNTagsConfig asset not found in any 'Resources' folder. Please ensure the asset is placed in a folder named 'Resources' and that its file name matches " + ConfigName);
         }
 
         return config;

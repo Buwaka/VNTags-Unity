@@ -19,8 +19,6 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            //todo figure out how to not use external package
-
             // only when there is an extra condition provided, otherwise it will just use the default condition
             if ((parameters != null) && (parameters.Length > 0))
             {

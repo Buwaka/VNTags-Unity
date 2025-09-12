@@ -15,7 +15,7 @@ namespace VNTags.Components
         Custom
     }
     
-    public delegate bool TransitionEventHandler(VNTransitionComponent component, VNTransitionEvent transitionEvent, [CanBeNull] string customEvent);
+    public delegate void TransitionEventHandler(VNTransitionComponent component, VNTransitionEvent transitionEvent, [CanBeNull] string customEvent);
     
     [RequireComponent(typeof(Animator))]
     public class VNTransitionComponent : MonoBehaviour
