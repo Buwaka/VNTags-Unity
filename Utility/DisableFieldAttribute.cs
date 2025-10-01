@@ -1,10 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VNTags.Utility
 {
-    public class DisableFieldAttribute : PropertyAttribute
-    {
-        
-    }
+    public class DisableFieldAttribute : PropertyAttribute { }
 }

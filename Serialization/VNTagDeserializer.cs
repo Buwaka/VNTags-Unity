@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using UnityEngine;
-using VN;
 using VNTags.Tags;
 
 namespace VNTags
@@ -27,7 +26,6 @@ namespace VNTags
         ///     The primary function to process pure text into VNTags,
         ///     note: adds a confirm and EoL tag to the end of every line
         ///     todo: make it possible to decide if and what gets added at the end.
-        /// 
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
         /// <returns>a queue containing all the tags for this script</returns>
@@ -53,8 +51,8 @@ namespace VNTags
                     tagQueue.AddLast(tag);
                 }
 
-                tagQueue.AddLast(new ConfirmTag());
-                tagQueue.AddLast(new EndOfLineTag());
+                tagQueue.AddLast(ScriptableObject.CreateInstance<ConfirmTag>());
+                tagQueue.AddLast(ScriptableObject.CreateInstance<EndOfLineTag>());
             }
 
             return tagQueue;
@@ -71,7 +69,7 @@ namespace VNTags
         ///     potentially for choices later on
         /// </param>
         /// <returns>a collection of VNTags</returns>
-        public static ICollection<VNTag> ParseLine(string line, ushort lineNumber)
+        public static IList<VNTag> ParseLine(string line, ushort lineNumber)
         {
             var tags = new List<VNTag>();
 
@@ -91,7 +89,7 @@ namespace VNTags
                 if (c == ';')
                 {
                     string characterName = line.Substring(start, index - start);
-                    var    cTag          = new CharacterTag();
+                    var    cTag          = ScriptableObject.CreateInstance<CharacterTag>();
                     if (cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), characterName))
                     {
                         tags.Add(cTag);
@@ -108,7 +106,7 @@ namespace VNTags
                     if (index > start)
                     {
                         string rawDialogue = line.Substring(start, index - start);
-                        var    dialogue    = new DialogueTag();
+                        var    dialogue    = ScriptableObject.CreateInstance<DialogueTag>();
                         if (dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), rawDialogue))
                         {
                             tags.Add(dialogue);
@@ -139,8 +137,8 @@ namespace VNTags
             // process the dialogue after all the last tag, or if no tag is present
             if (start < line.Length)
             {
-                var dialogue = new DialogueTag();
-                dialogue._init(GenerateTagID(lineNumber, (ushort)tags.Count), line);
+                var dialogue = ScriptableObject.CreateInstance<DialogueTag>();
+                dialogue._init(VNTagID.GenerateID(lineNumber, (ushort)tags.Count), line);
                 if (dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), line.Substring(start)))
                 {
                     tags.Add(dialogue);
@@ -164,7 +162,7 @@ namespace VNTags
 &&                                                 // Exclude abstract classes
                     !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
                 {
-                    var tag = (VNTag)Activator.CreateInstance(type);
+                    var tag = (VNTag)ScriptableObject.CreateInstance(type);
                     Out.Add(tag.GetTagName(), tag);
                 }
             }
@@ -204,19 +202,6 @@ namespace VNTags
             // Debug.LogWarning("VNTagParser: ExtractToken: could not properly extract token, forwarding the whole token, '" + token + "'");
 
             return token;
-        }
-
-        /// <summary>
-        /// the ID is a 32 bit number,
-        /// the first 16 bits are the line number,
-        /// the following 16 bits are the tag number
-        /// </summary>
-        /// <param name="lineNumber"></param>
-        /// <param name="tagNumber"></param>
-        /// <returns></returns>
-        public static VNTagID GenerateTagID(ushort lineNumber, ushort tagNumber)
-        {
-            return new VNTagID(lineNumber, tagNumber);
         }
 
         /// <summary>
@@ -262,8 +247,8 @@ namespace VNTags
 
                 VNTag tagType = TagLibrary[tagID];
 
-                var newInst = (VNTag)Activator.CreateInstance(tagType.GetType());
-                newInst._init(GenerateTagID(context.LineNumber, context.TagNumber), line);
+                var newInst = (VNTag)ScriptableObject.CreateInstance(tagType.GetType());
+                newInst._init(VNTagID.GenerateID(context.LineNumber, context.TagNumber), line);
                 bool result = newInst.Deserialize(context, tokens.Skip(1).ToArray());
                 return result ? newInst : null;
             }

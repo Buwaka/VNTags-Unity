@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -61,31 +60,33 @@ namespace VNTags.Tags
             return "Outfit";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
+            var characterParameter = new VNTagParameter(1,
+                                                        "Character",
+                                                        TypeCode.String,
+                                                        "Character to add or remove from the scene",
+                                                        false,
+                                                        null,
+                                                        VNTagsConfig.GetConfig().GetCharacterNames());
             string character = null;
-            if (currentParameters.Count > 0)
+            if (currentParameters.TryGetValue(characterParameter, out object parameter))
             {
-                character = (string)currentParameters[0];
+                character = (string)parameter;
             }
 
-            return new[]
-            {
-                new VNTagParameter("Character",
-                                   TypeCode.String,
-                                   "Character to add or remove from the scene",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetCharacterNames()),
-                new VNTagParameter("Outfit",
-                                   TypeCode.String,
-                                   "Outfit to render for given character",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetOutfitNames(character))
-            };
+            var outfitParameter = new VNTagParameter(2,
+                                                     "Outfit",
+                                                     TypeCode.String,
+                                                     "Outfit to render for given character",
+                                                     false,
+                                                     null,
+                                                     VNTagsConfig.GetConfig().GetOutfitNames(character));
+
+            currentParameters.UpdateParameter(characterParameter, TargetCharacter);
+            currentParameters.UpdateParameter(outfitParameter,    _outfit);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

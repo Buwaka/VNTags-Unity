@@ -11,12 +11,17 @@ namespace VNTags
     [Serializable]
     public class VNSoundData : IVNData
     {
-        [Tooltip("ID for the sound, case insensitive")]
-        [SerializeField] private string name;
+        [Tooltip("ID for the sound, case insensitive")] [SerializeField]
+        private string name;
 
         [SerializeField] private string[] alias;
 
         [SerializeField] private AudioClip soundAsset;
+
+        public AudioClip SoundAsset
+        {
+            get { return soundAsset; }
+        }
 
         // probably a layer
         // default volume
@@ -31,5 +36,7 @@ namespace VNTags
         {
             get { return alias; }
         }
+
+        public string DataType { get; } = "Sound";
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 namespace VNTags.Tags
 {
     public delegate bool BackgroundHandler(VNTagContext context, VNBackgroundData background);
+
     public class BackgroundTag : VNTag
     {
         public VNBackgroundData Background { get; private set; }
@@ -38,18 +37,18 @@ namespace VNTags.Tags
             return "Background";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[]
-            {
-                new VNTagParameter("Background",
-                                   TypeCode.String,
-                                   "Background to set the scene to",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetBackgroundNames())
-            };
+            var backgroundParameter = new VNTagParameter(1,
+                                                         "Background",
+                                                         TypeCode.String,
+                                                         "Background to set the scene to",
+                                                         false,
+                                                         null,
+                                                         VNTagsConfig.GetConfig().GetBackgroundNames());
+
+            currentParameters.UpdateParameter(backgroundParameter, Background);
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

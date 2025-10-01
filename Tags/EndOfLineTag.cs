@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace VNTags.Tags
+﻿namespace VNTags.Tags
 {
     public delegate bool EndOfLineHandler(VNTagContext context);
 
@@ -21,9 +19,9 @@ namespace VNTags.Tags
             return "EOL";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return null!;
+            return new VNTagParameters();
         }
 
         public override bool EditorVisibility()

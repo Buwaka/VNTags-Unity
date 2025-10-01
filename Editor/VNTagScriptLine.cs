@@ -1,43 +1,41 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VNTags.Tags;
 
 namespace VNTags.Editor
 {
-    public class VNTagEditLine
+    public class VNTagScriptLine
     {
-        private readonly VNTagQueue Tags;
-        private          BackgroundTag     _backgroundChangeTag;
+        private readonly ushort        _lineNumber;
+        private readonly VNTagQueue    Tags;
+        private          BackgroundTag _backgroundChangeTag;
 
 
-        private CharacterTag  _characterChangeTag;
-        private ExpressionTag _expressionChangeTag;
-        private OutfitTag     _outfitChangeTag;
-        private ushort           _lineNumber;
-        
-        public int               NameIndex;
-        public int               ExpressionIndex;
-        public int               OutfitIndex;
-        public int               BackgroundIndex;
-        public int               BGMIndex     = 0;
-        public int               SFXIndex     = 0;
-        public List<DialogueTag> DialogueTags = new();
-        public bool              Foldout;
-        public string            Preview = "";
-        public string            RawLine;
-        public string            SerializedPreview = "";
+        private CharacterTag      _characterChangeTag;
+        private ExpressionTag     _expressionChangeTag;
+        private OutfitTag         _outfitChangeTag;
+        public  int               BackgroundIndex;
+        public  int               BGMIndex     = 0;
+        public  List<DialogueTag> DialogueTags = new();
+        public  int               ExpressionIndex;
+        public  bool              Foldout;
+
+        public int    NameIndex;
+        public int    OutfitIndex;
+        public string Preview = "";
+        public string RawLine;
+        public string SerializedPreview = "";
+        public int    SFXIndex          = 0;
 
 
-
-        public VNTagEditLine(string rawLine, ushort lineNumber)
+        public VNTagScriptLine(string rawLine, ushort lineNumber)
         {
             Preview     = lineNumber + ": ";
             _lineNumber = lineNumber;
             RawLine     = rawLine;
             Tags        = new VNTagQueue(VNTagDeserializer.ParseLine(RawLine, lineNumber));
-            
+
             // filter out starter tags
             foreach (VNTag tag in Tags)
             {
@@ -84,25 +82,7 @@ namespace VNTags.Editor
 
         public VNTagSerializationContext SerializationContext
         {
-            get
-            {
-                return new VNTagSerializationContext(Tags);
-            }
-        }
-        
-        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
-        {
-            return new VNTagDeserializationContext(_lineNumber, RawLine, tagNumber);
-        }
-        
-        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
-        {
-            var index = Tags.IndexOf(tag);
-            if (index == -1)
-            {
-                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
-            }
-            return new VNTagDeserializationContext(_lineNumber, RawLine, (ushort)index);
+            get { return new VNTagSerializationContext(Tags); }
         }
 
         public CharacterTag CharacterChangeTag
@@ -111,7 +91,7 @@ namespace VNTags.Editor
             {
                 if (_characterChangeTag == null)
                 {
-                    _characterChangeTag = new CharacterTag();
+                    _characterChangeTag = ScriptableObject.CreateInstance<CharacterTag>();
                     Tags.AddFirst(_characterChangeTag);
                 }
 
@@ -125,7 +105,7 @@ namespace VNTags.Editor
             {
                 if (_expressionChangeTag == null)
                 {
-                    _expressionChangeTag = new ExpressionTag();
+                    _expressionChangeTag = ScriptableObject.CreateInstance<ExpressionTag>();
                     Tags.AddFirst(_expressionChangeTag);
                 }
 
@@ -139,7 +119,7 @@ namespace VNTags.Editor
             {
                 if (_outfitChangeTag == null)
                 {
-                    _outfitChangeTag = new OutfitTag();
+                    _outfitChangeTag = ScriptableObject.CreateInstance<OutfitTag>();
                     Tags.AddFirst(_outfitChangeTag);
                 }
 
@@ -153,12 +133,35 @@ namespace VNTags.Editor
             {
                 if (_backgroundChangeTag == null)
                 {
-                    _backgroundChangeTag = new BackgroundTag();
+                    _backgroundChangeTag = ScriptableObject.CreateInstance<BackgroundTag>();
                     Tags.AddFirst(_backgroundChangeTag);
                 }
 
                 return _backgroundChangeTag;
             }
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
+        {
+            return new VNTagDeserializationContext(_lineNumber, RawLine, tagNumber);
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
+        {
+            if (Tags == null || Tags.Count <= 0)
+            {
+                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
+                return new VNTagDeserializationContext();
+            }
+            
+            int index = Tags.IndexOf(tag);
+            if (index == -1)
+            {
+                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
+                return new VNTagDeserializationContext();
+            }
+            
+            return new VNTagDeserializationContext(_lineNumber, RawLine, (ushort)index);
         }
 
         public void InvalidateCharacter()
@@ -182,9 +185,7 @@ namespace VNTags.Editor
                 var characterNames = VNTagsConfig.GetConfig().GetCharacterNamesGUI("");
                 for (int i = 0; i < characterNames.Length; i++)
                 {
-                    if (characterNames[i]
-                       .text
-                       .Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
+                    if (characterNames[i].text.Equals(_characterChangeTag.Character.Name, StringComparison.OrdinalIgnoreCase))
                     {
                         NameIndex = i;
                         break;
@@ -196,9 +197,7 @@ namespace VNTags.Editor
                 {
                     for (int i = 0; i < expressionNames.Length; i++)
                     {
-                        if (expressionNames[i]
-                           .text.Equals(_expressionChangeTag.Expression.Name,
-                                        StringComparison.OrdinalIgnoreCase))
+                        if (expressionNames[i].text.Equals(_expressionChangeTag.Expression.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             ExpressionIndex = i;
                             break;
@@ -211,9 +210,7 @@ namespace VNTags.Editor
                 {
                     for (int i = 0; i < outfitNames.Length; i++)
                     {
-                        if (outfitNames[i]
-                           .text
-                           .Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
+                        if (outfitNames[i].text.Equals(_outfitChangeTag.Outfit.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             OutfitIndex = i;
                             break;

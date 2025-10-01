@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -14,8 +13,9 @@ namespace VNTags.Tags
 
     public class CharacterTag : VNTag
     {
-        private CharacterAction? _action;
-        private VNCharacterData  _character;
+        [SerializeField] private CharacterAction _action = 0;
+
+        [SerializeField] private VNCharacterData _character;
 
         public VNCharacterData Character
         {
@@ -66,31 +66,31 @@ namespace VNTags.Tags
             return "Character";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[]
-            {
-                new VNTagParameter("Character",
-                                   TypeCode.String,
-                                   "Character to add or remove from the scene",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetCharacterNames()),
-                new VNTagParameter("Character Action",
-                                   TypeCode.String,
-                                   "enum value of 'add' or 'remove', will be passed along the onCharacterTag event (default is 'add')",
-                                   "",
-                                   true,
-                                   typeof(CharacterAction))
-            };
+            var characterParameter = new VNTagParameter(1,
+                                                        "Character",
+                                                        TypeCode.String,
+                                                        "Character to add or remove from the scene",
+                                                        false,
+                                                        null,
+                                                        VNTagsConfig.GetConfig().GetCharacterNames());
+            var actionParameter = new VNTagParameter(2,
+                                                     "Character Action",
+                                                     TypeCode.String,
+                                                     "enum value of 'add' or 'remove', will be passed along the onCharacterTag event (default is 'add')",
+                                                     true,
+                                                     typeof(CharacterAction));
+
+            currentParameters.UpdateParameter(characterParameter, _character);
+            currentParameters.UpdateParameter(actionParameter,    _action);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            CharacterAction action = _action.HasValue ? _action.Value : CharacterAction.AddedToScene;
-
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context, Character, action));
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context, Character, _action));
         }
 
 #if UNITY_EDITOR

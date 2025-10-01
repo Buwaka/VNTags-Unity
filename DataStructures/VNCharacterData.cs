@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace VNTags
 {
@@ -13,22 +12,25 @@ namespace VNTags
     [Serializable]
     public class VNCharacterData : IVNData
     {
-        [Tooltip("Name that will be rendered, case insensitive")]
-        [SerializeField] private string name;
+        [Tooltip("Name that will be rendered, case insensitive")] [SerializeField]
+        private string name;
 
-        [Tooltip("Alternative names for writing convenience, case insensitive")]
-        [SerializeField] private string[] alias;
-        
-        [Tooltip("Optional but useful field, can be used for the CharacterNameColor TextProcessor")]
-        [SerializeField] private Color mainColor;
-        
-        [Tooltip(
-                    "Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        [SerializeField] private VNExpressionData[] expressions;
-        
-        [Tooltip(
-                    "Name for the Outfit, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
-        [SerializeField] private VNOutfitData[] outfits;
+        [Tooltip("Alternative names for writing convenience, case insensitive")] [SerializeField]
+        private string[] alias;
+
+        [Tooltip("Optional but useful field, can be used for the CharacterNameColor TextProcessor")] [SerializeField]
+        private Color mainColor;
+
+        [Tooltip("Name for the expression, to be used as a case-insensitive ID, Expression gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
+        [SerializeField]
+        private VNExpressionData[] expressions;
+
+        [Tooltip("Name for the Outfit, to be used as a case-insensitive ID, Outfit gameobject will be attached as a child object to the VNCharacter object, first in the list is the default")]
+        [SerializeField]
+        private VNOutfitData[] outfits;
+
+        private VNExpressionData _defaultExpression;
+        private VNOutfitData     _defaultOutfit;
 
         public VNExpressionData[] Expressions
         {
@@ -39,9 +41,6 @@ namespace VNTags
         {
             get { return outfits; }
         }
-
-        private VNExpressionData _defaultExpression;
-        private VNOutfitData     _defaultOutfit;
 
         public VNExpressionData DefaultExpression
         {
@@ -87,6 +86,8 @@ namespace VNTags
             get { return alias; }
         }
 
+        public string DataType { get; } = "Character";
+
         public static VNCharacterData BlankCharacter(string name)
         {
             var chara = new VNCharacterData();
@@ -96,9 +97,9 @@ namespace VNTags
 
         public bool IsBlankCharacter()
         {
-            return Expressions == null && Outfits == null;
+            return (Expressions == null) && (Outfits == null);
         }
-        
+
         public VNExpressionData GetExpressionByIndex(int index)
         {
             if ((index > 0) && (index <= expressions.Length))
@@ -159,7 +160,7 @@ namespace VNTags
             {
                 return Array.Empty<GUIContent>();
             }
-            
+
             int total  = expressions.Length + 1;
             var result = new GUIContent[total];
 
@@ -184,7 +185,7 @@ namespace VNTags
             {
                 return Array.Empty<GUIContent>();
             }
-            
+
             int total  = outfits.Length + 1;
             var result = new GUIContent[total];
 

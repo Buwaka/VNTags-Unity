@@ -8,7 +8,10 @@ namespace VNTags.Utility
     {
         public int id;
 
-        public string Name => SortingLayer.IDToName(id);
+        public string Name
+        {
+            get { return SortingLayer.IDToName(id); }
+        }
 
         public static implicit operator int(SortingLayerPicker layerPicker)
         {

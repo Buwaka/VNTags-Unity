@@ -1,22 +1,58 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace VNTags.Utility
 {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     /// <summary>
-    /// this is AI generated and doesn't actually work fully,
+    ///     this is AI generated and doesn't actually work fully,
     /// </summary>
     public class MultiSelectorWindow : EditorWindow
     {
-        private SerializedProperty _typesProperty;
         private Type               _baseType;
         private List<Type>         _foundTypes;
-        private List<bool>         _selectionStates;
         private Vector2            _scrollPosition;
+        private List<bool>         _selectionStates;
+        private SerializedProperty _typesProperty;
+
+        private void OnDestroy()
+        {
+            if (_typesProperty != null)
+            {
+                ApplySelection();
+            }
+        }
+
+        private void OnGUI()
+        {
+            if ((_foundTypes == null) || (_baseType == null))
+            {
+                EditorGUILayout.HelpBox("Window not initialized. Please open it from a valid property drawer.", MessageType.Error);
+                return;
+            }
+
+            EditorGUILayout.LabelField($"Select types inheriting from {_baseType.Name}", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
+
+            for (int i = 0; i < _foundTypes.Count; i++)
+            {
+                _selectionStates[i] = EditorGUILayout.ToggleLeft(new GUIContent(_foundTypes[i].Name), _selectionStates[i]);
+            }
+
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.Space();
+            if (GUILayout.Button("Apply Selection"))
+            {
+                ApplySelection();
+                Close();
+            }
+        }
 
         public static void OpenWindow(SerializedProperty typesProperty, Type baseType)
         {
@@ -38,51 +74,12 @@ namespace VNTags.Utility
             _selectionStates = _foundTypes.Select(type => currentTypes.Contains(type)).ToList();
         }
 
-        private void OnGUI()
-        {
-            if (_foundTypes == null || _baseType == null)
-            {
-                EditorGUILayout.HelpBox("Window not initialized. Please open it from a valid property drawer.",
-                                        MessageType.Error);
-                return;
-            }
-
-            EditorGUILayout.LabelField($"Select types inheriting from {_baseType.Name}", EditorStyles.boldLabel);
-            EditorGUILayout.Space();
-
-            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-
-            for (int i = 0; i < _foundTypes.Count; i++)
-            {
-                _selectionStates[i] =
-                    EditorGUILayout.ToggleLeft(new GUIContent(_foundTypes[i].Name), _selectionStates[i]);
-            }
-
-            EditorGUILayout.EndScrollView();
-
-            EditorGUILayout.Space();
-            if (GUILayout.Button("Apply Selection"))
-            {
-                ApplySelection();
-                Close();
-            }
-        }
-
         private void ApplySelection()
         {
             var selectedTypes = _foundTypes.Where((t, i) => _selectionStates[i]).ToArray();
             _typesProperty.managedReferenceValue = selectedTypes;
             _typesProperty.serializedObject.ApplyModifiedProperties();
         }
-
-        private void OnDestroy()
-        {
-            if (_typesProperty != null)
-            {
-                ApplySelection();
-            }
-        }
-
     }
-    #endif
+#endif
 }

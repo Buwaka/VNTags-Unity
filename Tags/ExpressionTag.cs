@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -61,31 +61,39 @@ namespace VNTags.Tags
             return "Expression";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
+            var characterParameter = new VNTagParameter(1,
+                                                        "Character",
+                                                        TypeCode.String,
+                                                        "Character to change the expression of",
+                                                        false,
+                                                        null,
+                                                        VNTagsConfig.GetConfig().GetCharacterNames());
+
             string character = null;
-            if (currentParameters.Count > 0)
+            if (currentParameters.TryGetValue(characterParameter, out object parameter))
             {
-                character = (string)currentParameters[0];
+                character = (string)parameter;
+            }
+            else
+            {
+                character = VNTagsConfig.GetConfig().GetCharacterNames().First();
             }
 
-            return new[]
-            {
-                new VNTagParameter("Character",
-                                   TypeCode.String,
-                                   "Character to change the expression of",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetCharacterNames()),
-                new VNTagParameter("Expression",
-                                   TypeCode.String,
-                                   "Expression to set the character to",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetExpressionNames(character))
-            };
+            var expressionParameter = new VNTagParameter(2,
+                                                         "Expression",
+                                                         TypeCode.String,
+                                                         "Expression to set the character to",
+                                                         false,
+                                                         null,
+                                                         VNTagsConfig.GetConfig().GetExpressionNames(character));
+
+
+            currentParameters.UpdateParameter(characterParameter,  character);
+            currentParameters.UpdateParameter(expressionParameter, _expression);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

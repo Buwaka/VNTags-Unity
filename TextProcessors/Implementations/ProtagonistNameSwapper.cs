@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace VNTags.TextProcessors
 {
-    [CreateAssetMenu(fileName = "ProtagonistNameSwapper",
-                        menuName = "ScriptableObjects/TextProcessors/ProtagonistNameSwapper")]
+    [CreateAssetMenu(fileName = "ProtagonistNameSwapper", menuName = "ScriptableObjects/TextProcessors/ProtagonistNameSwapper")]
     public class ProtagonistNameSwapper : BaseTextProcessor
     {
         private static Func<string> NameGetter;

@@ -39,7 +39,7 @@ namespace VNTags.Utility
                 case TypeCode.String:
                     return string.Empty;
                 case TypeCode.Object:
-                    return null; 
+                    return null;
                 default:
                     throw new NotSupportedException($"TypeCode '{typeCode}' is not supported for default instance creation.");
             }

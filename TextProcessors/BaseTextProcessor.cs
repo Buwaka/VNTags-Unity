@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.Scripting;
 
 namespace VNTags.TextProcessors
 {
     public abstract class BaseTextProcessor : ScriptableObject
     {
         /// <summary>
-        /// change the dialogue before it is processed,
-        /// this is meant for text processors that work on the raw dialogue.
-        /// there's no guarantee that your class will be first,
-        /// but by differentiating pre- and post- we can alleviate order-based most issues.
+        ///     change the dialogue before it is processed,
+        ///     this is meant for text processors that work on the raw dialogue.
+        ///     there's no guarantee that your class will be first,
+        ///     but by differentiating pre- and post- we can alleviate order-based most issues.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -17,40 +16,40 @@ namespace VNTags.TextProcessors
         {
             return text;
         }
-        
+
         /// <summary>
-        /// change the dialogue after it is processed,
-        /// mainly meant for text processors where the order does not matter.
+        ///     change the dialogue after it is processed,
+        ///     mainly meant for text processors where the order does not matter.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-       public virtual string PostProcessDialogue(string text)
-       {
-           return text;
-       }
-       
+        public virtual string PostProcessDialogue(string text)
+        {
+            return text;
+        }
+
         /// <summary>
-        /// change the raw script before it is processed,
-        /// this is meant for text processors that work on the raw md scripts.
-        /// there's no guarantee that your class will be first,
-        /// but by differentiating pre- and post- we can alleviate order-based most issues.
+        ///     change the raw script before it is processed,
+        ///     this is meant for text processors that work on the raw md scripts.
+        ///     there's no guarantee that your class will be first,
+        ///     but by differentiating pre- and post- we can alleviate order-based most issues.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-       public virtual string PreProcessRawScript(string text)
-       {
-           return text;
-       }
-        
-       /// <summary>
-       /// change the raw script after it is processed,
-       /// mainly meant for text processors where the order does not matter.
-       /// </summary>
-       /// <param name="text"></param>
-       /// <returns></returns>
-       public virtual string PostProcessRawScript(string text)
-       {
-           return text;
-       }
+        public virtual string PreProcessRawScript(string text)
+        {
+            return text;
+        }
+
+        /// <summary>
+        ///     change the raw script after it is processed,
+        ///     mainly meant for text processors where the order does not matter.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public virtual string PostProcessRawScript(string text)
+        {
+            return text;
+        }
     }
 }

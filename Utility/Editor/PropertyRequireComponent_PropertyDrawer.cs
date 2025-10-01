@@ -13,14 +13,8 @@ namespace VNTags.Utility
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var PropertyRect = new Rect(position.x,
-                                        position.y,
-                                        position.width,
-                                        EditorGUIUtility.singleLineHeight);
-            var HelpBoxRect = new Rect(position.x,
-                                       position.y + EditorGUIUtility.singleLineHeight,
-                                       position.width,
-                                       HelpBoxHeight);
+            var PropertyRect = new Rect(position.x, position.y,                                     position.width, EditorGUIUtility.singleLineHeight);
+            var HelpBoxRect  = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.width, HelpBoxHeight);
 
             var  requiredAttribute = attribute as PropertyRequireComponent;
             Type requiredType      = requiredAttribute.Type;
@@ -42,18 +36,14 @@ namespace VNTags.Utility
                     }
                     else
                     {
-                        EditorGUI.HelpBox(HelpBoxRect,
-                                          "Object does not have component of type: " + requiredType.Name,
-                                          MessageType.Error);
+                        EditorGUI.HelpBox(HelpBoxRect, "Object does not have component of type: " + requiredType.Name, MessageType.Error);
                         HelpBoxActive = true;
                         // property.objectReferenceValue = null;
                     }
                 }
                 else
                 {
-                    EditorGUI.HelpBox(HelpBoxRect,
-                                      "Not a reference type",
-                                      MessageType.Error);
+                    EditorGUI.HelpBox(HelpBoxRect, "Not a reference type", MessageType.Error);
                     HelpBoxActive = true;
                     // property.objectReferenceValue = null;
                 }

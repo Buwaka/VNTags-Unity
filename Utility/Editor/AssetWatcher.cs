@@ -14,10 +14,7 @@ namespace VNTags.Utility
         private static readonly Dictionary<string, AssetChanged> _assetEventLibrary = new();
 
 
-        private static void OnPostprocessAllAssets(string[] importedAssets,
-                                                   string[] deletedAssets,
-                                                   string[] movedAssets,
-                                                   string[] movedFromAssetPaths)
+        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
             if (_allAssets == null)
             {

@@ -16,9 +16,7 @@ public class InputActionActivator : OnScreenControl
 
     public void TriggerInputAction(InputActionReference actionRef)
     {
-        if (inProgress
-         || actionRef.action.WasPerformedThisFrame()
-         || (performedFrame.HasValue && (Time.frameCount == performedFrame.Value)))
+        if (inProgress || actionRef.action.WasPerformedThisFrame() || (performedFrame.HasValue && (Time.frameCount == performedFrame.Value)))
         {
             return;
         }
@@ -93,7 +91,8 @@ public class InputActionActivator : OnScreenControl
     }
 
 
-    private IEnumerator DisableValueAfterFrame<TValue>(TValue value) where TValue : struct
+    private IEnumerator DisableValueAfterFrame<TValue>(TValue value)
+        where TValue : struct
     {
         //this just skips the current update
         if (UsedFixedUpdateTiming)

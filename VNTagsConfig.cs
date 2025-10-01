@@ -5,21 +5,20 @@ using UnityEditor;
 using UnityEngine;
 using VNTags.TextProcessors;
 
-
 namespace VNTags
 {
     /// <summary>
-    /// Note: when creating a config in a project, make sure the name is kept to the default, otherwise the config won't be found,
-    /// this implicitly means you can only have 1 config per project!
+    ///     Note: when creating a config in a project, make sure the name is kept to the default, otherwise the config won't be
+    ///     found,
+    ///     this implicitly means you can only have 1 config per project!
     /// </summary>
     [CreateAssetMenu(fileName = "VNTagsConfig", menuName = "ScriptableObjects/VNTagsConfig")]
     public class VNTagsConfig : ScriptableObject
     {
+        private const  string       ConfigName = "VNTagsConfig";
         private static VNTagsConfig config;
-        
-        const string ConfigName = "VNTagsConfig";
 
-        
+
         [SerializeField] private VNCharacterData[] Characters;
 
         [SerializeField] private VNBackgroundData[] Backgrounds;
@@ -31,11 +30,9 @@ namespace VNTags
         [SerializeField] private VNTransition[] Transitions;
 
         [SerializeField] private VNScene[] Scenes;
-        
-        [SerializeReference]
-        public BaseTextProcessor[] TextProcessors; // do mind this is a SerializeReference, which is necessary for polymorphism
-        
-        
+
+        [SerializeReference] public BaseTextProcessor[] TextProcessors; // do mind this is a SerializeReference, which is necessary for polymorphism
+
 
         public VNCharacterData[] AllCharacters
         {
@@ -74,7 +71,7 @@ namespace VNTags
             {
                 return null;
             }
-            
+
             foreach (IVNData character in arr)
             {
                 if (character.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
@@ -164,7 +161,7 @@ namespace VNTags
             {
                 return config;
             }
-            
+
 #if UNITY_EDITOR
             // 1. Use AssetDatabase.FindAssets with a type filter
             // The filter string uses "t:" followed by the type name.
@@ -196,31 +193,30 @@ namespace VNTags
         }
 
 
-
         public string[] GetCharacterNames()
         {
-            return  Characters.Select((t) => t.Name).ToArray();
+            return Characters.Select(t => t.Name).ToArray();
         }
-        
+
         public string[] GetOutfitNames(string name)
         {
-            var character = GetCharacterByNameOrAlias(name);
-            return character?.Outfits.Select((t) => t.Name).ToArray();
+            VNCharacterData character = GetCharacterByNameOrAlias(name);
+            return character?.Outfits.Select(t => t.Name).ToArray();
         }
-        
+
         public string[] GetExpressionNames(string name)
         {
-            var character = GetCharacterByNameOrAlias(name);
-            return character?.Expressions.Select((t) => t.Name).ToArray();
+            VNCharacterData character = GetCharacterByNameOrAlias(name);
+            return character?.Expressions.Select(t => t.Name).ToArray();
         }
-        
+
         public string[] GetBackgroundNames()
         {
-            return  Backgrounds.Select((t) => t.Name).ToArray();
+            return Backgrounds.Select(t => t.Name).ToArray();
         }
-        
+
 #if UNITY_EDITOR
-        
+
         /// <summary>
         ///     Is used in the script editor inspector script,
         ///     0 is always nullValue
@@ -261,6 +257,5 @@ namespace VNTags
             return result;
         }
 #endif
-
     }
 }

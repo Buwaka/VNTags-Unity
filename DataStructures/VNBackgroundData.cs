@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace VNTags
 {
@@ -11,6 +10,11 @@ namespace VNTags
         [SerializeField] private string[]   alias;
         [SerializeField] private GameObject prefab;
 
+        public GameObject Prefab
+        {
+            get { return prefab; }
+        }
+
         public string Name
         {
             get { return name; }
@@ -20,5 +24,7 @@ namespace VNTags
         {
             get { return alias; }
         }
+
+        public string DataType { get; } = "Background";
     }
 }

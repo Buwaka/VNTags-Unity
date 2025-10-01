@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Serialize.Linq.Serializers;
 using UnityEngine;
@@ -56,10 +55,10 @@ namespace VNTags.Tags
             return "Confirm";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
             // todo potentially list all functions and have the user choose, or a string expression that will be evaluated
-            return null;
+            return new VNTagParameters();
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

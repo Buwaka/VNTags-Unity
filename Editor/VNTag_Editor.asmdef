@@ -1,17 +1,17 @@
 {
-  "name": "com.buwaka.vntags",
+  "name": "VNTag_Editor",
   "rootNamespace": "",
   "references": [
-    "Unity.InputSystem",
-    "Eflatun.SceneReference"
+    "com.buwaka.vntags",
+    "Utility_Editor"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
-  "overrideReferences": true,
-  "precompiledReferences": [
-    "Serialize.Linq.dll"
-  ],
+  "overrideReferences": false,
+  "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],

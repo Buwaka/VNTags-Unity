@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -137,9 +136,7 @@ namespace VNTags.Utility
         public static string EncloseBatch(this string text, IEnumerable<(string SearchWord, string OpeningTag, string ClosingTag)> wordTags)
         {
             // Create a lookup dictionary for the tags.
-            var tagLookup = wordTags.ToDictionary(
-                                                  term => term.SearchWord,
-                                                  term => (term.OpeningTag, term.ClosingTag));
+            var tagLookup = wordTags.ToDictionary(term => term.SearchWord, term => (term.OpeningTag, term.ClosingTag));
             return EncloseBatch(text, tagLookup);
         }
 

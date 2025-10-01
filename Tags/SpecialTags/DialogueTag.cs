@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -23,9 +22,11 @@ namespace VNTags.Tags
             return true;
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[] { new VNTagParameter("Dialogue", TypeCode.String, "Text to be rendered as dialogue") };
+            var dialogueParameter = new VNTagParameter(1, "Dialogue", TypeCode.String, "Text to be rendered as dialogue");
+            currentParameters.UpdateParameter(dialogueParameter, Dialogue);
+            return currentParameters;
         }
 
         public override bool EditorVisibility()

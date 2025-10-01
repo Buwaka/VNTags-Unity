@@ -9,14 +9,14 @@ namespace VNTags.TextProcessors
     public class CharacterNameColor : BaseTextProcessor
     {
         // private static readonly List<(string SearchWord, string OpeningTag, string ClosingTag)> _characterNames = new();
-        private static readonly Dictionary<string, (string OpeningTag, string ClosingTag)>      wordDict        = new (StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, (string OpeningTag, string ClosingTag)> wordDict = new(StringComparer.OrdinalIgnoreCase);
 
 
         public static void AddCharacter(string name, Color color)
         {
             string openingTag = $"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>";
             string closingTag = "</color>";
-            wordDict.Add(name, new ValueTuple<string, string>(openingTag, closingTag) );
+            wordDict.TryAdd(name, new ValueTuple<string, string>(openingTag, closingTag));
         }
 
         public static void AddCharacter(VNCharacterData character, Color color)

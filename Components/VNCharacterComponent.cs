@@ -30,17 +30,14 @@ namespace VNTags.Components
 
             CharacterData = characterData;
 
-            if ((CurrentExpression                == null)
-             && (CharacterData.Expressions.Length > 0)
-             && (CharacterData.Expressions[0]     != null))
+            if ((CurrentExpression == null) && (CharacterData.Expressions.Length > 0) && (CharacterData.Expressions[0] != null))
             {
                 VNExpressionData defaultExpression = CharacterData.Expressions[0];
                 CurrentExpression = defaultExpression;
             }
             else
             {
-                Debug.LogWarning(
-                                 "VNCharacter: Init: This character has no expressions or the first expression is null");
+                Debug.LogWarning("VNCharacter: Init: This character has no expressions or the first expression is null");
             }
 
             if ((CurrentOutfit == null) && (CharacterData.Outfits.Length > 0) && (CharacterData.Outfits[0] != null))

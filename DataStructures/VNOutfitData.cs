@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace VNTags
 {
@@ -13,8 +12,8 @@ namespace VNTags
     {
         [SerializeField] private string name;
 
-        [Tooltip("Alternative names for writing convenience, case insensitive")]
-        [SerializeField] private string[] alias;
+        [Tooltip("Alternative names for writing convenience, case insensitive")] [SerializeField]
+        private string[] alias;
 
         [SerializeField] private GameObject prefab;
 
@@ -32,5 +31,7 @@ namespace VNTags
         {
             get { return alias; }
         }
+
+        public string DataType { get; } = "Outfit";
     }
 }

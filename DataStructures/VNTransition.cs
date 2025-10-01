@@ -8,13 +8,14 @@ namespace VNTags
     [Serializable]
     public class VNTransition : IVNData
     {
-        public string name;
+        [SerializeField] private string name;
 
-        public string[] alias;
+        [SerializeField] private string[] alias;
 
-        [PropertyRequireComponent(typeof(VNTransitionComponent))]
+        [SerializeField] [PropertyRequireComponent(typeof(VNTransitionComponent))]
         public GameObject prefab;
 
+        [SerializeField] [VNTagEditor] private string tags;
 
         public string Name
         {
@@ -26,7 +27,14 @@ namespace VNTags
             get { return alias; }
         }
 
+        public string DataType { get; } = "Transition";
+
 
         public void Play() { }
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 }

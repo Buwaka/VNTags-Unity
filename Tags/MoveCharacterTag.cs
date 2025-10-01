@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -16,13 +15,21 @@ namespace VNTags.Tags
             return "Move";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[]
-            {
-                new VNTagParameter("Character", TypeCode.String, "Character to move", null, false, null, VNTagsConfig.GetConfig().GetCharacterNames()),
-                new VNTagParameter("Position",  TypeCode.String, "Name of the position to move the character to")
-            };
+            var characterParameter = new VNTagParameter(1,
+                                                        "Character",
+                                                        TypeCode.String,
+                                                        "Character to move",
+                                                        false,
+                                                        null,
+                                                        VNTagsConfig.GetConfig().GetCharacterNames());
+            var positionParameter = new VNTagParameter(2, "Position", TypeCode.String, "Name of the position to move the character to");
+
+            currentParameters.UpdateParameter(characterParameter, _character);
+            currentParameters.UpdateParameter(positionParameter,  _namedPosition);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

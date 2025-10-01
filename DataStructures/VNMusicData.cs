@@ -12,12 +12,17 @@ namespace VNTags
     [Serializable]
     public class VNMusicData : IVNData
     {
-        [Tooltip("ID for the music, case insensitive")]
-        [SerializeField] private string name;
+        [Tooltip("ID for the music, case insensitive")] [SerializeField]
+        private string name;
 
         [SerializeField] private string[] alias;
 
         [SerializeField] private AudioClip soundAsset;
+
+        public AudioClip SoundAsset
+        {
+            get { return soundAsset; }
+        }
 
         public string Name
         {
@@ -28,5 +33,7 @@ namespace VNTags
         {
             get { return alias; }
         }
+
+        public string DataType { get; } = "Music";
     }
 }

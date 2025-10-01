@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VNTags.Tags
@@ -13,18 +12,19 @@ namespace VNTags.Tags
             return "Remove";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[]
-            {
-                new VNTagParameter("Character",
-                                   TypeCode.String,
-                                   "Character to add or remove from the scene",
-                                   null,
-                                   false,
-                                   null,
-                                   VNTagsConfig.GetConfig().GetCharacterNames())
-            };
+            var characterParameter = new VNTagParameter(1,
+                                                        "Character",
+                                                        TypeCode.String,
+                                                        "Character to add or remove from the scene",
+                                                        false,
+                                                        null,
+                                                        VNTagsConfig.GetConfig().GetCharacterNames());
+
+            currentParameters.UpdateParameter(characterParameter, _character);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)

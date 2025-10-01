@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace VNTags.Tags
@@ -8,31 +7,35 @@ namespace VNTags.Tags
 
     public class TransitionTag : VNTag
     {
-        public static VNTransition DefaultTransition { get; set; }         = null;
-        public        VNTransition Transition        { get; private set; } = null;
+        public static VNTransition DefaultTransition { get; set; } = null;
+        public        VNTransition Transition        { get; private set; }
 
         public override string GetTagName()
         {
             return "transition";
         }
 
-        public override VNTagParameter[] GetParameters(IList<object> currentParameters)
+        protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            return new[]
-            {
-                new VNTagParameter("Transition Name",
-                                   TypeCode.String,
-                                   "Name of the transition to be played",
-                                   null,
-                                   true,
-                                   null,
-                                   VNTagsConfig.GetConfig().AllTransitions.Select(t => t.name).ToArray())
-            };
+            var transitionParameter = new VNTagParameter(1,
+                                                         "Transition Name",
+                                                         TypeCode.String,
+                                                         "Name of the transition to be played",
+                                                         true,
+                                                         null,
+                                                         VNTagsConfig.GetConfig().AllTransitions.Select(t => t.Name).ToArray());
+
+            var tagParameter = new VNTagParameter(2, "Transition Name", TypeCode.Object, "Name of the transition to be played");
+
+            currentParameters.UpdateParameter(transitionParameter, Transition);
+            currentParameters.UpdateParameter(tagParameter,        null);
+
+            return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            var trans = Transition ?? DefaultTransition;
+            VNTransition trans = Transition ?? DefaultTransition;
             isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, trans));
         }
 
