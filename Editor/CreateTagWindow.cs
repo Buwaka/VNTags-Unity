@@ -4,41 +4,39 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using VNTags.Tags;
 using VNTags.Utility;
-using Object = System.Object;
 
 namespace VNTags.Editor
 {
     public class CreateTagWindow : EditorWindow
     {
-        private VNTagParameters           _parameters = new();
         private readonly Dictionary<int, (int index, bool freeInput)> _popupIndex = new();
         private readonly SortedDictionary<string, VNTag>              _tags       = new();
         private          bool                                         _addNew;
+        private          string                                       _current;
         private          VNTag                                        _currentSelectedTag;
         private          int                                          _cursor;
+        private          VNTagDeserializationContext                  _deserializationContext;
 
-        private int                         _lastIndex;
-        private bool                        _parameterChanged;
-        private string                      _serializedTag;
-        private int                         _tagIndex;
-        private Action<string>              _target;
-        private string                      _current;
-        private VNTagSerializationContext   _serializationContext;
-        private VNTagDeserializationContext _deserializationContext;
-        
+        private int                       _lastIndex;
+        private bool                      _parameterChanged;
+        private VNTagParameters           _parameters = new();
+        private VNTagSerializationContext _serializationContext;
+        private string                    _serializedTag;
+        private int                       _tagIndex;
+        private Action<string>            _target;
+
 
         private void OnGUI()
         {
             EditorGUILayout.Separator();
-        
+
             string[] tagNames = GetPotentialTags();
             _tagIndex = EditorGUILayout.Popup(_tagIndex, tagNames);
-        
+
             bool tagChanged = _lastIndex != _tagIndex;
             _lastIndex = _tagIndex;
-        
+
             // index 0 the placeholder display value and thus not a tag
             if (_tagIndex != 0)
             {
@@ -49,40 +47,39 @@ namespace VNTags.Editor
                     _serializedTag      = null;
                     _parameters         = new VNTagParameters();
                 }
-        
+
                 _parameters = _currentSelectedTag.GetParameters(_parameters);
-        
+
                 if ((_parameters != null) && (_parameters.Count > 0))
                 {
                     _parameterChanged = false;
-                    
-                    List<VNTagParameter> keys = new List<VNTagParameter>(_parameters.Keys);
-                    foreach (var parameter in keys)
+
+                    var keys = new List<VNTagParameter>(_parameters.Keys);
+                    foreach (VNTagParameter parameter in keys)
                     {
                         _parameters.UpdateParameter(parameter, RenderParameterField(parameter, _parameters[parameter]));
                         EditorGUILayout.Separator();
                     }
-                    
                 }
             }
             else
             {
                 ResetTag();
             }
-        
+
             EditorGUILayout.Separator();
-        
+
             EditorGUILayout.LabelField("Dialogue", EditorStyles.boldLabel);
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.TextArea(_current.Insert(_cursor, "▾"));
             EditorGUI.EndDisabledGroup();
-        
+
             EditorGUILayout.LabelField("Position", EditorStyles.boldLabel);
             _cursor = EditorGUILayout.IntSlider(_cursor, 0, _current.Length);
-        
+
             EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
             EditorGUI.BeginDisabledGroup(true);
-        
+
             bool deserializationResult = false;
             if (_currentSelectedTag != null)
             {
@@ -90,9 +87,8 @@ namespace VNTags.Editor
                 {
                     Debug.unityLogger.logEnabled = false;
                     // re-serialize tag
-                    deserializationResult = _currentSelectedTag.Deserialize(_deserializationContext,
-                                                                            _parameters.Select(t => t.Value.ToString()).ToArray());
-                    _serializedTag               = _currentSelectedTag.Serialize(_serializationContext);
+                    deserializationResult = _currentSelectedTag.Deserialize(_deserializationContext, _parameters.Select(t => t.Value.ToString()).ToArray());
+                    _serializedTag = _currentSelectedTag.Serialize(_serializationContext);
                     Debug.unityLogger.logEnabled = true;
                 }
                 else
@@ -100,7 +96,7 @@ namespace VNTags.Editor
                     deserializationResult = !string.IsNullOrEmpty(_serializedTag);
                 }
             }
-        
+
             if (deserializationResult)
             {
                 EditorGUILayout.TextArea(CreateNewLine());
@@ -109,87 +105,89 @@ namespace VNTags.Editor
             {
                 EditorGUILayout.TextArea("");
             }
-        
+
             EditorGUI.EndDisabledGroup();
-        
+
             EditorGUILayout.Separator();
-        
+
             EditorGUI.BeginDisabledGroup((_currentSelectedTag == null) || !deserializationResult);
             if (GUILayout.Button("Save"))
             {
                 Save();
             }
-        
+
             EditorGUI.EndDisabledGroup();
-        
+
             if (GUILayout.Button("Close Window"))
             {
                 Close();
             }
         }
-        
-        public static void ShowWindow(Action<string> target, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext, string current = null)
+
+        public static void ShowWindow
+            (Action<string> target, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext, string current = null)
         {
             var window = GetWindow<CreateTagWindow>("Create new Tag (with context)");
             window.Init(target, current, serializationContext, deserializationContext);
         }
-        
+
         public static void ShowWindow(Action<string> target, string current = null)
         {
             var window = GetWindow<CreateTagWindow>("Create new Tag (without context)");
             window.Init(target, current, new VNTagSerializationContext(), new VNTagDeserializationContext());
         }
-        
-        private void Init(Action<string> target, string current, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext)
+
+        private void Init
+            (Action<string> target, string current, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext)
         {
             _serializationContext   = serializationContext;
             _deserializationContext = deserializationContext;
             _current                = current;
-            _target                  = target;
+            _target                 = target;
             var tags = VNTag.GetAllTagTypes();
-        
+
             foreach (Type tagType in tags)
             {
                 var tag = (VNTag)CreateInstance(tagType);
-                if ((tag != null) && tag.EditorVisibility())
+                if ((tag != null) && tag.EditorVisible())
                 {
                     _tags.Add(tag.GetTagName(), tag);
                 }
             }
         }
-        
+
         private string[] GetPotentialTags()
         {
             return _tags.Keys.Prepend("Select a Tag").ToArray();
         }
-        
+
         private void ResetTag()
         {
             _currentSelectedTag = null;
             _serializedTag      = null;
             _popupIndex.Clear();
         }
-        
+
         public void Save()
         {
             _target.Invoke(CreateNewLine());
             Close();
         }
-        
+
         private string CreateNewLine()
         {
             return _current.Insert(_cursor, _serializedTag);
         }
-        
+
         private object RenderParameterField(VNTagParameter parameter, object value)
         {
-            var current = value;
+            object current = value;
             EditorGUILayout.BeginFoldoutHeaderGroup(true, parameter.Name + (parameter.Optional ? "" : "*"));
-        
+
             if ((parameter.EnumType != null) && parameter.EnumType.IsEnum)
             {
                 bool isFlags = parameter.EnumType.GetCustomAttribute<FlagsAttribute>() != null;
-        
+
                 if (value is string sParameter)
                 {
                     if (string.IsNullOrEmpty(sParameter))
@@ -202,7 +200,7 @@ namespace VNTags.Editor
                         return value;
                     }
                 }
-        
+
                 var enumInstance = (Enum)Enum.ToObject(parameter.EnumType, value);
                 if (isFlags)
                 {
@@ -217,7 +215,7 @@ namespace VNTags.Editor
             {
                 int index = parameter.Number;
                 _popupIndex.TryAdd(parameter.Number, new ValueTuple<int, bool>(index, false));
-        
+
                 (int index, bool freeInput) popup = _popupIndex[index];
                 if (popup.freeInput)
                 {
@@ -228,7 +226,7 @@ namespace VNTags.Editor
                     popup.index = EditorGUILayout.Popup(popup.index, parameter.Options);
                     value       = parameter.Options[popup.index];
                 }
-        
+
                 popup.freeInput    = EditorGUILayout.Toggle("Free input", popup.freeInput);
                 _popupIndex[index] = popup;
             }
@@ -236,11 +234,11 @@ namespace VNTags.Editor
             {
                 value = DisplayFieldOfTypeCode(parameter, value);
             }
-        
+
             EditorGUILayout.LabelField(parameter.Description, EditorStyles.helpBox);
             EditorGUILayout.EndFoldoutHeaderGroup();
             EditorGUILayout.Separator();
-        
+
             if (current != value)
             {
                 _parameterChanged = true;
@@ -248,7 +246,7 @@ namespace VNTags.Editor
 
             return value;
         }
-        
+
         private object DisplayFieldOfTypeCode(VNTagParameter parameter, object value)
         {
             switch (parameter.Type)
@@ -298,7 +296,7 @@ namespace VNTags.Editor
                     Debug.LogWarning("CreateTagWindow: OnGUI: Unrecognised typecode, " + parameter);
                     break;
             }
-        
+
             return null;
         }
     }

@@ -7,8 +7,15 @@ namespace VNTags.Tags
 
     public class TransitionTag : VNTag
     {
-        public static VNTransition DefaultTransition { get; set; } = null;
-        public        VNTransition Transition        { get; private set; }
+        public static readonly VNTransition NoTransition = new();
+        private                VNTransition _transition;
+        public static          VNTransition DefaultTransition { get; set; } = null;
+
+        public VNTransition Transition
+        {
+            get { return _transition; }
+            private set { _transition = value; }
+        }
 
         public override string GetTagName()
         {
@@ -51,7 +58,24 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
+            if (Transition.IsNone())
+            {
+                return "";
+            }
+
             return Transition == null ? SerializeHelper(GetTagName()) : SerializeHelper(GetTagName(), Transition.Name);
         }
+
+#if UNITY_EDITOR
+        public ref VNTransition GetTransitionRef()
+        {
+            return ref _transition;
+        }
+
+        public void SetNone()
+        {
+            Transition = (VNTransition) VNTransition.NoneDataStatic;
+        }
+#endif
     }
 }

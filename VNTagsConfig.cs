@@ -72,36 +72,74 @@ namespace VNTags
                 return null;
             }
 
-            foreach (IVNData character in arr)
+            foreach (IVNData data in arr)
             {
-                if (character.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
-                 || character.Alias.Any(chara => chara.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                if (data.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
+                 || data.Alias.Any(chara => chara.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    return character;
+                    return data;
                 }
             }
 
-            return null;
+            if (name.Equals(IVNData.DefaultKeyword, StringComparison.OrdinalIgnoreCase) || arr.Count <= 0)
+            {
+                return null;
+            }
+
+            return arr.First().NoneData;
         }
 
-        private IVNData GetDataByIndex(IReadOnlyList<IVNData> arr, int index)
+        private T GetDataByIndex<T>(IReadOnlyList<T> arr, int index)
+            where T : IVNData, new()
         {
             if ((index > 0) && (index <= arr.Count))
             {
                 return arr[index - 1];
             }
 
-            return null;
-        }
-
-        public VNCharacterData GetCharacterByNameOrAlias(string name)
-        {
-            return (VNCharacterData)GetDataByNameOrAlias(Characters, name);
+            // If the index is out of bounds, return a new, empty instance of the specific IVNData type, which is the same as NoneData
+            return new T();
         }
 
         public VNCharacterData GetCharacterByIndex(int index)
         {
-            return (VNCharacterData)GetDataByIndex(Characters, index);
+            return GetDataByIndex(Characters, index);
+        }
+
+        public VNBackgroundData GetBackgroundByIndex(int index)
+        {
+            return GetDataByIndex(Backgrounds, index);
+        }
+
+        public VNSoundData GetSoundByIndex(int index)
+        {
+            return GetDataByIndex(SoundEffects, index);
+        }
+
+        public VNMusicData GetMusicByIndex(int index)
+        {
+            return GetDataByIndex(Musics, index);
+        }
+
+        public VNScene GetSceneByIndex(int index)
+        {
+            return GetDataByIndex(Scenes, index);
+        }
+
+        /// <summary>
+        /// !!!!unsafe since default also occupies an index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public VNTransition GetTransitionByIndex(int index)
+        {
+            return GetDataByIndex(Transitions, index);
+        }
+
+
+        public VNCharacterData GetCharacterByNameOrAlias(string name)
+        {
+            return (VNCharacterData)GetDataByNameOrAlias(Characters, name);
         }
 
         public VNBackgroundData GetBackgroundByNameOrAlias(string name)
@@ -109,19 +147,9 @@ namespace VNTags
             return (VNBackgroundData)GetDataByNameOrAlias(Backgrounds, name);
         }
 
-        public VNBackgroundData GetBackgroundByIndex(int index)
-        {
-            return (VNBackgroundData)GetDataByIndex(Backgrounds, index);
-        }
-
         public VNSoundData GetSoundByNameOrAlias(string name)
         {
             return (VNSoundData)GetDataByNameOrAlias(SoundEffects, name);
-        }
-
-        public VNSoundData GetSoundByIndex(int index)
-        {
-            return (VNSoundData)GetDataByIndex(SoundEffects, index);
         }
 
         public VNMusicData GetMusicByNameOrAlias(string name)
@@ -129,29 +157,14 @@ namespace VNTags
             return (VNMusicData)GetDataByNameOrAlias(Musics, name);
         }
 
-        public VNMusicData GetMusicByIndex(int index)
-        {
-            return (VNMusicData)GetDataByIndex(Musics, index);
-        }
-
         public VNScene GetSceneByName(string name)
         {
             return (VNScene)GetDataByNameOrAlias(Scenes, name);
         }
 
-        public VNScene GetSceneByIndex(int index)
-        {
-            return (VNScene)GetDataByIndex(Scenes, index);
-        }
-
         public VNTransition GetTransitionByNameOrAlias(string name)
         {
             return (VNTransition)GetDataByNameOrAlias(Transitions, name);
-        }
-
-        public VNTransition GetTransitionByIndex(int index)
-        {
-            return (VNTransition)GetDataByIndex(Transitions, index);
         }
 
 
@@ -217,6 +230,19 @@ namespace VNTags
 
 #if UNITY_EDITOR
 
+        public GUIContent[] GetCharacterNamesGUI()
+        {
+            int total  = Characters.Length;
+            var result = new GUIContent[total];
+
+            for (int i = 0; i < total; i++)
+            {
+                result[i] = new GUIContent(Characters[i].Name);
+            }
+
+            return result;
+        }
+
         /// <summary>
         ///     Is used in the script editor inspector script,
         ///     0 is always nullValue
@@ -252,6 +278,27 @@ namespace VNTags
             for (int i = 0; i < Backgrounds.Length; i++)
             {
                 result[i + 1] = new GUIContent(Backgrounds[i].Name);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        ///     Is used in the script editor inspector script,
+        ///     0 is always nullValue
+        /// </summary>
+        /// <returns></returns>
+        public GUIContent[] GetTransitionNamesGUI(string nullValue)
+        {
+            int total  = Transitions.Length + 2;
+            var result = new GUIContent[total];
+
+            result[0] = new GUIContent(nullValue);
+            result[1] = new GUIContent(IVNData.DefaultKeyword);
+
+            for (int i = 0; i < Transitions.Length; i++)
+            {
+                result[i + 2] = new GUIContent(Transitions[i].Name);
             }
 
             return result;

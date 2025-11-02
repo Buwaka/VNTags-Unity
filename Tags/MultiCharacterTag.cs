@@ -1,25 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VNTags.Tags
 {
-    public delegate bool CharacterHandler(VNTagContext context, VNCharacterData character, CharacterAction action);
-
-    public enum CharacterAction
+    public class MultiCharacterTag : VNTag
     {
-        AddedToScene,
-        RemovedFromScene
-    }
+        [SerializeField] private CharacterAction _action = 0;
 
-    public class CharacterTag : VNTag
-    {
-        private CharacterAction _action = 0;
+        [SerializeField] private VNCharacterData[] _characters = Array.Empty<VNCharacterData>();
 
-        private VNCharacterData _character;
-
-        public VNCharacterData Character
+        public VNCharacterData[] Characters
         {
-            get { return _character; }
+            get { return _characters; }
         }
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
@@ -30,17 +24,19 @@ namespace VNTags.Tags
                 return false;
             }
 
-            _character = VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[0]);
-
-            if (Character == null)
+            int index      = 0;
+            var characters = new List<VNCharacterData>();
+            while ((parameters.Length > index) && VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[index]) is VNCharacterData character)
             {
-                Debug.Log("CharacterTag: Deserialize: Failed to find Character with name '" + parameters[0] + "', using only name instead " + context);
-                _character = VNCharacterData.BlankCharacter(parameters[0]);
+                characters.Add(character);
+                index++;
             }
 
-            if (parameters.Length > 1)
+            _characters = characters.ToArray();
+
+            if (parameters.Length > index)
             {
-                if (CharacterAction.TryParse(parameters[1], true, out CharacterAction result))
+                if (CharacterAction.TryParse(parameters[index], true, out CharacterAction result))
                 {
                     _action = result;
                 }
@@ -58,16 +54,18 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return (Character != null) && !Character.IsNone() ? SerializeHelper(GetTagName(), Character.Name, _action) : "";
+            var characterNames = string.Join(',', _characters.Select(t => '"' + t.Name + '"'));
+            return (_characters != null) && (_characters.Length > 0) ? SerializeHelper(GetTagName(), _characters.Select(t => t.Name), _action) : "";
         }
 
         public override string GetTagName()
         {
-            return "Character";
+            return "MultiCharacter";
         }
 
         protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
+            // todo make VNTagParameter handle arrays
             var characterParameter = new VNTagParameter(1,
                                                         "Character",
                                                         TypeCode.String,
@@ -82,7 +80,7 @@ namespace VNTags.Tags
                                                      true,
                                                      typeof(CharacterAction));
 
-            currentParameters.UpdateParameter(characterParameter, _character);
+            currentParameters.UpdateParameter(characterParameter, _characters);
             currentParameters.UpdateParameter(actionParameter,    _action);
 
             return currentParameters;
@@ -90,18 +88,17 @@ namespace VNTags.Tags
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context, Character, _action));
+            isFinished = true;
+            foreach (VNCharacterData character in _characters)
+            {
+                isFinished &= ExecuteHelper(VNTagEventAnnouncer.onCharacterTag?.Invoke(context, character, _action));
+            }
         }
 
 #if UNITY_EDITOR
-        public void SetCharacter(VNCharacterData character)
+        public ref VNCharacterData[] GetCharacterRef()
         {
-            _character = character;
-        }
-
-        public ref VNCharacterData GetCharacterRef()
-        {
-            return ref _character;
+            return ref _characters;
         }
 #endif
     }

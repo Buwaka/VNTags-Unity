@@ -53,7 +53,9 @@ namespace VNTags.Tags
                 TargetCharacter = context.GetMainCharacter();
             }
 
-            return (_expression != null) && (TargetCharacter != null) ? SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name) : "";
+            return (_expression != null) && !_expression.IsNone() && (TargetCharacter != null) && !TargetCharacter.IsNone()
+                ? SerializeHelper(GetTagName(), TargetCharacter.Name, _expression.Name)
+                : "";
         }
 
         public override string GetTagName()

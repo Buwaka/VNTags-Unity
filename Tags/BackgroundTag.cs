@@ -7,7 +7,13 @@ namespace VNTags.Tags
 
     public class BackgroundTag : VNTag
     {
-        public VNBackgroundData Background { get; private set; }
+        private VNBackgroundData _background;
+
+        public VNBackgroundData Background
+        {
+            get { return _background; }
+            private set { _background = value; }
+        }
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
@@ -29,7 +35,7 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return SerializeHelper(GetTagName(), Background.Name);
+            return (Background != null) && !Background.IsNone() ? SerializeHelper(GetTagName(), Background.Name) : "";
         }
 
         public override string GetTagName()
@@ -55,5 +61,12 @@ namespace VNTags.Tags
         {
             isFinished = ExecuteHelper(VNTagEventAnnouncer.onBackgroundTag?.Invoke(context, Background));
         }
+
+#if UNITY_EDITOR
+        public ref VNBackgroundData GetBackgroundRef()
+        {
+            return ref _background;
+        }
+#endif
     }
 }

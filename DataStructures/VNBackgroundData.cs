@@ -26,5 +26,11 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Background";
+
+        public static IVNData NoneDataStatic
+        {
+            get { return _None; }
+        }
+        private static           IVNData    _None = new VNBackgroundData();
     }
 }

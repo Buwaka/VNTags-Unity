@@ -8,24 +8,19 @@ namespace VNTags.Utility
     [Serializable]
     public class SubAssetIndex : ScriptableObject
     {
-        private (string path, Object reference)[] _entries;
-
-        public (string path, Object reference)[] Entries
-        {
-            get { return _entries; }
-        }
+        public (string path, Object reference)[] Entries { get; private set; }
 
         public void AddEntry(string path, Object reference)
         {
             var newArr = new List<(string path, Object reference)>();
 
-            if ((_entries != null) && (_entries.Length > 0))
+            if ((Entries != null) && (Entries.Length > 0))
             {
-                newArr.AddRange(_entries);
+                newArr.AddRange(Entries);
             }
 
             newArr.Add((path, reference));
-            _entries = newArr.ToArray();
+            Entries = newArr.ToArray();
         }
     }
 }

@@ -5,10 +5,20 @@ namespace VNTags.Tags
 {
     public delegate bool DialogueHandler(VNTagContext context, string dialogue);
 
-    public class DialogueTag : VNTag
+    public class DialogueTag : VNTag, IEditorTag
     {
         private string _processedDialogue;
         public  string Dialogue { get; private set; } = "";
+
+        public string GetValue()
+        {
+            return Dialogue;
+        }
+
+        public void SetValue(string value)
+        {
+            Dialogue = value;
+        }
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
@@ -29,7 +39,7 @@ namespace VNTags.Tags
             return currentParameters;
         }
 
-        public override bool EditorVisibility()
+        public override bool EditorVisible()
         {
             return false;
         }

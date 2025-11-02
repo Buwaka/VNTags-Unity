@@ -10,7 +10,8 @@ namespace VNTags
     [Serializable]
     public class VNExpressionData : IVNData
     {
-        [SerializeField] private string name;
+        private static           IVNData _None = new VNExpressionData();
+        [SerializeField] private string  name;
 
         [Tooltip("Alternative names for writing convenience, case insensitive")] [SerializeField]
         private string[] alias;
@@ -33,5 +34,10 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Expression";
+
+        public static IVNData NoneDataStatic
+        {
+            get { return _None; }
+        }
     }
 }

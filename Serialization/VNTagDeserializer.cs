@@ -90,6 +90,7 @@ namespace VNTags
                 {
                     string characterName = line.Substring(start, index - start);
                     var    cTag          = ScriptableObject.CreateInstance<CharacterTag>();
+                    cTag._init(VNTagID.GenerateID(lineNumber, (ushort)tags.Count), line);
                     if (cTag.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), characterName))
                     {
                         tags.Add(cTag);
@@ -107,6 +108,7 @@ namespace VNTags
                     {
                         string rawDialogue = line.Substring(start, index - start);
                         var    dialogue    = ScriptableObject.CreateInstance<DialogueTag>();
+                        dialogue._init(VNTagID.GenerateID(lineNumber, (ushort)tags.Count), line);
                         if (dialogue.Deserialize(new VNTagDeserializationContext(lineNumber, line, (ushort)tags.Count), rawDialogue))
                         {
                             tags.Add(dialogue);
@@ -155,12 +157,10 @@ namespace VNTags
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
                 if (typeof(VNTag).IsAssignableFrom(type)
-                 && // Check if the type implements or inherits the interface
-                    type.IsClass
-                 && // Ensure it's a class (not an interface itself or a struct)
-                    !type.IsAbstract
-&&                                                 // Exclude abstract classes
-                    !type.IsGenericTypeDefinition) // Exclude open generic types (e.g., IMyGenericInterface<>)
+                 && type.IsClass                   // Check if the type implements or inherits the interface
+                 && !type.IsAbstract               // Ensure it's a class (not an interface itself or a struct)
+                 && !type.IsGenericTypeDefinition) // Exclude abstract classes
+                    // Exclude open generic types (e.g., IMyGenericInterface<>)
                 {
                     var tag = (VNTag)ScriptableObject.CreateInstance(type);
                     Out.Add(tag.GetTagName(), tag);
@@ -182,10 +182,10 @@ namespace VNTags
                         continue;
                     case '"':
                     {
-                        int closingQuoteIndex = token.IndexOf("\"", i + 1, StringComparison.OrdinalIgnoreCase);
+                        int closingQuoteIndex = token.LastIndexOf('\"');
 
-                        // if not closing bracket is found
-                        if (closingQuoteIndex == -1)
+                        // if not closing bracket is found or it is from before the current quote
+                        if ((closingQuoteIndex == -1) || (closingQuoteIndex <= i))
                         {
                             Debug.LogError("VNTagParser: ExtractToken: did not find closing bracket for bracket at position "
                                          + i

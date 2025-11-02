@@ -225,13 +225,13 @@ namespace VNTags
     [Serializable]
     public abstract class VNTag : ScriptableObject, IStringSerializable
     {
-        public VNTagID ID     { get; private set; }
-        public string  RawTag { get; private set; } = "";
+        private string  _rawTag = "";
+        public  VNTagID ID { get; private set; }
 
         public string StringRepresentation
         {
-            get { return RawTag; }
-            set { RawTag = value; }
+            get { return _rawTag; }
+            set { _rawTag = value; }
         }
 
         public string Serialize(object? context)
@@ -256,9 +256,9 @@ namespace VNTags
 
         public void _init(VNTagID id, string raw)
         {
-            ID     = id;
-            RawTag = raw;
-            name   = ToString();
+            ID      = id;
+            _rawTag = raw;
+            name    = ToString();
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace VNTags
         ///     Whether this tag should show up as an option in the editor
         /// </summary>
         /// <returns></returns>
-        public virtual bool EditorVisibility()
+        public virtual bool EditorVisible()
         {
             return true;
         }
@@ -370,6 +370,10 @@ namespace VNTags
                                                              return Convert.ToDecimal(f).ToString(CultureInfo.InvariantCulture);
                                                          case bool b:
                                                              return b ? "true" : "false";
+                                                         case string[] sarr:
+                                                             return string.Join(';', sarr.Select(t => $"\"{t}\""));
+                                                         case IEnumerable<string> earr:
+                                                             return string.Join(';', earr.Select(t => $"\"{t}\""));
                                                          default:
                                                              return p.ToString();
                                                      }

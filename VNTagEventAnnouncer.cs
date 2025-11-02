@@ -26,5 +26,6 @@ namespace VNTags
         public static ChoiceHandler          onChoiceTag;
         public static TransitionHandler      onTransitionTag;
         public static TransitionEventHandler onTransitionEvent;
+        public static SceneResetHandler      onSceneReset;
     }
 }

@@ -52,7 +52,9 @@ namespace VNTags.Tags
                 TargetCharacter = context.GetMainCharacter();
             }
 
-            return (_outfit != null) && (TargetCharacter != null) ? SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name) : "";
+            return (_outfit != null) && !_outfit.IsNone() && (TargetCharacter != null) && !TargetCharacter.IsNone()
+                ? SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name)
+                : "";
         }
 
         public override string GetTagName()

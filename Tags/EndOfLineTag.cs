@@ -24,7 +24,7 @@
             return new VNTagParameters();
         }
 
-        public override bool EditorVisibility()
+        public override bool EditorVisible()
         {
             return false;
         }

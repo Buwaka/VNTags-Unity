@@ -1,6 +1,4 @@
-﻿
-
-// namespace VNTags.Editor
+﻿// namespace VNTags.Editor
 // {
 //     [CustomPropertyDrawer(typeof(VNTag), true)]
 //     public class VNTag_PropertyDrawer : PropertyDrawer
@@ -425,3 +423,4 @@
 //         }
 //     }
 // }
+

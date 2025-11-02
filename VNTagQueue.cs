@@ -56,6 +56,41 @@ namespace VNTags
             return true;
         }
 
+        public void AddUnique(VNTag tag, bool first = true)
+        {
+            foreach (var ctag in GetCollection())
+            {
+                if (ctag.GetType() == tag.GetType())
+                {
+                    return;
+                }
+            }
+
+            if (first)
+            {
+                AddFirst(tag);
+            }
+            else
+            {
+                AddLast(tag);
+            }
+        }
+
+        public void RemoveofType(VNTag tag)
+        {
+            LinkedListNode<VNTag> currentNode = First;
+            while (currentNode != null)
+            {
+                var next = currentNode.Next;
+                if (currentNode.Value.GetType() == tag.GetType())
+                {
+                    Remove(currentNode);
+                }
+                
+                currentNode = next;
+            }
+        }
+
 
         private bool OnCharacterTag(VNTagContext context, VNCharacterData character, CharacterAction action)
         {

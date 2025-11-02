@@ -12,6 +12,8 @@ namespace VNTags
     [Serializable]
     public class VNCharacterData : IVNData
     {
+        private static IVNData _None = new VNCharacterData();
+
         [Tooltip("Name that will be rendered, case insensitive")] [SerializeField]
         private string name;
 
@@ -87,6 +89,11 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Character";
+
+        public static IVNData NoneDataStatic
+        {
+            get { return _None; }
+        }
 
         public static VNCharacterData BlankCharacter(string name)
         {

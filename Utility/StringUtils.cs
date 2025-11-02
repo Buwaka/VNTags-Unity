@@ -166,5 +166,58 @@ namespace VNTags.Utility
 
             return Regex.Replace(text, masterPattern, Matcher, options);
         }
+
+        /// <summary>
+        ///     Extracts the value in-between quotes (" and ') starting from the first quote and ending with the last quote
+        ///     example:
+        ///     He said "what if I don't get "first place"? huh? what then? Will the 'Grim Reaper' come and visit?"
+        ///     result:
+        ///     what if I don't get "first place"? huh? what then? Will the 'Grim Reaper' come and visit?
+        ///     WARNING: does not check whether the first or last quote is \escaped
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="startIndex">optional, from where to start looking</param>
+        /// <param name="endIndex">optional, where to end looking</param>
+        /// <returns>
+        ///     the value inside the first pair of quotes (either ' or "), if no quotes are present, the input will be
+        ///     returned
+        /// </returns>
+        public static string ExtractEnclosing(this string input, int startIndex = 0, int endIndex = -1)
+        {
+            int depth = 0;
+
+            if (endIndex == -1)
+            {
+                endIndex = input.Length - startIndex;
+            }
+
+            int doubleQuoteStartIndex = input.IndexOf('"',  startIndex, endIndex - startIndex);
+            int singleQuoteStartIndex = input.IndexOf('\'', startIndex, endIndex - startIndex);
+
+            if (((doubleQuoteStartIndex == -1) || (input.Count(c => c == '"') < 2)) && ((singleQuoteStartIndex == -1) || (input.Count(c => c == '\'') < 2)))
+            {
+                return input;
+            }
+
+
+            char quoteChar;
+            //single quote
+            if ((doubleQuoteStartIndex == -1) || (singleQuoteStartIndex < doubleQuoteStartIndex))
+            {
+                startIndex = singleQuoteStartIndex;
+                quoteChar  = '\'';
+            }
+            //double quote
+            else
+            {
+                startIndex = doubleQuoteStartIndex;
+                quoteChar  = '"';
+            }
+
+            endIndex = input.LastIndexOf(quoteChar, startIndex, endIndex - startIndex);
+
+
+            return input.Substring(startIndex, endIndex - startIndex);
+        }
     }
 }

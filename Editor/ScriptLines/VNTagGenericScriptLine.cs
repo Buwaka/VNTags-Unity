@@ -5,80 +5,31 @@ using VNTags.Tags;
 
 namespace VNTags.Editor
 {
-    public class VNTagScriptLine
+    public class VNTagGenericScriptLine : VNTagScriptLine_base
     {
-        private readonly ushort        _lineNumber;
-        private readonly VNTagQueue    Tags;
-        private          BackgroundTag _backgroundChangeTag;
+        private BackgroundTag    _backgroundChangeTag;
+        private CharacterTag     _characterChangeTag;
+        private ExpressionTag    _expressionChangeTag;
+        private OutfitTag        _outfitChangeTag;
+        public  int              BackgroundIndex;
+        public  int              BGMIndex;
+        public  int              ExpressionIndex;
+        public  List<IEditorTag> ExtraTags = new();
+        public  bool             Foldout;
+        public  int              NameIndex;
+        public  int              OutfitIndex;
+        public  int              SFXIndex;
 
-
-        private CharacterTag      _characterChangeTag;
-        private ExpressionTag     _expressionChangeTag;
-        private OutfitTag         _outfitChangeTag;
-        public  int               BackgroundIndex;
-        public  int               BGMIndex     = 0;
-        public  List<DialogueTag> DialogueTags = new();
-        public  int               ExpressionIndex;
-        public  bool              Foldout;
-
-        public int    NameIndex;
-        public int    OutfitIndex;
-        public string Preview = "";
-        public string RawLine;
-        public string SerializedPreview = "";
-        public int    SFXIndex          = 0;
-
-
-        public VNTagScriptLine(string rawLine, ushort lineNumber)
+        public VNTagGenericScriptLine(string rawLine, ushort lineNumber) : base(rawLine, lineNumber)
         {
-            Preview     = lineNumber + ": ";
-            _lineNumber = lineNumber;
-            RawLine     = rawLine;
-            Tags        = new VNTagQueue(VNTagDeserializer.ParseLine(RawLine, lineNumber));
-
-            // filter out starter tags
-            foreach (VNTag tag in Tags)
-            {
-                if (tag is CharacterTag characterTag && (_characterChangeTag == null))
-                {
-                    _characterChangeTag = characterTag;
-                    if (_characterChangeTag.Character != null)
-                    {
-                        Preview += _characterChangeTag.Character.Name + ": ";
-                    }
-                }
-                else if (tag is ExpressionTag expressionTag)
-                {
-                    _expressionChangeTag = expressionTag;
-                }
-                else if (tag is OutfitTag outfitTag)
-                {
-                    _outfitChangeTag = outfitTag;
-                }
-                else if (tag is BackgroundTag backgroundTag)
-                {
-                    _backgroundChangeTag = backgroundTag;
-                }
-                else if (tag is DialogueTag)
-                {
-                    break;
-                }
-            }
-
-            // get all the dialogue tags
-            foreach (VNTag tag in Tags)
-            {
-                if (tag is DialogueTag)
-                {
-                    var dTag = (DialogueTag)tag;
-                    Preview += dTag.Dialogue;
-                    DialogueTags.Add(dTag);
-                }
-            }
-
-            SetIndieces();
-            Invalidate();
+            Init();
         }
+
+        public VNTagGenericScriptLine(VNTagScriptLine_base baseLine) : base(baseLine)
+        {
+            Init();
+        }
+
 
         public VNTagSerializationContext SerializationContext
         {
@@ -141,27 +92,120 @@ namespace VNTags.Editor
             }
         }
 
-        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
+        private void Init()
         {
-            return new VNTagDeserializationContext(_lineNumber, RawLine, tagNumber);
+            Preview = LineNumber + ": ";
+
+            // filter out starter tags
+            // todo but then render all the other tags, is gonna be hard to edit them generically, perhaps cast the all as DialogueTags?
+            // we have to keep track of the iterator so we don't include the starter tags
+
+            // starter tags
+            LinkedList<VNTag>.Enumerator iterator = Tags.GetEnumerator();
+            do
+            {
+                VNTag tag = iterator.Current;
+                if (tag is CharacterTag characterTag && (_characterChangeTag == null))
+                {
+                    _characterChangeTag = characterTag;
+                    if (_characterChangeTag.Character != null)
+                    {
+                        Preview += _characterChangeTag.Character.Name + ": ";
+                    }
+                }
+                else if (tag is ExpressionTag expressionTag && (_expressionChangeTag == null))
+                {
+                    _expressionChangeTag = expressionTag;
+                }
+                else if (tag is OutfitTag outfitTag && (_outfitChangeTag == null))
+                {
+                    _outfitChangeTag = outfitTag;
+                }
+                else if (tag is BackgroundTag backgroundTag && (_backgroundChangeTag == null))
+                {
+                    _backgroundChangeTag = backgroundTag;
+                }
+                else
+                {
+                    break;
+                }
+            } while (iterator.MoveNext());
+
+            // extra tags
+            while (iterator.MoveNext())
+            {
+                VNTag tag = iterator.Current;
+                if (tag is DialogueTag dTag)
+                {
+                    Preview += dTag.Dialogue;
+                    ExtraTags.Add(dTag);
+                }
+                else
+                {
+                    var dummy = ScriptableObject.CreateInstance<DummyTag>();
+                    dummy._init(VNTagID.GenerateID(LineNumber, (ushort)Tags.Count), RawLine);
+                    dummy.Deserialize(new VNTagDeserializationContext(), tag.StringRepresentation);
+                    ExtraTags.Add(dummy);
+                }
+            }
+
+            iterator.Dispose();
+
+            InitUIIndieces();
+            Invalidate();
         }
 
-        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
+        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
         {
-            if (Tags == null || Tags.Count <= 0)
+            return new VNTagDeserializationContext(LineNumber, RawLine, tagNumber);
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(IEditorTag editorTag)
+        {
+            if ((Tags == null) || (Tags.Count <= 0))
             {
                 Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
                 return new VNTagDeserializationContext();
             }
-            
+
+            ushort index = 0;
+            bool   found = false;
+            foreach (VNTag tag in Tags)
+            {
+                if (tag is IEditorTag eTag && (eTag == editorTag))
+                {
+                    found = true;
+                    break;
+                }
+
+                index++;
+            }
+
+            if (!found)
+            {
+                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
+                return new VNTagDeserializationContext();
+            }
+
+            return new VNTagDeserializationContext(LineNumber, RawLine, index);
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
+        {
+            if ((Tags == null) || (Tags.Count <= 0))
+            {
+                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
+                return new VNTagDeserializationContext();
+            }
+
             int index = Tags.IndexOf(tag);
             if (index == -1)
             {
                 Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
                 return new VNTagDeserializationContext();
             }
-            
-            return new VNTagDeserializationContext(_lineNumber, RawLine, (ushort)index);
+
+            return new VNTagDeserializationContext(LineNumber, RawLine, (ushort)index);
         }
 
         public void InvalidateCharacter()
@@ -173,12 +217,12 @@ namespace VNTags.Editor
             Invalidate();
         }
 
-        public void Invalidate()
+        public override void Invalidate()
         {
             SerializedPreview = VNTagSerializer.SerializeLine(Tags);
         }
 
-        public void SetIndieces()
+        public void InitUIIndieces()
         {
             if ((_characterChangeTag != null) && (_characterChangeTag.Character != null))
             {
@@ -221,22 +265,16 @@ namespace VNTags.Editor
 
             if (_backgroundChangeTag != null)
             {
-                //todo
-                var backgrounds = VNTagsConfig.GetConfig().AllBackgrounds;
+                var backgrounds = VNTagsConfig.GetConfig().GetBackgroundNamesGUI("");
                 for (int i = 0; i < backgrounds.Length; i++)
                 {
-                    if (backgrounds[i].Name == _backgroundChangeTag.Background.Name)
+                    if (backgrounds[i].text.Equals(_backgroundChangeTag.Background.Name, StringComparison.OrdinalIgnoreCase))
                     {
                         BackgroundIndex = i;
                         break;
                     }
                 }
             }
-        }
-
-        public string Serialize()
-        {
-            return VNTagSerializer.SerializeLine(Tags);
         }
     }
 }
