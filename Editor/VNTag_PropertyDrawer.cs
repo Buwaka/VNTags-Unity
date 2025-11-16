@@ -15,31 +15,14 @@ namespace VNTags.Editor
             }
             else
             {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField(property.displayName, GUILayout.Width(100));
-                property.stringValue = EditorGUILayout.TextArea(property.stringValue, GUILayout.ExpandHeight(true));
-
-                if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
+                VNTagTextArea.TextAreaWithTagCreationDropDown(property.displayName, tag =>
                 {
-                    ShowTextBoxContextMenu(tag =>
-                                           {
-                                               property.stringValue = tag;
-                                               property.serializedObject.ApplyModifiedProperties();
-                                           },
-                                           property.stringValue);
-                }
-
-                EditorGUILayout.EndHorizontal();
+                    property.stringValue = tag;
+                    property.serializedObject.ApplyModifiedProperties();
+                }, property.stringValue); 
             }
         }
 
-        private void ShowTextBoxContextMenu(Action<string> target, string current)
-        {
-            var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Create new Tag"), false, () => CreateTagWindow.ShowWindow(target, current));
-
-            menu.ShowAsContext();
-        }
     }
 }

@@ -20,6 +20,11 @@ namespace VNTags.Tags
             Dialogue = value;
         }
 
+        public VNTagID GetID()
+        {
+            return ID;
+        }
+
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             if ((parameters == null) || (parameters.Length <= 0))

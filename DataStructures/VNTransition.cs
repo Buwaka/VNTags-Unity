@@ -15,8 +15,6 @@ namespace VNTags
         [SerializeField] [PropertyRequireComponent(typeof(VNTransitionComponent))]
         public GameObject prefab;
 
-        [SerializeField] [VNTagEditor] private string tags;
-
         public string Name
         {
             get { return name; }

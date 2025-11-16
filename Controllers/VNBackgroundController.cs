@@ -89,7 +89,7 @@ namespace VNTags.Controllers
 
             _transitionTime = time;
             _skipTransition = instant;
-            if (_targetBackground != background)
+            if (_targetBackground != background && _targetBackground != null)
             {
                 Debug.LogError("VNSceneController: ChangeBackground: different background is still transitioning, "
                              + "transition will be finished but call this function again for the new transition, exiting");
@@ -101,6 +101,7 @@ namespace VNTags.Controllers
                 return false;
             }
 
+            _targetBackground    = background;
             _transitionCoroutine = StartCoroutine(TransitionBackground());
             return _skipTransition;
         }
@@ -150,7 +151,9 @@ namespace VNTags.Controllers
                 {
                     foreach (IVNTransitionable transitionable in _backgrounds[_targetBackground])
                     {
-                        float progress = Mathf.Clamp((_timer + _transitionTime / 2) / (_transitionTime / 2), 0, 1.0f);
+                        float total    = (_transitionTime / 2);
+                        float current  = _timer;
+                        float progress = Mathf.Clamp( current / total, 0, 1.0f);
                         transitionable.FadeIn(progress);
                     }
 

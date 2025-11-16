@@ -30,12 +30,6 @@ namespace VNTags.Editor
             Init();
         }
 
-
-        public VNTagSerializationContext SerializationContext
-        {
-            get { return new VNTagSerializationContext(Tags); }
-        }
-
         public CharacterTag CharacterChangeTag
         {
             get
@@ -102,10 +96,11 @@ namespace VNTags.Editor
 
             // starter tags
             LinkedList<VNTag>.Enumerator iterator = Tags.GetEnumerator();
-            do
+            VNTag                        current  = null;
+            while (iterator.MoveNext())
             {
-                VNTag tag = iterator.Current;
-                if (tag is CharacterTag characterTag && (_characterChangeTag == null))
+                current = iterator.Current;
+                if (current is CharacterTag characterTag && (_characterChangeTag == null))
                 {
                     _characterChangeTag = characterTag;
                     if (_characterChangeTag.Character != null)
@@ -113,15 +108,15 @@ namespace VNTags.Editor
                         Preview += _characterChangeTag.Character.Name + ": ";
                     }
                 }
-                else if (tag is ExpressionTag expressionTag && (_expressionChangeTag == null))
+                else if (current is ExpressionTag expressionTag && (_expressionChangeTag == null))
                 {
                     _expressionChangeTag = expressionTag;
                 }
-                else if (tag is OutfitTag outfitTag && (_outfitChangeTag == null))
+                else if (current is OutfitTag outfitTag && (_outfitChangeTag == null))
                 {
                     _outfitChangeTag = outfitTag;
                 }
-                else if (tag is BackgroundTag backgroundTag && (_backgroundChangeTag == null))
+                else if (current is BackgroundTag backgroundTag && (_backgroundChangeTag == null))
                 {
                     _backgroundChangeTag = backgroundTag;
                 }
@@ -129,83 +124,38 @@ namespace VNTags.Editor
                 {
                     break;
                 }
-            } while (iterator.MoveNext());
+            }
 
             // extra tags
-            while (iterator.MoveNext())
+            if (current != null)
             {
-                VNTag tag = iterator.Current;
-                if (tag is DialogueTag dTag)
+                do
                 {
-                    Preview += dTag.Dialogue;
-                    ExtraTags.Add(dTag);
-                }
-                else
-                {
-                    var dummy = ScriptableObject.CreateInstance<DummyTag>();
-                    dummy._init(VNTagID.GenerateID(LineNumber, (ushort)Tags.Count), RawLine);
-                    dummy.Deserialize(new VNTagDeserializationContext(), tag.StringRepresentation);
-                    ExtraTags.Add(dummy);
-                }
+                    VNTag tag = iterator.Current;
+                    if (tag == null)
+                    {
+                        continue;
+                    }
+
+                    if (tag is DialogueTag dTag)
+                    {
+                        Preview += dTag.Dialogue;
+                        ExtraTags.Add(dTag);
+                    }
+                    else
+                    {
+                        var dummy = ScriptableObject.CreateInstance<DummyTag>();
+                        dummy._init(VNTagID.GenerateID(LineNumber, (ushort)Tags.Count), RawLine);
+                        dummy.Deserialize(new VNTagDeserializationContext(), tag.Serialize(new VNTagSerializationContext(Tags)));
+                        ExtraTags.Add(dummy);
+                    }
+                } while (iterator.MoveNext());
             }
 
             iterator.Dispose();
 
             InitUIIndieces();
             Invalidate();
-        }
-
-        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
-        {
-            return new VNTagDeserializationContext(LineNumber, RawLine, tagNumber);
-        }
-
-        public VNTagDeserializationContext CreateDeserializationContext(IEditorTag editorTag)
-        {
-            if ((Tags == null) || (Tags.Count <= 0))
-            {
-                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
-                return new VNTagDeserializationContext();
-            }
-
-            ushort index = 0;
-            bool   found = false;
-            foreach (VNTag tag in Tags)
-            {
-                if (tag is IEditorTag eTag && (eTag == editorTag))
-                {
-                    found = true;
-                    break;
-                }
-
-                index++;
-            }
-
-            if (!found)
-            {
-                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
-                return new VNTagDeserializationContext();
-            }
-
-            return new VNTagDeserializationContext(LineNumber, RawLine, index);
-        }
-
-        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
-        {
-            if ((Tags == null) || (Tags.Count <= 0))
-            {
-                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
-                return new VNTagDeserializationContext();
-            }
-
-            int index = Tags.IndexOf(tag);
-            if (index == -1)
-            {
-                Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
-                return new VNTagDeserializationContext();
-            }
-
-            return new VNTagDeserializationContext(LineNumber, RawLine, (ushort)index);
         }
 
         public void InvalidateCharacter()
@@ -268,7 +218,7 @@ namespace VNTags.Editor
                 var backgrounds = VNTagsConfig.GetConfig().GetBackgroundNamesGUI("");
                 for (int i = 0; i < backgrounds.Length; i++)
                 {
-                    if (backgrounds[i].text.Equals(_backgroundChangeTag.Background.Name, StringComparison.OrdinalIgnoreCase))
+                    if (_backgroundChangeTag.Background == null || backgrounds[i].text.Equals(_backgroundChangeTag.Background.Name, StringComparison.OrdinalIgnoreCase))
                     {
                         BackgroundIndex = i;
                         break;

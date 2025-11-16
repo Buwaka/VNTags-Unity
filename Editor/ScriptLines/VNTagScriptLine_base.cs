@@ -1,4 +1,5 @@
-﻿using VNTags.Tags;
+﻿using UnityEngine;
+using VNTags.Tags;
 
 namespace VNTags.Editor
 {
@@ -25,6 +26,11 @@ namespace VNTags.Editor
         public string     SerializedPreview { get; protected set; }
         public ushort     LineNumber        { get; }
         public VNTagQueue Tags              { get; }
+        
+        public VNTagSerializationContext SerializationContext
+        {
+            get { return new VNTagSerializationContext(Tags); }
+        }
 
         public bool HasDialogueTags()
         {
@@ -49,6 +55,62 @@ namespace VNTags.Editor
         public virtual string Serialize()
         {
             return VNTagSerializer.SerializeLine(Tags);
+        }
+        
+        public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
+        {
+            return new VNTagDeserializationContext(LineNumber, RawLine, tagNumber);
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(IEditorTag editorTag)
+        {
+            return new VNTagDeserializationContext(LineNumber, RawLine, editorTag.GetID().TagNumber);
+            //
+            // if ((Tags == null) || (Tags.Count <= 0))
+            // {
+            //     Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
+            //     return new VNTagDeserializationContext();
+            // }
+            //
+            // ushort index = 0;
+            // bool   found = false;
+            // foreach (VNTag tag in Tags)
+            // {
+            //     if (tag is IEditorTag eTag && (eTag == editorTag))
+            //     {
+            //         found = true;
+            //         break;
+            //     }
+            //
+            //     index++;
+            // }
+            //
+            // if (!found)
+            // {
+            //     Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
+            //     return new VNTagDeserializationContext();
+            // }
+            //
+            // return new VNTagDeserializationContext(LineNumber, RawLine, index);
+        }
+
+        public VNTagDeserializationContext CreateDeserializationContext(VNTag tag)
+        {
+            return new VNTagDeserializationContext(LineNumber, RawLine, tag.ID.TagNumber);
+            // if ((Tags == null) || (Tags.Count <= 0))
+            // {
+            //     Debug.LogError("VNTagEditLine: CreateDeserializationContext: tags is null or empty");
+            //     return new VNTagDeserializationContext();
+            // }
+            //
+            // int index = Tags.IndexOf(tag);
+            // if (index == -1)
+            // {
+            //     Debug.LogError("VNTagEditLine: CreateDeserializationContext: tag not found, returning empty context");
+            //     return new VNTagDeserializationContext();
+            // }
+            //
+            // return new VNTagDeserializationContext(LineNumber, RawLine, (ushort)index);
         }
     }
 }

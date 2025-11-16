@@ -8,7 +8,7 @@ using VNTags.Utility;
 [Serializable]
 public class VNPosition
 {
-    public Transform          Transform;
+    public TransformData          Transform;
     public SortingLayerPicker Layer;
 }
 
@@ -125,13 +125,17 @@ public class VNCharacterController : MonoBehaviour
 
         obj = charaComp.gameObject;
 
-        obj.transform.position   = position.Transform.position;
-        obj.transform.rotation   = position.Transform.rotation;
-        obj.transform.localScale = new Vector3(_instance.GlobablSpriteScale, _instance.GlobablSpriteScale, _instance.GlobablSpriteScale);
+        obj.transform.position   = position.Transform.Position;
+        obj.transform.rotation   = Quaternion.Euler(position.Transform.Rotation);
+        obj.transform.localScale = position.Transform.Scale * _instance.GlobablSpriteScale;
+        // obj.transform.localScale = new Vector3(position.Transform.Scale.x * _instance.GlobablSpriteScale, 
+        //                                        position.Transform.Scale.y * _instance.GlobablSpriteScale, 
+        //                                        position.Transform.Scale.z * _instance.GlobablSpriteScale);
 
         foreach (SpriteRenderer renderer in obj.GetComponentsInChildren<SpriteRenderer>(true))
         {
-            renderer.sortingLayerID = position.Layer.id;
+            // renderer.sortingLayerID   = position.Layer.id;
+            renderer.sortingLayerName = position.Layer.Name;
         }
 
         charaComp.Show();

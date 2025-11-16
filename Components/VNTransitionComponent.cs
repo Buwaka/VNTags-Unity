@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 using VNTags.Utility;
 
@@ -32,15 +33,16 @@ namespace VNTags.Components
         [SerializeField]
         private string EVENTS = "Read Above";
 
-        private Animator _animator;
+        private Animator     _animator;
+        private VNTagQueue   _midTransitionTags = null;
+        private VNTagContext _context           = new VNTagContext();
 
 
         private void Start()
         {
             _animator = GetComponent<Animator>();
         }
-
-
+        
         public void StartAnimation()
         {
             VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Start, null);
@@ -53,7 +55,19 @@ namespace VNTags.Components
 
         public void Reveal()
         {
-            VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Reveal, null);
+            if (_midTransitionTags.ExecuteAll(_context))
+            {
+                VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Reveal, null);
+            }
+            else
+            {
+                StartCoroutine(_midTransitionTags.ExecuteAsync(_context,
+                                                () =>
+                                                {
+                                                    VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Reveal, null);
+                                                }));
+            }
+
         }
 
         public void Finished()
@@ -64,6 +78,11 @@ namespace VNTags.Components
         public void CustomEvent(string customValue)
         {
             VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Custom, customValue);
+        }
+
+        public void SetMidTransitionTags(IList<VNTag> tags)
+        {
+            _midTransitionTags = new VNTagQueue(tags);
         }
     }
 }

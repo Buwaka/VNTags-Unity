@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 using VNTags.Tags;
 using VNTags.Utility;
 
@@ -19,7 +20,7 @@ namespace VNTags.Editor
         public TransitionTag TransitionTag;
 
         public bool          SceneResetFlag = true;
-        public SceneResetTag SceneResetTag  = null;
+        public bool          ToggleVNUIFlag = false;
 
         public VNTagSceneSetupLine(string rawLine, ushort lineNumber) : base(rawLine, lineNumber)
         {
@@ -47,23 +48,16 @@ namespace VNTags.Editor
                     case TransitionTag transitionTag when TransitionTag == null:
                         TransitionTag = transitionTag;
                         break;
-                    case SceneResetTag sceneResetTag when SceneResetTag == null:
-                        SceneResetTag = sceneResetTag;
+                    case SceneResetTag:
+                        SceneResetFlag = true;
+                        break;
+                    case ToggleVNUI:
+                        ToggleVNUIFlag = true;
                         break;
                 }
             }
 
-            if (CharacterTag == null)
-            {
-                CharacterTag = ScriptableObject.CreateInstance<MultiCharacterTag>();
-                Tags.AddLast(CharacterTag);
-            }
-
-            if (BackgroundTag == null)
-            {
-                BackgroundTag = ScriptableObject.CreateInstance<BackgroundTag>();
-                Tags.AddLast(BackgroundTag);
-            }
+            
 
             if (TransitionTag == null)
             {
@@ -71,10 +65,17 @@ namespace VNTags.Editor
                 TransitionTag.SetNone();
                 Tags.AddLast(TransitionTag);
             }
-
-            if (SceneResetTag == null)
+            
+            if (BackgroundTag == null)
             {
-                SceneResetTag = ScriptableObject.CreateInstance<SceneResetTag>();
+                BackgroundTag = ScriptableObject.CreateInstance<BackgroundTag>();
+                Tags.AddLast(BackgroundTag);
+            }
+            
+            if (CharacterTag == null)
+            {
+                CharacterTag = ScriptableObject.CreateInstance<MultiCharacterTag>();
+                Tags.AddLast(CharacterTag);
             }
 
 
@@ -144,21 +145,26 @@ namespace VNTags.Editor
                     TransitionName = IVNData.DefaultKeyword;
                 }
             }
-
-
-            // SceneResetFlag
-            SceneResetFlag = SceneResetTag != null;
         }
 
         public override string Serialize()
         {
             if (SceneResetFlag)
             {
-                Tags.AddUnique(SceneResetTag);
+                Tags.AddUnique(ScriptableObject.CreateInstance<SceneResetTag>());
             }
             else
             {
-                Tags.RemoveofType(SceneResetTag);
+                Tags.RemoveofType(typeof(SceneResetTag));
+            }
+            
+            if (ToggleVNUIFlag)
+            {
+                Tags.AddUnique(ScriptableObject.CreateInstance<ToggleVNUI>(), false);
+            }
+            else
+            {
+                Tags.RemoveofType(typeof(ToggleVNUI));
             }
             
             return base.Serialize();

@@ -152,7 +152,7 @@ namespace VNTags
                 && (Description == other.Description)
                 && (Optional    == other.Optional)
                 && Equals(EnumType, other.EnumType)
-                && Equals(Options,  other.Options);
+                && (Options != null && other.Options != null && Options.SequenceEqual(other.Options));
         }
 
         public override bool Equals(object? obj)

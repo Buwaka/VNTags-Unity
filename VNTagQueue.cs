@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using VNTags.Tags;
 
@@ -78,11 +80,16 @@ namespace VNTags
 
         public void RemoveofType(VNTag tag)
         {
+            RemoveofType(tag.GetType());
+        }
+        
+        public void RemoveofType(Type type)
+        {
             LinkedListNode<VNTag> currentNode = First;
             while (currentNode != null)
             {
                 var next = currentNode.Next;
-                if (currentNode.Value.GetType() == tag.GetType())
+                if (currentNode.Value.GetType() == type)
                 {
                     Remove(currentNode);
                 }
@@ -105,6 +112,47 @@ namespace VNTags
         public LinkedList<VNTag> GetCollection()
         {
             return this;
+        }
+
+        public bool ExecuteAll(VNTagContext context, int retries = 3)
+        {
+            if ((Count <= 0) || (First.Value == null))
+            {
+                return true;
+            }
+            
+            VNTag tag = First.Value;
+            context.SetMainCharacter(_currentCharacter);
+
+            int tries = 0;
+            while (tries < retries && tag != null)
+            {
+                tag.BaseExecute(context, out bool isFinished);
+
+                if (isFinished)
+                {
+                    RemoveFirst();
+                    tries = 0;
+                    tag = First?.Value;
+                }
+                else
+                {
+                    tries++;
+                }
+            }
+
+            return Count == 0;
+        }
+
+        public IEnumerator ExecuteAsync(VNTagContext context, Action onComplete = null)
+        {
+            while (Count > 0)
+            {
+                Tick(context);
+                yield return null;
+            }
+            
+            onComplete?.Invoke();
         }
 
         public void Tick(VNTagContext context)

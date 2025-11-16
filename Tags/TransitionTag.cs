@@ -1,21 +1,18 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace VNTags.Tags
 {
-    public delegate bool TransitionHandler(VNTagContext context, VNTransition transition);
+    public delegate bool TransitionHandler(VNTagContext context, VNTransition transition, IList<VNTag> tags);
 
     public class TransitionTag : VNTag
     {
-        public static readonly VNTransition NoTransition = new();
-        private                VNTransition _transition;
         public static          VNTransition DefaultTransition { get; set; } = null;
 
-        public VNTransition Transition
-        {
-            get { return _transition; }
-            private set { _transition = value; }
-        }
+        public              VNTransition Transition;
+        [VNTagEditor] public string       MidTransitionTags = "";
 
         public override string GetTagName()
         {
@@ -32,10 +29,10 @@ namespace VNTags.Tags
                                                          null,
                                                          VNTagsConfig.GetConfig().AllTransitions.Select(t => t.Name).ToArray());
 
-            var tagParameter = new VNTagParameter(2, "Transition Name", TypeCode.Object, "Name of the transition to be played");
+            var tagParameter = new VNTagParameter(2, "Mid Transition Tags", TypeCode.Object, "Tags to be processed during the transition", true);
 
             currentParameters.UpdateParameter(transitionParameter, Transition);
-            currentParameters.UpdateParameter(tagParameter,        null);
+            currentParameters.UpdateParameter(tagParameter,        MidTransitionTags);
 
             return currentParameters;
         }
@@ -43,7 +40,9 @@ namespace VNTags.Tags
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
             VNTransition trans = Transition ?? DefaultTransition;
-            isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, trans));
+            
+            var tags = VNTagDeserializer.ParseLine(MidTransitionTags, ID.LineNumber);
+            isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, trans, tags));
         }
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
@@ -69,7 +68,7 @@ namespace VNTags.Tags
 #if UNITY_EDITOR
         public ref VNTransition GetTransitionRef()
         {
-            return ref _transition;
+            return ref Transition;
         }
 
         public void SetNone()

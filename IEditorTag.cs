@@ -5,5 +5,7 @@
         string GetValue();
 
         void SetValue(string value);
+
+        VNTagID GetID();
     }
 }

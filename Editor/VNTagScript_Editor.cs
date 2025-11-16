@@ -41,7 +41,7 @@ namespace VNTags.Editor
             return base.CreateInspectorGUI();
         }
 
-        ~VNTagScript_Editor()
+        private void OnDestroy()
         {
             AssetWatcher.UnwatchAsset(target, InvalidateTarget);
         }
@@ -139,7 +139,7 @@ namespace VNTags.Editor
 
                     if (line is VNTagGenericScriptLine scriptLine)
                     {
-                            RenderLine(scriptLine);
+                        RenderLine(scriptLine);
                     }
                 }
                 EditorGUILayout.EndToggleGroup();
@@ -159,24 +159,6 @@ namespace VNTags.Editor
             var nullVal = Array.Empty<GUIContent>();
             EditorGUILayout.PrefixLabel(label);
             EditorGUILayout.Popup(0, nullVal);
-        }
-
-        private void ShowTextBoxContextMenu(IEditorTag tag, VNTagGenericScriptLine lineBase)
-        {
-            var menu = new GenericMenu();
-
-
-            menu.AddItem(new GUIContent("Create new Tag"),
-                         false,
-                         () => CreateTagWindow.ShowWindow(value => tag.SetValue(value),
-                                                          lineBase.SerializationContext,
-                                                          lineBase.CreateDeserializationContext(tag),
-                                                          tag.GetValue()));
-            // menu.AddSeparator("");
-            // menu.AddItem(new GUIContent("Do Something Else"), false, () => Debug.Log("Doing something else!"));
-
-
-            menu.ShowAsContext();
         }
 
 
@@ -225,46 +207,40 @@ namespace VNTags.Editor
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
-            bool result =EditorGUILayout.Toggle("Reset Scene", setupLine.SceneResetFlag);
-            setupLine.SceneResetFlag = result;
+            setupLine.SceneResetFlag = EditorGUILayout.Toggle("Reset Scene", setupLine.SceneResetFlag);
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.BeginVertical();
+            setupLine.ToggleVNUIFlag =  EditorGUILayout.Toggle("Toggle Textbox", setupLine.ToggleVNUIFlag);;
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.Separator();
         }
 
-        private void RenderLine(VNTagGenericScriptLine lineBase)
+        private void RenderLine(VNTagGenericScriptLine line)
         {
             //dialogue
-            foreach (IEditorTag tag in lineBase.ExtraTags)
+            foreach (IEditorTag tag in line.ExtraTags)
             {
-                EditorGUILayout.BeginHorizontal();
-                tag.SetValue(EditorGUILayout.TextArea(tag.GetValue()));
-
-                if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
-                {
-                    ShowTextBoxContextMenu(tag, lineBase);
-                }
-
-                EditorGUILayout.EndHorizontal();
+                VNTagTextArea.TextAreaWithTagCreationDropDown(tag, line);
             }
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             // Name
-            string nullName = (lineBase.CharacterChangeTag.Character == null) || !lineBase.CharacterChangeTag.Character.IsBlankCharacter()
+            string nullName = (line.CharacterChangeTag.Character == null) || !line.CharacterChangeTag.Character.IsBlankCharacter()
                 ? "Narrator"
-                : lineBase.CharacterChangeTag.Character.Name;
+                : line.CharacterChangeTag.Character.Name;
             LayoutHelpers.RenderPopup("Character",
                                       VNTagsConfig.GetConfig().GetCharacterNamesGUI(nullName),
-                                      ref lineBase.NameIndex,
+                                      ref line.NameIndex,
                                       VNTagsConfig.GetConfig().GetCharacterByIndex,
-                                      ref lineBase.CharacterChangeTag.GetCharacterRef(),
-                                      lineBase.InvalidateCharacter);
+                                      ref line.CharacterChangeTag.GetCharacterRef(),
+                                      line.InvalidateCharacter);
             EditorGUILayout.EndVertical();
 
-            EditorGUI.BeginDisabledGroup(lineBase.CharacterChangeTag.Character == null);
-            if (lineBase.CharacterChangeTag.Character == null)
+            EditorGUI.BeginDisabledGroup(line.CharacterChangeTag.Character == null);
+            if (line.CharacterChangeTag.Character == null)
             {
                 // Expression
                 EditorGUILayout.BeginVertical();
@@ -281,22 +257,22 @@ namespace VNTags.Editor
                 // Expression
                 EditorGUILayout.BeginVertical();
                 LayoutHelpers.RenderPopup("Expression",
-                                          lineBase.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
-                                          ref lineBase.ExpressionIndex,
-                                          lineBase.CharacterChangeTag.Character.GetExpressionByIndex,
-                                          ref lineBase.ExpressionChangeTag.GetOutfitRef(),
-                                          lineBase.Invalidate);
+                                          line.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
+                                          ref line.ExpressionIndex,
+                                          line.CharacterChangeTag.Character.GetExpressionByIndex,
+                                          ref line.ExpressionChangeTag.GetOutfitRef(),
+                                          line.Invalidate);
                 EditorGUILayout.EndVertical();
 
 
                 //Outfit
                 EditorGUILayout.BeginVertical();
                 LayoutHelpers.RenderPopup("Outfit",
-                                          lineBase.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
-                                          ref lineBase.OutfitIndex,
-                                          lineBase.CharacterChangeTag.Character.GetOutfitByIndex,
-                                          ref lineBase.OutfitChangeTag.GetOutfitRef(),
-                                          lineBase.Invalidate);
+                                          line.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
+                                          ref line.OutfitIndex,
+                                          line.CharacterChangeTag.Character.GetOutfitByIndex,
+                                          ref line.OutfitChangeTag.GetOutfitRef(),
+                                          line.Invalidate);
                 EditorGUILayout.EndVertical();
             }
 
@@ -308,7 +284,7 @@ namespace VNTags.Editor
 
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PrefixLabel("Background");
-            lineBase.BackgroundIndex = EditorGUILayout.Popup(lineBase.BackgroundIndex, VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background Change"));
+            line.BackgroundIndex = EditorGUILayout.Popup(line.BackgroundIndex, VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background Change"));
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
@@ -322,7 +298,7 @@ namespace VNTags.Editor
 
             // EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.LabelField("Preview");
-            EditorGUILayout.SelectableLabel(lineBase.SerializedPreview);
+            EditorGUILayout.SelectableLabel(line.SerializedPreview);
             // EditorGUI.EndDisabledGroup();
         }
 

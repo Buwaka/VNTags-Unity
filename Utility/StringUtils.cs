@@ -184,8 +184,6 @@ namespace VNTags.Utility
         /// </returns>
         public static string ExtractEnclosing(this string input, int startIndex = 0, int endIndex = -1)
         {
-            int depth = 0;
-
             if (endIndex == -1)
             {
                 endIndex = input.Length - startIndex;

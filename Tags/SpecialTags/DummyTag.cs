@@ -15,6 +15,11 @@ namespace VNTags.Tags
         {
             TagString = value;
         }
+        
+        public VNTagID GetID()
+        {
+            return ID;
+        }
 
         public override string GetTagName()
         {

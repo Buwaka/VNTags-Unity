@@ -121,20 +121,16 @@ namespace VNTags.Editor
             if (GUILayout.Button("Close Window"))
             {
                 Close();
+                
             }
         }
 
         public static void ShowWindow
-            (Action<string> target, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext, string current = null)
+            (Action<string> target, VNTagSerializationContext serializationContext, VNTagDeserializationContext deserializationContext, string current = null, EditorWindow parent = null)
         {
-            var window = GetWindow<CreateTagWindow>("Create new Tag (with context)");
+            var window = CreateWindow<CreateTagWindow>();
+            window.titleContent = new GUIContent($"Create new Tag ({current})");
             window.Init(target, current, serializationContext, deserializationContext);
-        }
-
-        public static void ShowWindow(Action<string> target, string current = null)
-        {
-            var window = GetWindow<CreateTagWindow>("Create new Tag (without context)");
-            window.Init(target, current, new VNTagSerializationContext(), new VNTagDeserializationContext());
         }
 
         private void Init
@@ -276,8 +272,10 @@ namespace VNTags.Editor
                 case TypeCode.Int64:
                     return EditorGUILayout.LongField((long)value);
                 case TypeCode.Object:
-                    Debug.LogWarning("CreateTagWindow: OnGUI: Object references are unsupported, use a different system to retrieve object instead, "
-                                   + parameter);
+                    // Debug.LogWarning("CreateTagWindow: OnGUI: Object references are unsupported, use a different system to retrieve object instead, "
+                    //                + parameter);
+                    return VNTagTextArea.TextAreaWithTagCreationDropDown(t => value = t, (string)value);
+                    
                     break;
                 case TypeCode.SByte:
                     return (sbyte)EditorGUILayout.IntField((sbyte)value);

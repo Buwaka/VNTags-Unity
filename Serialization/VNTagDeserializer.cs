@@ -46,13 +46,21 @@ namespace VNTags
                 string processedLine = TextProcessors.TextProcessors.PreProcessRawScript(line);
                 processedLine = TextProcessors.TextProcessors.PostProcessRawScript(processedLine);
 
+                bool hasDialogue = false;
                 foreach (VNTag tag in ParseLine(processedLine, (ushort)(lineIndex + 1)))
                 {
+                    if (tag is DialogueTag)
+                    {
+                        hasDialogue = true;
+                    }
                     tagQueue.AddLast(tag);
                 }
 
-                tagQueue.AddLast(ScriptableObject.CreateInstance<ConfirmTag>());
-                tagQueue.AddLast(ScriptableObject.CreateInstance<EndOfLineTag>());
+                if (hasDialogue)
+                {
+                    tagQueue.AddLast(ScriptableObject.CreateInstance<ConfirmTag>());
+                    tagQueue.AddLast(ScriptableObject.CreateInstance<EndOfLineTag>());
+                }
             }
 
             return tagQueue;
@@ -72,6 +80,11 @@ namespace VNTags
         public static IList<VNTag> ParseLine(string line, ushort lineNumber)
         {
             var tags = new List<VNTag>();
+
+            if (string.IsNullOrEmpty(line))
+            {
+                return tags;
+            }
 
             int start = 0;
             for (int index = 0; index < line.Length; index++)
