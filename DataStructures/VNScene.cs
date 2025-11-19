@@ -7,7 +7,6 @@ namespace VNTags
     [Serializable]
     public class VNScene : IVNData
     {
-        private static           IVNData        _None = new VNScene();
         [SerializeField] private string         name;
         [SerializeField] private string[]       alias;
         [SerializeField] private SceneReference scene;
@@ -41,9 +40,14 @@ namespace VNTags
 
         public string DataType { get; } = "Scene";
 
-        public static IVNData NoneDataStatic
+        public IVNData NoneData
         {
-            get { return _None; }
+            get
+            {
+                return None;
+            }
         }
+        
+        public static           IVNData    None = new VNScene();
     }
 }

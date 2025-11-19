@@ -22,7 +22,7 @@ namespace VNTags.Tags
                                                         null,
                                                         VNTagsConfig.GetConfig().GetCharacterNames());
 
-            currentParameters.UpdateParameter(characterParameter, _character);
+            currentParameters.DefaultParameter(characterParameter, _character?.Name!);
 
             return currentParameters;
         }

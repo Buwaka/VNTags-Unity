@@ -31,24 +31,21 @@ namespace VNTags.Editor
             return result;
         }
         
-        public static string TextAreaWithTagCreationDropDown(Action<string> target, string current)
+        public static void TextAreaWithTagCreationDropDown(Action<string> target, string current)
         {
-            return TextAreaWithTagCreationDropDown(null, target, current);
+            TextAreaWithTagCreationDropDown(null, target, current);
         }
         
-        public static string TextAreaWithTagCreationDropDown(string label, Action<string> target, string current)
+        public static void TextAreaWithTagCreationDropDown(string label, Action<string> target, string current)
         {
             EditorGUILayout.BeginHorizontal();
             if (label != null)
             {
                 EditorGUILayout.LabelField(label, GUILayout.Width(100));
             }
-
-            // Get the new value from the text area. This 'newValue' is what the user has typed in this frame.
+            
             string newValue = EditorGUILayout.TextArea(current);
-
-            // If the value has changed (either by user typing or external update via dropdown),
-            // invoke the target action to update the external string.
+            
             if (newValue != current)
             {
                 target.Invoke(newValue);
@@ -56,14 +53,10 @@ namespace VNTags.Editor
 
             if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
             {
-                // Pass the original target action and the current value to the context menu.
-                // When the context menu eventually invokes 'target', it will update the external variable.
                 ShowTextBoxContextMenu(target, current);
             }
 
             EditorGUILayout.EndHorizontal();
-            // Return the current value, which should be updated by 'target' if something changed.
-            return current;
         }
         
         private static  void ShowTextBoxContextMenu(Action<string> target, string current, IEditorTag tag = null, VNTagScriptLine_base line = null)

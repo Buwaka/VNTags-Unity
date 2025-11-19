@@ -35,6 +35,10 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
+            if (Background.IsNone())
+            {
+                return "";
+            }
             return (Background != null) && !Background.IsNone() ? SerializeHelper(GetTagName(), Background.Name) : "";
         }
 
@@ -53,7 +57,7 @@ namespace VNTags.Tags
                                                          null,
                                                          VNTagsConfig.GetConfig().GetBackgroundNames());
 
-            currentParameters.UpdateParameter(backgroundParameter, Background);
+            currentParameters.DefaultParameter(backgroundParameter, Background?.Name!);
             return currentParameters;
         }
 
@@ -66,6 +70,11 @@ namespace VNTags.Tags
         public ref VNBackgroundData GetBackgroundRef()
         {
             return ref _background;
+        }
+        
+        public void SetNone()
+        {
+            _background = (VNBackgroundData) VNBackgroundData.None;
         }
 #endif
     }

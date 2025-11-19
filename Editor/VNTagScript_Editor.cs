@@ -132,15 +132,7 @@ namespace VNTags.Editor
                 line.Foldout = EditorGUILayout.BeginToggleGroup(line.Preview, line.Foldout);
                 if (line.Foldout)
                 {
-                    if (line is VNTagSceneSetupLine setup)
-                    {
-                        RenderSceneSetupLine(setup);
-                    }
-
-                    if (line is VNTagGenericScriptLine scriptLine)
-                    {
-                        RenderLine(scriptLine);
-                    }
+                    line.RenderLine(this);
                 }
                 EditorGUILayout.EndToggleGroup();
                 EditorGUILayout.Separator();
@@ -148,159 +140,13 @@ namespace VNTags.Editor
         }
 
 
-        public VNCharacterData[] MaskToCharacterArray(int mask)
-        {
-            return LayoutHelpers.MaskToValueArray(mask, VNTagsConfig.GetConfig().AllCharacters);
-        }
-
-
-        private void RenderEmptyPopup(string label)
+        public void RenderEmptyPopup(string label)
         {
             var nullVal = Array.Empty<GUIContent>();
             EditorGUILayout.PrefixLabel(label);
             EditorGUILayout.Popup(0, nullVal);
         }
 
-
-        private void RenderSceneSetupLine(VNTagSceneSetupLine setupLine)
-        {
-            EditorGUILayout.LabelField("Scene Setup");
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.BeginVertical();
-            LayoutHelpers.RenderPopup("Background",
-                                      VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background"),
-                                      ref setupLine.BackgroundIndex,
-                                      VNTagsConfig.GetConfig().GetBackgroundByIndex,
-                                      ref setupLine.BackgroundTag.GetBackgroundRef(),
-                                      setupLine.Invalidate);
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            LayoutHelpers.RenderMaskMultiSelectPopup("Character(s)",
-                                                     VNTagsConfig.GetConfig().GetCharacterNamesGUI(),
-                                                     ref setupLine.CharacterMask,
-                                                     MaskToCharacterArray,
-                                                     ref setupLine.CharacterTag.GetCharacterRef(),
-                                                     setupLine.Invalidate);
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            LayoutHelpers.RenderPopup("Transition",
-                                      VNTagsConfig.GetConfig().GetTransitionNamesGUI("No Transition"),
-                                      ref setupLine.TransitionName,
-                                      VNTagsConfig.GetConfig().GetTransitionByNameOrAlias,
-                                      ref setupLine.TransitionTag.GetTransitionRef(),
-                                      setupLine.Invalidate);
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.BeginVertical();
-            // music
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-            
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.BeginVertical();
-            setupLine.SceneResetFlag = EditorGUILayout.Toggle("Reset Scene", setupLine.SceneResetFlag);
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.BeginVertical();
-            setupLine.ToggleVNUIFlag =  EditorGUILayout.Toggle("Toggle Textbox", setupLine.ToggleVNUIFlag);;
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Separator();
-        }
-
-        private void RenderLine(VNTagGenericScriptLine line)
-        {
-            //dialogue
-            foreach (IEditorTag tag in line.ExtraTags)
-            {
-                VNTagTextArea.TextAreaWithTagCreationDropDown(tag, line);
-            }
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.BeginVertical();
-            // Name
-            string nullName = (line.CharacterChangeTag.Character == null) || !line.CharacterChangeTag.Character.IsBlankCharacter()
-                ? "Narrator"
-                : line.CharacterChangeTag.Character.Name;
-            LayoutHelpers.RenderPopup("Character",
-                                      VNTagsConfig.GetConfig().GetCharacterNamesGUI(nullName),
-                                      ref line.NameIndex,
-                                      VNTagsConfig.GetConfig().GetCharacterByIndex,
-                                      ref line.CharacterChangeTag.GetCharacterRef(),
-                                      line.InvalidateCharacter);
-            EditorGUILayout.EndVertical();
-
-            EditorGUI.BeginDisabledGroup(line.CharacterChangeTag.Character == null);
-            if (line.CharacterChangeTag.Character == null)
-            {
-                // Expression
-                EditorGUILayout.BeginVertical();
-                RenderEmptyPopup("Expression");
-                EditorGUILayout.EndVertical();
-
-                //Outfit
-                EditorGUILayout.BeginVertical();
-                RenderEmptyPopup("Outfit");
-                EditorGUILayout.EndVertical();
-            }
-            else
-            {
-                // Expression
-                EditorGUILayout.BeginVertical();
-                LayoutHelpers.RenderPopup("Expression",
-                                          line.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
-                                          ref line.ExpressionIndex,
-                                          line.CharacterChangeTag.Character.GetExpressionByIndex,
-                                          ref line.ExpressionChangeTag.GetOutfitRef(),
-                                          line.Invalidate);
-                EditorGUILayout.EndVertical();
-
-
-                //Outfit
-                EditorGUILayout.BeginVertical();
-                LayoutHelpers.RenderPopup("Outfit",
-                                          line.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
-                                          ref line.OutfitIndex,
-                                          line.CharacterChangeTag.Character.GetOutfitByIndex,
-                                          ref line.OutfitChangeTag.GetOutfitRef(),
-                                          line.Invalidate);
-                EditorGUILayout.EndVertical();
-            }
-
-            EditorGUI.EndDisabledGroup();
-            EditorGUILayout.EndHorizontal();
-
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.BeginVertical();
-            EditorGUILayout.PrefixLabel("Background");
-            line.BackgroundIndex = EditorGUILayout.Popup(line.BackgroundIndex, VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background Change"));
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            RenderEmptyPopup("Sound Effect");
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            RenderEmptyPopup("Music");
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
-
-            // EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.LabelField("Preview");
-            EditorGUILayout.SelectableLabel(line.SerializedPreview);
-            // EditorGUI.EndDisabledGroup();
-        }
 
         private void SerializeLines()
         {

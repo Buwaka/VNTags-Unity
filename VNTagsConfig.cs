@@ -27,7 +27,7 @@ namespace VNTags
 
         [SerializeField] private VNMusicData[] Musics;
 
-        [SerializeField] private VNTransition[] Transitions;
+        [SerializeField] private VNTransitionData[] Transitions;
 
         [SerializeField] private VNScene[] Scenes;
 
@@ -59,7 +59,7 @@ namespace VNTags
             get { return Scenes; }
         }
 
-        public VNTransition[] AllTransitions
+        public VNTransitionData[] AllTransitions
         {
             get { return Transitions; }
         }
@@ -83,10 +83,10 @@ namespace VNTags
 
             if (name.Equals(IVNData.DefaultKeyword, StringComparison.OrdinalIgnoreCase) || arr.Count <= 0)
             {
-                return null;
+                return arr.First().NoneData;
             }
 
-            return arr.First().NoneData;
+            return null;
         }
 
         private T GetDataByIndex<T>(IReadOnlyList<T> arr, int index)
@@ -131,7 +131,7 @@ namespace VNTags
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public VNTransition GetTransitionByIndex(int index)
+        public VNTransitionData GetTransitionByIndex(int index)
         {
             return GetDataByIndex(Transitions, index);
         }
@@ -162,9 +162,9 @@ namespace VNTags
             return (VNScene)GetDataByNameOrAlias(Scenes, name);
         }
 
-        public VNTransition GetTransitionByNameOrAlias(string name)
+        public VNTransitionData GetTransitionByNameOrAlias(string name)
         {
-            return (VNTransition)GetDataByNameOrAlias(Transitions, name);
+            return (VNTransitionData)GetDataByNameOrAlias(Transitions, name);
         }
 
 

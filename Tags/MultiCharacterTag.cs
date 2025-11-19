@@ -54,7 +54,6 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            var characterNames = string.Join(',', _characters.Select(t => '"' + t.Name + '"'));
             return (_characters != null) && (_characters.Length > 0) ? SerializeHelper(GetTagName(), _characters.Select(t => t.Name), _action) : "";
         }
 
@@ -80,8 +79,8 @@ namespace VNTags.Tags
                                                      true,
                                                      typeof(CharacterAction));
 
-            currentParameters.UpdateParameter(characterParameter, _characters);
-            currentParameters.UpdateParameter(actionParameter,    _action);
+            currentParameters.DefaultParameter(characterParameter, string.Join(";", _characters.Select(t => t.Name)));
+            currentParameters.DefaultParameter(actionParameter,    _action.ToString());
 
             return currentParameters;
         }

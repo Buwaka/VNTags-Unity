@@ -5,6 +5,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using UnityEngine;
 using VNTags.Tags;
+using VNTags.Utility;
 
 namespace VNTags
 {
@@ -129,7 +130,7 @@ namespace VNTags
                     }
 
                     // look for the closing bracket
-                    int endBracketIndex = line.IndexOf("}", index, StringComparison.Ordinal);
+                    int endBracketIndex = StringUtils.FindClosingBracket(line, index, '{', '}');
 
                     // if not closing bracket is found
                     if (endBracketIndex == -1)
@@ -229,7 +230,7 @@ namespace VNTags
             var    tokens   = new List<string>();
             string workLine = line;
 
-            while (workLine.Contains(';'))
+            while (workLine.ContainsUnEscaped(';'))
             {
                 int    semicolonIndex = workLine.IndexOf(";", StringComparison.OrdinalIgnoreCase);
                 string token          = ExtractToken(workLine.Substring(0, semicolonIndex));

@@ -13,7 +13,7 @@ namespace VNTags.Tags
 
     public class CharacterTag : VNTag
     {
-        private CharacterAction _action = 0;
+        private CharacterAction _action = CharacterAction.AddedToScene;
 
         private VNCharacterData _character;
 
@@ -82,8 +82,8 @@ namespace VNTags.Tags
                                                      true,
                                                      typeof(CharacterAction));
 
-            currentParameters.UpdateParameter(characterParameter, _character);
-            currentParameters.UpdateParameter(actionParameter,    _action);
+            currentParameters.DefaultParameter(characterParameter, _character?.Name!);
+            currentParameters.DefaultParameter(actionParameter,   _action.ToString());
 
             return currentParameters;
         }

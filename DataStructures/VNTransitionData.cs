@@ -6,7 +6,7 @@ using VNTags.Utility;
 namespace VNTags
 {
     [Serializable]
-    public class VNTransition : IVNData
+    public class VNTransitionData : IVNData
     {
         [SerializeField] private string  name;
 
@@ -27,11 +27,15 @@ namespace VNTags
 
         public string DataType { get; } = "Transition";
 
-        public static IVNData NoneDataStatic
+        public IVNData NoneData
         {
-            get { return _none; }
+            get
+            {
+                return None;
+            }
         }
-        private static           IVNData _none = new VNTransition();
+        
+        public static           IVNData    None = new VNTransitionData();
 
         public void Play() { }
 

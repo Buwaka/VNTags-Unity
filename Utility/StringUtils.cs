@@ -14,12 +14,12 @@ namespace VNTags.Utility
         /// <returns></returns>
         public static char? FirstChar(this string text, params char[] except)
         {
-            if ((text == null) || (text.Length <= 0))
+            if (text == null || text.Length <= 0)
             {
                 return null;
             }
 
-            if ((except == null) || (except.Length <= 0))
+            if (except == null || except.Length <= 0)
             {
                 return text[0];
             }
@@ -105,8 +105,8 @@ namespace VNTags.Utility
         {
             RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Compiled;
 
-            string pattern     = @"\b("     + Regex.Escape(searchWord) + @")\b";
-            string replacement = openingTag + "$1"                     + closingTag;
+            string pattern     = @"\b(" + Regex.Escape(searchWord) + @")\b";
+            string replacement = openingTag + "$1" + closingTag;
 
             return Regex.Replace(text, pattern, replacement, options);
         }
@@ -192,7 +192,7 @@ namespace VNTags.Utility
             int doubleQuoteStartIndex = input.IndexOf('"',  startIndex, endIndex - startIndex);
             int singleQuoteStartIndex = input.IndexOf('\'', startIndex, endIndex - startIndex);
 
-            if (((doubleQuoteStartIndex == -1) || (input.Count(c => c == '"') < 2)) && ((singleQuoteStartIndex == -1) || (input.Count(c => c == '\'') < 2)))
+            if ((doubleQuoteStartIndex == -1 || input.Count(c => c == '"') < 2) && (singleQuoteStartIndex == -1 || input.Count(c => c == '\'') < 2))
             {
                 return input;
             }
@@ -200,7 +200,7 @@ namespace VNTags.Utility
 
             char quoteChar;
             //single quote
-            if ((doubleQuoteStartIndex == -1) || (singleQuoteStartIndex < doubleQuoteStartIndex))
+            if (doubleQuoteStartIndex == -1 || singleQuoteStartIndex < doubleQuoteStartIndex)
             {
                 startIndex = singleQuoteStartIndex;
                 quoteChar  = '\'';
@@ -216,6 +216,109 @@ namespace VNTags.Utility
 
 
             return input.Substring(startIndex, endIndex - startIndex);
+        }
+
+        /// <summary>
+        ///     Finds the index of the closing bracket that matches a specified opening bracket within the input string.
+        ///     This method searches forward from the position immediately after the given <paramref name="bracketIndex" />,
+        ///     and accounts for nested brackets of the same type. If a matching closing bracket is found, its index is returned.
+        ///     If no closing bracket is found, or the input is invalid, the method returns -1.
+        ///     \ is an escape character.
+        /// </summary>
+        /// <param name="input">
+        ///     The input string in which to search for the matching closing bracket.
+        /// </param>
+        /// <param name="bracketIndex">
+        ///     The index of the known opening bracket character within <paramref name="input" /> where the search should begin.
+        /// </param>
+        /// <param name="openingBracket">
+        ///     The character representing the opening bracket (e.g., '(' or '{').
+        /// </param>
+        /// <param name="closingBracket">
+        ///     The character representing the closing bracket (e.g., ')' or '}').
+        /// </param>
+        /// <returns>
+        ///     The index of the corresponding closing bracket if found; otherwise, -1 if no match is found or if input is invalid.
+        /// </returns>
+        public static int FindClosingBracket(this string input, int bracketIndex, char openingBracket, char closingBracket)
+        {
+            int depth = 1;
+            if (bracketIndex == -1 || (bracketIndex + 1) >= input.Length)
+            {
+                return -1;
+            }
+
+            for (int i = bracketIndex + 1; i < input.Length; i++)
+            {
+                char c = input[i];
+
+                if (c == '\\')
+                {
+                    i++;
+                    continue;
+                }
+                
+                if (c == openingBracket)
+                {
+                    depth++;
+                }
+                else if (c == closingBracket)
+                {
+                    depth--;
+                }
+
+                if (depth == 0)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public static string Escape(this string input, params char[] escapeChars)
+        {
+            if (string.IsNullOrEmpty(input) || escapeChars == null || escapeChars.Length == 0)
+            {
+                return input;
+            }
+
+            // Build a character class pattern with each char individually escaped
+            string pattern = "[" + string.Join("", escapeChars.Select(c => "\\" + c)) + "]";
+            
+            return Regex.Replace(input, pattern, @"\$&");
+        }
+
+        public static string Unescape(this string input, params char[] escapeChars)
+        {
+            if (string.IsNullOrEmpty(input) || escapeChars == null || escapeChars.Length == 0)
+            {
+                return input;
+            }
+
+            // Build a pattern that matches backslash followed by any of the escape chars
+            string pattern = @"\\" + "[" + string.Join("", escapeChars.Select(c => "\\" + c)) + "]";
+            
+            return Regex.Replace(input, pattern, m => m.Value.Substring(1));
+        }
+
+        public static bool ContainsUnEscaped(this string input, char chr)
+        {
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+
+                if (c == '\\')
+                {
+                    i++;
+                    continue;
+                }
+                
+                if (c == chr)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

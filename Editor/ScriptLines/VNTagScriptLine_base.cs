@@ -56,6 +56,11 @@ namespace VNTags.Editor
         {
             return VNTagSerializer.SerializeLine(Tags);
         }
+
+        public virtual void RenderLine(VNTagScript_Editor editor)
+        {
+            
+        }
         
         public VNTagDeserializationContext CreateDeserializationContext(ushort tagNumber)
         {

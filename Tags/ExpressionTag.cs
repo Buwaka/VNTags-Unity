@@ -74,9 +74,9 @@ namespace VNTags.Tags
                                                         VNTagsConfig.GetConfig().GetCharacterNames());
 
             string character = null;
-            if (currentParameters.TryGetValue(characterParameter, out object parameter))
+            if (currentParameters.TryGetValue(characterParameter, out string parameter))
             {
-                character = (string)parameter;
+                character = parameter;
             }
             else
             {
@@ -92,8 +92,8 @@ namespace VNTags.Tags
                                                          VNTagsConfig.GetConfig().GetExpressionNames(character));
 
 
-            currentParameters.UpdateParameter(characterParameter,  character);
-            currentParameters.UpdateParameter(expressionParameter, _expression);
+            currentParameters.DefaultParameter(characterParameter,  character);
+            currentParameters.DefaultParameter(expressionParameter, _expression?.Name!);
 
             return currentParameters;
         }

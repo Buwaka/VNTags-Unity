@@ -25,12 +25,16 @@ namespace VNTags
             get { return alias; }
         }
 
-        public string DataType { get; } = "Background";
-
-        public static IVNData NoneDataStatic
+        public string  DataType { get; } = "Background";
+        public IVNData NoneData
         {
-            get { return _None; }
+            get
+            {
+                return None;
+            }
         }
-        private static           IVNData    _None = new VNBackgroundData();
+        
+        
+        public static           IVNData    None = new VNBackgroundData();
     }
 }

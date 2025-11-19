@@ -71,11 +71,7 @@ namespace VNTags.Tags
                                                         false,
                                                         null,
                                                         VNTagsConfig.GetConfig().GetCharacterNames());
-            string character = null;
-            if (currentParameters.TryGetValue(characterParameter, out object parameter))
-            {
-                character = (string)parameter;
-            }
+            currentParameters.TryGetValue(characterParameter, out var character);
 
             var outfitParameter = new VNTagParameter(2,
                                                      "Outfit",
@@ -85,8 +81,8 @@ namespace VNTags.Tags
                                                      null,
                                                      VNTagsConfig.GetConfig().GetOutfitNames(character));
 
-            currentParameters.UpdateParameter(characterParameter, TargetCharacter);
-            currentParameters.UpdateParameter(outfitParameter,    _outfit);
+            currentParameters.DefaultParameter(characterParameter, TargetCharacter?.Name!);
+            currentParameters.DefaultParameter(outfitParameter,    _outfit?.Name!);
 
             return currentParameters;
         }

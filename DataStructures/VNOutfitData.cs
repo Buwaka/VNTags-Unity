@@ -10,7 +10,6 @@ namespace VNTags
     [Serializable]
     public class VNOutfitData : IVNData
     {
-        private static           IVNData _None = new VNOutfitData();
         [SerializeField] private string  name;
 
         [Tooltip("Alternative names for writing convenience, case insensitive")] [SerializeField]
@@ -35,9 +34,14 @@ namespace VNTags
 
         public string DataType { get; } = "Outfit";
 
-        public static IVNData NoneDataStatic
+        public IVNData NoneData
         {
-            get { return _None; }
+            get
+            {
+                return None;
+            }
         }
+        
+        public static           IVNData    None = new VNOutfitData();
     }
 }

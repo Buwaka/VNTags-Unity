@@ -20,10 +20,9 @@ namespace VNTags
         ///     This works because the EqualityComparer is written so only the contents of the data is checked, instead of the
         ///     default reference check
         /// </summary>
-        public static IVNData NoneDataStatic { get; }
         public IVNData NoneData
         {
-            get { return NoneDataStatic; }
+            get;
         }
 
         bool IEqualityComparer.Equals(object x, object y)

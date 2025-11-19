@@ -26,8 +26,8 @@ namespace VNTags.Tags
                                                         VNTagsConfig.GetConfig().GetCharacterNames());
             var positionParameter = new VNTagParameter(2, "Position", TypeCode.String, "Name of the position to move the character to");
 
-            currentParameters.UpdateParameter(characterParameter, _character);
-            currentParameters.UpdateParameter(positionParameter,  _namedPosition);
+            currentParameters.DefaultParameter(characterParameter, _character?.Name!);
+            currentParameters.DefaultParameter(positionParameter,  _namedPosition);
 
             return currentParameters;
         }

@@ -12,8 +12,6 @@ namespace VNTags
     [Serializable]
     public class VNMusicData : IVNData
     {
-        private static IVNData _None = new VNMusicData();
-
         [Tooltip("ID for the music, case insensitive")] [SerializeField]
         private string name;
 
@@ -38,9 +36,14 @@ namespace VNTags
 
         public string DataType { get; } = "Music";
 
-        public static IVNData NoneDataStatic
+        public IVNData NoneData
         {
-            get { return _None; }
+            get
+            {
+                return None;
+            }
         }
+        
+        public static           IVNData    None = new VNMusicData();
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using VNTags.Tags;
+using VNTags.Utility;
 
 namespace VNTags.Editor
 {
@@ -225,6 +227,91 @@ namespace VNTags.Editor
                     }
                 }
             }
+        }
+
+        public override void RenderLine(VNTagScript_Editor vnTagScriptEditor)
+        {
+            //dialogue
+            foreach (IEditorTag tag in this.ExtraTags)
+            {
+                VNTagTextArea.TextAreaWithTagCreationDropDown(tag, this);
+            }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+            // Name
+            string nullName = (this.CharacterChangeTag.Character == null) || !this.CharacterChangeTag.Character.IsBlankCharacter()
+                ? "Narrator"
+                : this.CharacterChangeTag.Character.Name;
+            LayoutHelpers.RenderPopup("Character",
+                VNTagsConfig.GetConfig().GetCharacterNamesGUI(nullName),
+                ref this.NameIndex,
+                VNTagsConfig.GetConfig().GetCharacterByIndex,
+                ref this.CharacterChangeTag.GetCharacterRef(),
+                this.InvalidateCharacter);
+            EditorGUILayout.EndVertical();
+
+            EditorGUI.BeginDisabledGroup(this.CharacterChangeTag.Character == null);
+            if (this.CharacterChangeTag.Character == null)
+            {
+                // Expression
+                EditorGUILayout.BeginVertical();
+                vnTagScriptEditor.RenderEmptyPopup("Expression");
+                EditorGUILayout.EndVertical();
+
+                //Outfit
+                EditorGUILayout.BeginVertical();
+                vnTagScriptEditor.RenderEmptyPopup("Outfit");
+                EditorGUILayout.EndVertical();
+            }
+            else
+            {
+                // Expression
+                EditorGUILayout.BeginVertical();
+                LayoutHelpers.RenderPopup("Expression",
+                    this.CharacterChangeTag.Character.GetExpressionNamesGUI("No Expression Change"),
+                    ref this.ExpressionIndex,
+                    this.CharacterChangeTag.Character.GetExpressionByIndex,
+                    ref this.ExpressionChangeTag.GetOutfitRef(),
+                    this.Invalidate);
+                EditorGUILayout.EndVertical();
+
+
+                //Outfit
+                EditorGUILayout.BeginVertical();
+                LayoutHelpers.RenderPopup("Outfit",
+                    this.CharacterChangeTag.Character.GetOutfitNamesGUI("No Outfit Change"),
+                    ref this.OutfitIndex,
+                    this.CharacterChangeTag.Character.GetOutfitByIndex,
+                    ref this.OutfitChangeTag.GetOutfitRef(),
+                    this.Invalidate);
+                EditorGUILayout.EndVertical();
+            }
+
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.PrefixLabel("Background");
+            this.BackgroundIndex = EditorGUILayout.Popup(this.BackgroundIndex, VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background Change"));
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            vnTagScriptEditor.RenderEmptyPopup("Sound Effect");
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            vnTagScriptEditor.RenderEmptyPopup("Music");
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            // EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.LabelField("Preview");
+            EditorGUILayout.SelectableLabel(this.SerializedPreview, new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true});
+            // EditorGUI.EndDisabledGroup();
         }
     }
 }
