@@ -29,6 +29,8 @@ namespace VNTags
         /// </summary>
         public VNCharacterData CurrentCharacter { get; private set; }
 
+        public bool Instant;
+
         /// <summary>
         ///     This dictionary will be accessible from every tag, could potentially use it as another way to communicate between
         ///     tags
@@ -37,23 +39,24 @@ namespace VNTags
 
         public VNTagContext(uint id, VNTag tag)
         {
-            ID = id;
-            Tag = tag;
+            ID               = id;
+            Tag              = tag;
             CurrentCharacter = null!;
+            Instant          = false;
         }
 
         public VNTagContext(VNTagContext other)
         {
-            ID = other.ID;
-            Tag = other.Tag;
+            ID               = other.ID;
+            Tag              = other.Tag;
+            Instant          = other.Instant;
             CurrentCharacter = null!;
         }
 
-        private VNTagContext(VNTagContext other, uint id, VNTag tag)
+        private VNTagContext(VNTagContext other, uint id, VNTag tag) : this(other)
         {
-            ID = id;
-            Tag = tag;
-            CurrentCharacter = null!;
+            ID               = id;
+            Tag              = tag;
         }
 
         public VNTagContext Instantiate(uint id, VNTag tag)

@@ -55,7 +55,7 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return "{" + TagString + "}";
+            return TagString;
         }
     }
 }

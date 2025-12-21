@@ -89,7 +89,7 @@ namespace VNTags
             while (currentNode != null)
             {
                 var next = currentNode.Next;
-                if (currentNode.Value.GetType() == type)
+                if (currentNode.Value != null && currentNode.Value.GetType() == type)
                 {
                     Remove(currentNode);
                 }
@@ -123,6 +123,7 @@ namespace VNTags
             
             VNTag tag = First.Value;
             context.SetMainCharacter(_currentCharacter);
+            context.Instant = true;
 
             int tries = 0;
             while (tries < retries && tag != null)
@@ -139,6 +140,11 @@ namespace VNTags
                 {
                     tries++;
                 }
+            }
+
+            if (Count > 0)
+            {
+                Debug.LogError("VNTagQueue: ExecuteAll: failed to execute all tags, stuck on: " + tag);
             }
 
             return Count == 0;

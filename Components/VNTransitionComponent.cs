@@ -73,6 +73,7 @@ namespace VNTags.Components
         public void Finished()
         {
             VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Finished, null);
+            Destroy(gameObject);
         }
 
         public void CustomEvent(string customValue)

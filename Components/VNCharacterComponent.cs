@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VNTags.ScriptAnimations;
 
 namespace VNTags.Components
 {
@@ -7,15 +8,20 @@ namespace VNTags.Components
     {
         private readonly Dictionary<VNExpressionData, GameObject> _expressionObjects = new();
         private readonly Dictionary<VNOutfitData, GameObject>     _outfitObjects     = new();
+        private          string                                   _sortingLayerName  = "Default";
+        
+        public           bool                                     isVisible          = false;
 
         public VNCharacterData CharacterData { get; private set; }
 
         public VNExpressionData CurrentExpression { get; private set; }
 
         public VNOutfitData CurrentOutfit { get; private set; }
+        
 
-        public void Init(VNCharacterData characterData)
+        public void Init(VNCharacterData characterData, string sortingLayer)
         {
+            _sortingLayerName = sortingLayer;
             if (characterData == null)
             {
                 Debug.LogError("VNCharacterComponent: Init: provided parent is null, exiting");
@@ -30,58 +36,102 @@ namespace VNTags.Components
 
             CharacterData = characterData;
 
-            if ((CurrentExpression == null) && (CharacterData.Expressions.Length > 0) && (CharacterData.Expressions[0] != null))
+            Reset();
+        }
+
+        public void SetDefaultExpression()
+        {
+            if (CharacterData.Expressions.Length > 0 && CharacterData.Expressions[0] != null)
             {
                 VNExpressionData defaultExpression = CharacterData.Expressions[0];
-                CurrentExpression = defaultExpression;
+                ChangeExpression(defaultExpression);
             }
             else
             {
-                Debug.LogWarning("VNCharacter: Init: This character has no expressions or the first expression is null");
+                Debug.LogWarning("VNCharacterComponent: SetDefaultExpression: This character has no expressions or the first expression is null");
             }
-
-            if ((CurrentOutfit == null) && (CharacterData.Outfits.Length > 0) && (CharacterData.Outfits[0] != null))
+        }
+        
+        public void SetDefaultOutfit()
+        {
+            if (CharacterData.Outfits.Length > 0 && CharacterData.Outfits[0] != null)
             {
                 VNOutfitData defaultOutfit = CharacterData.Outfits[0];
-                CurrentOutfit = defaultOutfit;
+                ChangeOutfit(defaultOutfit);
             }
             else
             {
-                Debug.LogWarning("VNCharacter: Init: This character has no outfits or the first outfit is null");
+                Debug.LogWarning("VNCharacterComponent: SetDefaultOutfit: This character has no outfits or the first outfit is null");
             }
         }
 
-        public void Show(bool show = true)
+        public void Reset()
+        {
+            SetDefaultExpression();
+            SetDefaultOutfit();
+        }
+
+        public void Show(bool show = true, ScriptAnimation animation = null)
+        {
+            if (show)
+            {
+                Refresh();
+            }
+            
+            if (show != isVisible)
+            {
+                if (animation)
+                {
+                    animation.Init(gameObject, this);
+                    if (show)
+                    {
+                        gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        animation.OnStop += () => gameObject.SetActive(false);
+                    }
+                    animation.Play();
+                }
+                else
+                {
+                    if (show)
+                    {
+                        gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        gameObject.SetActive(false);
+                    }
+                }
+            }
+            
+            isVisible = show;
+        }
+
+        public void Hide(ScriptAnimation animation = null)
+        {
+            Show(false, animation);
+        }
+
+        public void Refresh()
         {
             if (CurrentExpression != null)
             {
-                GameObject exprObj = _expressionObjects.GetValueOrDefault(CurrentExpression, Load(CurrentExpression));
-                if (exprObj != null)
-                {
-                    exprObj.SetActive(show);
-                }
+                ChangeExpression(CurrentExpression);
             }
 
             if (CurrentOutfit != null)
             {
-                GameObject outfObj = _outfitObjects.GetValueOrDefault(CurrentOutfit, Load(CurrentOutfit));
-                if (outfObj != null)
-                {
-                    outfObj.SetActive(show);
-                }
+                ChangeOutfit(CurrentOutfit);
             }
-        }
-
-        public void Hide()
-        {
-            Show(false);
         }
 
         private GameObject Load(VNExpressionData expression, bool reload = false)
         {
             if ((expression == null) || (expression.Prefab == null))
             {
-                Debug.LogError("VNCharacter: Load: expression or expression object is null, aborting");
+                Debug.LogError("VNCharacterComponent: Load: expression or expression object is null, aborting");
                 return null;
             }
 
@@ -100,6 +150,11 @@ namespace VNTags.Components
             }
 
             GameObject newExpr = Instantiate(expression.Prefab, gameObject.transform);
+            foreach (var sprite in newExpr.GetComponentsInChildren<SpriteRenderer>())
+            {
+                sprite.sortingLayerName = _sortingLayerName;
+            }
+            
             _expressionObjects.Add(expression, newExpr);
             return newExpr;
         }
@@ -108,7 +163,7 @@ namespace VNTags.Components
         {
             if ((outfit == null) || (outfit.Prefab == null))
             {
-                Debug.LogError("VNCharacter: Load: outfit or outfit object is null, aborting");
+                Debug.LogError("VNCharacterComponent: Load: outfit or outfit object is null, aborting");
                 return null;
             }
 
@@ -127,6 +182,11 @@ namespace VNTags.Components
             }
 
             GameObject newExpr = Instantiate(outfit.Prefab, gameObject.transform);
+            foreach (var sprite in newExpr.GetComponentsInChildren<SpriteRenderer>())
+            {
+                sprite.sortingLayerName = _sortingLayerName;
+            }
+            
             _outfitObjects.Add(outfit, newExpr);
             return newExpr;
         }
@@ -157,13 +217,13 @@ namespace VNTags.Components
         {
             if ((expression == null) || (expression.Prefab == null))
             {
-                Debug.LogError("VNCharacter: ChangeExpression: Expression is null, aborting, " + expression);
+                Debug.LogError("VNCharacterComponent: ChangeExpression: Expression is null, aborting, " + expression);
                 return;
             }
 
             if (expression == CurrentExpression)
             {
-                Debug.Log("VNCharacter: ChangeExpression: this expression is already active, aborting, " + expression);
+                Debug.Log("VNCharacterComponent: ChangeExpression: this expression is already active, aborting, " + expression);
                 return;
             }
 
@@ -174,7 +234,7 @@ namespace VNTags.Components
             }
             else
             {
-                Debug.LogError("VNCharacter: ChangeExpression: failed to load Expression GameObject, aborting");
+                Debug.LogError("VNCharacterComponent: ChangeExpression: failed to load Expression GameObject, aborting");
                 return;
             }
 
@@ -190,7 +250,7 @@ namespace VNTags.Components
         {
             if ((outfit == null) || (outfit.Prefab == null))
             {
-                Debug.LogError("VNCharacter: ChangeOutfit: Outfit is null, aborting, " + outfit);
+                Debug.LogError("VNCharacterComponent: ChangeOutfit: Outfit is null, aborting, " + outfit);
                 return;
             }
 
@@ -201,7 +261,7 @@ namespace VNTags.Components
             }
             else
             {
-                Debug.LogError("VNCharacter: ChangeOutfit: failed to load Expression GameObject, aborting");
+                Debug.LogError("VNCharacterComponent: ChangeOutfit: failed to load Expression GameObject, aborting");
                 return;
             }
 

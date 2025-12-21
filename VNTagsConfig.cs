@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VNTags.TextProcessors;
+using VNTags.ScriptAnimations;
 
 namespace VNTags
 {
@@ -32,6 +33,10 @@ namespace VNTags
         [SerializeField] private VNScene[] Scenes;
 
         [SerializeReference] public BaseTextProcessor[] TextProcessors; // do mind this is a SerializeReference, which is necessary for polymorphism
+        
+        [SerializeReference] public ScriptAnimation DefaultEntranceAnimation;
+        
+        [SerializeReference] public ScriptAnimation DefaultExitAnimation;
 
 
         public VNCharacterData[] AllCharacters

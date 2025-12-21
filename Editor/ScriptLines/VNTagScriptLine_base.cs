@@ -32,6 +32,54 @@ namespace VNTags.Editor
             get { return new VNTagSerializationContext(Tags); }
         }
 
+        public CharacterTag GetMainCharacter()
+        {
+            foreach (var tag in Tags)
+            {
+                if (tag is CharacterTag cTag)
+                {
+                    return cTag;
+                }
+                else if(tag is DialogueTag)
+                {
+                    break;
+                }
+            }
+            return null;
+        }
+        
+        public ExpressionTag GetMainCharacterExpression()
+        {
+            foreach (var tag in Tags)
+            {
+                if (tag is ExpressionTag eTag)
+                {
+                    return eTag;
+                }
+                else if(tag is DialogueTag)
+                {
+                    break;
+                }
+            }
+            return null;
+        }
+        
+        public OutfitTag GetMainCharacterOutfit()
+        {
+            foreach (var tag in Tags)
+            {
+                if (tag is OutfitTag oTag)
+                {
+                    return oTag;
+                }
+                else if(tag is DialogueTag)
+                {
+                    break;
+                }
+            }
+            return null;
+        }
+
         public bool HasDialogueTags()
         {
             foreach (VNTag tag in Tags)

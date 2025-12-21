@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using VNTags;
 using VNTags.Components;
+using VNTags.ScriptAnimations;
 using VNTags.Utility;
 
 [Serializable]
 public class VNPosition
 {
-    public TransformData          Transform;
+    public TransformData      Transform;
     public SortingLayerPicker Layer;
 }
 
@@ -50,7 +51,7 @@ public class VNCharacterController : MonoBehaviour
     {
         foreach (VNCharacterComponent characterVal in _instance._scenePositionComposition.Values)
         {
-            if (characterVal.CharacterData == character)
+            if (characterVal.CharacterData == character && characterVal.isVisible)
             {
                 return true;
             }
@@ -64,11 +65,30 @@ public class VNCharacterController : MonoBehaviour
         return _instance._characters.GetValueOrDefault(character, null);
     }
 
-    public static void HideCharacter(VNCharacterData character)
+    public static void HideCharacter(VNCharacterData character, bool instant = false)
     {
         if (GetCharacter(character) is VNCharacterComponent charaComp)
         {
-            charaComp.Hide();
+            if (instant)
+            {
+                charaComp.Hide();
+            }
+            else
+            {
+                ScriptAnimation defaultAnimation  = VNTagsConfig.GetConfig().DefaultExitAnimation;
+                ScriptAnimation animationInstance = null;
+                if (defaultAnimation != null)
+                {
+                    animationInstance = (ScriptAnimation)ScriptableObject.CreateInstance(defaultAnimation.GetType());
+                }
+                else
+                {
+                    Debug.LogWarning("VNCharacterPositionController: HideCharacter: Default exit animation not found");
+                }
+                charaComp.Hide(animationInstance);
+            }
+            
+            charaComp.Reset();
 
             foreach (var pair in _instance._scenePositionComposition)
             {
@@ -80,20 +100,28 @@ public class VNCharacterController : MonoBehaviour
             }
         }
     }
+    
+    public static void HideAllCharacters(bool instant = false)
+    {
+        foreach (var character in _instance._characters)
+        {
+            HideCharacter(character.Key, instant);
+        }
+    }
 
 
-    public static void ShowCharacter(VNCharacterData character, out GameObject obj, VNPosition position = null)
+    public static void ShowCharacter(VNCharacterData character, out GameObject obj, VNPosition position = null, bool instant = false)
     {
         if (character == null)
         {
-            Debug.LogError("VNCharacterPositionController: AddCharacter: Character is null, exiting");
+            Debug.LogError("VNCharacterPositionController: ShowCharacter: Character is null, exiting");
             obj = null;
             return;
         }
 
         if (IsCharacterActive(character))
         {
-            Debug.Log("VNCharacterPositionController: AddCharacter: Character is already active, exiting");
+            Debug.Log("VNCharacterPositionController: ShowCharacter: Character is already active, exiting");
             obj = null;
             return;
         }
@@ -111,7 +139,7 @@ public class VNCharacterController : MonoBehaviour
 
             if (position == null)
             {
-                Debug.LogError("VNCharacterPositionController: AddCharacter: Not enough ordered positions, exiting");
+                Debug.LogError("VNCharacterPositionController: ShowCharacter: Not enough ordered positions, exiting");
                 obj = null;
                 return;
             }
@@ -120,7 +148,7 @@ public class VNCharacterController : MonoBehaviour
         VNCharacterComponent charaComp;
         if (!_instance._characters.TryGetValue(character, out charaComp))
         {
-            CreateCharacterComponent(character, out charaComp);
+            CreateCharacterComponent(character, out charaComp,  position.Layer.Name);
         }
 
         obj = charaComp.gameObject;
@@ -137,24 +165,42 @@ public class VNCharacterController : MonoBehaviour
             // renderer.sortingLayerID   = position.Layer.id;
             renderer.sortingLayerName = position.Layer.Name;
         }
-
-        charaComp.Show();
-
+        
+        if (instant)
+        {
+            charaComp.Show(true);
+        }
+        else
+        {
+            ScriptAnimation defaultAnimation  = VNTagsConfig.GetConfig().DefaultEntranceAnimation;
+            ScriptAnimation animationInstance = null;
+            if (defaultAnimation != null)
+            {
+                animationInstance = (ScriptAnimation)ScriptableObject.CreateInstance(defaultAnimation.GetType());
+            }
+            else
+            {
+                Debug.LogWarning("VNCharacterPositionController: ShowCharacter: Default entrance animation not found");
+            }
+            
+            charaComp.Show(true,  animationInstance);
+        }
+        
         _instance._scenePositionComposition.Add(position, charaComp);
-        _instance._characters.Add(character, charaComp);
+        _instance._characters.TryAdd(character, charaComp);
         onCharacterAdded?.Invoke(charaComp, obj, position);
     }
 
-    private static void CreateCharacterComponent(VNCharacterData character, out VNCharacterComponent charaComp)
+    private static void CreateCharacterComponent(VNCharacterData character, out VNCharacterComponent charaComp, string sortingLayerName)
     {
         var obj = new GameObject(character.Name);
         obj.transform.SetParent(_instance.transform);
 
         charaComp = obj.AddComponent<VNCharacterComponent>();
-        charaComp.Init(character);
+        charaComp.Init(character, sortingLayerName);
     }
 
-    public static void MoveCharacter(VNCharacterData character, string position)
+    public static void MoveCharacter(VNCharacterData character, string position, bool instant)
     {
         // todo
     }

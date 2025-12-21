@@ -22,7 +22,9 @@ namespace VNTags.Tags
 
         protected override VNTagParameters Parameters(VNTagParameters currentParameters)
         {
-            var transitionParameter = new VNTagParameter(1,
+            var tagParameter = new VNTagParameter(1, "Mid Transition Tags", TypeCode.Object, "Tags to be processed during the transition", true);
+
+            var transitionParameter = new VNTagParameter(2,
                                                          "Transition Name",
                                                          TypeCode.String,
                                                          "Name of the transition to be played",
@@ -30,17 +32,16 @@ namespace VNTags.Tags
                                                          null,
                                                          VNTagsConfig.GetConfig().AllTransitions.Select(t => t.Name).ToArray());
 
-            var tagParameter = new VNTagParameter(2, "Mid Transition Tags", TypeCode.Object, "Tags to be processed during the transition", true);
-
-            currentParameters.DefaultParameter(transitionParameter, Transition?.Name!);
+            
             currentParameters.DefaultParameter(tagParameter,        MidTransitionTags);
+            currentParameters.DefaultParameter(transitionParameter, Transition?.Name!);
 
             return currentParameters;
         }
 
         protected override void Execute(VNTagContext context, out bool isFinished)
         {
-            VNTransitionData trans = Transition ?? DefaultTransition;
+            VNTransitionData trans = Transition == null || Transition.IsNone() ? DefaultTransition : Transition;
             
             var tags = VNTagDeserializer.ParseLine(MidTransitionTags, ID.LineNumber);
             isFinished = ExecuteHelper(VNTagEventAnnouncer.onTransitionTag?.Invoke(context, trans, tags));
@@ -49,14 +50,15 @@ namespace VNTags.Tags
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
             SetNone();
+            
             if ((parameters != null) && (parameters.Length > 0))
             {
-                Transition = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[0]);
+                MidTransitionTags = StringUtils.Unescape(parameters[0], EscapeCharacters);
             }
             
             if ((parameters != null) && (parameters.Length > 1))
             {
-                MidTransitionTags = StringUtils.Unescape(parameters[1], EscapeCharacters);
+                Transition = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[1]);
             }
 
             return true;
@@ -69,7 +71,8 @@ namespace VNTags.Tags
                 return "";
             }
 
-            return Transition.IsNone() ? SerializeHelper(GetTagName()) : SerializeHelper(GetTagName(), Transition.Name, StringUtils.Escape(MidTransitionTags, EscapeCharacters));
+            return Transition.IsNone() ? SerializeHelper(GetTagName(), StringUtils.Escape(MidTransitionTags, EscapeCharacters)) 
+                : SerializeHelper(GetTagName(), Transition.Name, StringUtils.Escape(MidTransitionTags, EscapeCharacters));
         }
 
 #if UNITY_EDITOR

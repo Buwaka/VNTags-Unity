@@ -43,7 +43,7 @@ namespace VNTags
             // special notation for the character
             if ((mainCharacter != null) && (mainCharacter.Character != null))
             {
-                outLine.Append(mainCharacter.Character.Name + ";");
+                outLine.Insert(0, mainCharacter.Character.Name + ";");
             }
 
             // deal with the rest of the tags

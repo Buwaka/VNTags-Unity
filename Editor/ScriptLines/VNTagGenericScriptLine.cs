@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VNTags.Tags;
@@ -99,28 +100,44 @@ namespace VNTags.Editor
             // starter tags
             LinkedList<VNTag>.Enumerator iterator = Tags.GetEnumerator();
             VNTag                        current  = null;
+
+            _characterChangeTag = GetMainCharacter();
+            if(_characterChangeTag != null)
+            {
+                if (_characterChangeTag.Character != null)
+                {
+                    Preview += _characterChangeTag.Character.Name + ": ";
+                }
+            }
+            
+            
             while (iterator.MoveNext())
             {
                 current = iterator.Current;
-                if (current is CharacterTag characterTag && (_characterChangeTag == null))
+                if (current is CharacterTag characterTag )
                 {
-                    _characterChangeTag = characterTag;
-                    if (_characterChangeTag.Character != null)
+                    continue;
+                }
+                else if (current is ExpressionTag expressionTag)
+                {
+                    if (_expressionChangeTag == null && (_characterChangeTag != null && expressionTag.TargetCharacter == _characterChangeTag.Character))
                     {
-                        Preview += _characterChangeTag.Character.Name + ": ";
+                        _expressionChangeTag = expressionTag;
                     }
                 }
-                else if (current is ExpressionTag expressionTag && (_expressionChangeTag == null))
+                else if (current is OutfitTag outfitTag && (_characterChangeTag != null && outfitTag.TargetCharacter == _characterChangeTag.Character))
                 {
-                    _expressionChangeTag = expressionTag;
+                    if (_outfitChangeTag == null)
+                    {
+                        _outfitChangeTag = outfitTag; 
+                    }
                 }
-                else if (current is OutfitTag outfitTag && (_outfitChangeTag == null))
+                else if (current is BackgroundTag backgroundTag)
                 {
-                    _outfitChangeTag = outfitTag;
-                }
-                else if (current is BackgroundTag backgroundTag && (_backgroundChangeTag == null))
-                {
-                    _backgroundChangeTag = backgroundTag;
+                    if (_backgroundChangeTag == null)
+                    {
+                        _backgroundChangeTag = backgroundTag;
+                    }
                 }
                 else
                 {
@@ -158,6 +175,13 @@ namespace VNTags.Editor
 
             InitUIIndieces();
             Invalidate();
+        }
+
+        public override string Serialize()
+        {
+            var toSerialize = new List<VNTag>(ExtraTags.Cast<VNTag>());
+            toSerialize = toSerialize.Prepend(_backgroundChangeTag).Prepend(_outfitChangeTag).Prepend(_expressionChangeTag).Prepend(_characterChangeTag).ToList();
+            return VNTagSerializer.SerializeLine(toSerialize);
         }
 
         public void InvalidateCharacter()

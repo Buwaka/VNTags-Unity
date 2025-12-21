@@ -81,6 +81,15 @@ namespace VNTags
             get { return name; }
         }
 
+        public string NameProcessed
+        {
+            get
+            {
+                var pName = TextProcessors.TextProcessors.PreProcessDialogue(name);
+                return TextProcessors.TextProcessors.PostProcessDialogue(pName);
+            }
+        }
+
         public string[] Alias
         {
             get { return alias; }

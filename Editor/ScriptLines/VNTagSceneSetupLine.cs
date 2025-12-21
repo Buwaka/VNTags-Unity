@@ -18,11 +18,11 @@ namespace VNTags.Editor
         public MultiCharacterTag CharacterTag;
         
 
-        public string           TransitionName;
+        public string        TransitionName;
         public TransitionTag TransitionTag;
 
         public bool          SceneResetFlag = true;
-        public bool          ToggleVNUIFlag = false;
+        public bool          ToggleVNUIFlag = true;
 
         public VNTagSceneSetupLine(string rawLine, ushort lineNumber) : base(rawLine, lineNumber)
         {
@@ -145,6 +145,8 @@ namespace VNTags.Editor
                     }
                 }
             }
+            
+            // test out the setup and transitiontag ingame
 
             
             // TransitionIndex
@@ -180,6 +182,7 @@ namespace VNTags.Editor
             }
             else
             {
+                tempTags.AddLast(TransitionTag);
                 tempTags.AddLast(BackgroundTag);
                 tempTags.AddLast(CharacterTag);
             }
