@@ -124,21 +124,21 @@ namespace VNTags
         public Type? EnumType { get; }
         public string[]? Options { get; }
 
-        public GUID ID;
+        public Guid ID;
 
 
         public VNTagParameter
         (int number, string name, TypeCode type, string description, bool optional = false, Type? enumType = null,
             string[]? options = null)
         {
-            Number = number;
-            Name = name;
-            Type = type;
+            Number      = number;
+            Name        = name;
+            Type        = type;
             Description = description;
-            Optional = optional;
-            EnumType = enumType;
-            Options = options;
-            ID = GUID.Generate();
+            Optional    = optional;
+            EnumType    = enumType;
+            Options     = options;
+            ID          = Guid.NewGuid();
         }
 
         public bool Equals(VNTagParameter other)

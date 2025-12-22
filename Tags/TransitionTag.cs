@@ -49,8 +49,9 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
+#if UNITY_EDITOR
             SetNone();
-            
+#endif 
             if ((parameters != null) && (parameters.Length > 0))
             {
                 MidTransitionTags = StringUtils.Unescape(parameters[0], EscapeCharacters);

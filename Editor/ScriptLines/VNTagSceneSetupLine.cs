@@ -175,8 +175,15 @@ namespace VNTags.Editor
             {
                 //insert background tag into transition
                 List<VNTag> transitionTags = new List<VNTag>();
+                if (SceneResetFlag)
+                {
+                    transitionTags.Add(ScriptableObject.CreateInstance<SceneResetTag>());
+                }
+                tempTags.RemoveofType(typeof(SceneResetTag));
+                
                 transitionTags.Add(BackgroundTag);
                 transitionTags.Add(CharacterTag);
+                
                 TransitionTag.MidTransitionTags = VNTagSerializer.SerializeLine(transitionTags);
                 tempTags.AddFirst(TransitionTag);
             }
@@ -185,16 +192,17 @@ namespace VNTags.Editor
                 tempTags.AddLast(TransitionTag);
                 tempTags.AddLast(BackgroundTag);
                 tempTags.AddLast(CharacterTag);
+                if (SceneResetFlag)
+                {
+                    tempTags.AddUnique(ScriptableObject.CreateInstance<SceneResetTag>());
+                }
+                else
+                {
+                    tempTags.RemoveofType(typeof(SceneResetTag));
+                }
             }
             
-            if (SceneResetFlag)
-            {
-                tempTags.AddUnique(ScriptableObject.CreateInstance<SceneResetTag>());
-            }
-            else
-            {
-                tempTags.RemoveofType(typeof(SceneResetTag));
-            }
+
             
             if (ToggleVNUIFlag)
             {
