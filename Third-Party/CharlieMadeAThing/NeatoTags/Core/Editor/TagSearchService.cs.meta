@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: e363aaacf73b4c199a977d9fa100af01
+timeCreated: 1751225880
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229829
+  packageName: Neato Tags
+  packageVersion: 1.5.1
+  assetPath: Assets/CharlieMadeAThing/NeatoTags/Core/Editor/TagSearchService.cs
+  uploadId: 778107
