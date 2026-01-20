@@ -35,15 +35,15 @@ namespace VNTags.Editor
             }
         }
 
+        private void OnDestroy()
+        {
+            AssetWatcher.UnwatchAsset(target, InvalidateTarget);
+        }
+
         public override VisualElement CreateInspectorGUI()
         {
             AssetWatcher.WatchAsset(target, InvalidateTarget);
             return base.CreateInspectorGUI();
-        }
-
-        private void OnDestroy()
-        {
-            AssetWatcher.UnwatchAsset(target, InvalidateTarget);
         }
 
         public void InvalidateTarget()
@@ -84,7 +84,7 @@ namespace VNTags.Editor
                     }
                 }
 
-                if ((editLines.Count == 0) || !editLines.First().IsSceneSetupLine())
+                if (editLines.Count == 0 || !editLines.First().IsSceneSetupLine())
                 {
                     editLines.Insert(0, new VNTagSceneSetupLine("", 0));
                 }

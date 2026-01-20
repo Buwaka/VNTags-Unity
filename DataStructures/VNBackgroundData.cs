@@ -4,7 +4,8 @@ using UnityEngine;
 namespace VNTags
 {
     [Serializable]
-    public class VNBackgroundData : IVNData
+    [CreateAssetMenu(fileName = "VNBackground", menuName = "VNTags/Data/VNBackground")]
+    public class VNBackgroundData : ScriptableObject, IVNData
     {
         [SerializeField] private string     name;
         [SerializeField] private string[]   alias;
@@ -25,7 +26,9 @@ namespace VNTags
             get { return alias; }
         }
 
-        public string  DataType { get; } = "Background";
+        public         string           DataType { get; } = "Background";
+        
+        private static VNBackgroundData _none;
         public IVNData NoneData
         {
             get
@@ -34,7 +37,17 @@ namespace VNTags
             }
         }
         
-        
-        public static           IVNData    None = new VNBackgroundData();
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNBackgroundData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
+        }
     }
 }

@@ -9,8 +9,12 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNSoundData : IVNData
+    [CreateAssetMenu(fileName = "VNSound", menuName = "VNTags/Data/VNSound")]
+    public class VNSoundData : ScriptableObject, IVNData
     {
+
+        private static VNSoundData _none;
+
         [Tooltip("ID for the sound, case insensitive")] [SerializeField]
         private string name;
 
@@ -21,6 +25,19 @@ namespace VNTags
         public AudioClip SoundAsset
         {
             get { return soundAsset; }
+        }
+
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNSoundData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
         }
 
         // probably a layer
@@ -38,7 +55,6 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Sound";
-
         public IVNData NoneData
         {
             get
@@ -46,7 +62,5 @@ namespace VNTags
                 return None;
             }
         }
-        
-        public static           IVNData    None = new VNSoundData();
     }
 }

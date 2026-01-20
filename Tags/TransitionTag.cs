@@ -10,7 +10,8 @@ namespace VNTags.Tags
 
     public class TransitionTag : VNTag
     {
-        public static          VNTransitionData DefaultTransition { get; set; } = null;
+        private const string           DefaultTransitionName = "Default";
+        public static VNTransitionData DefaultTransition { get; set; } = null;
 
         public              VNTransitionData Transition;
         [VNTagEditor] public string       MidTransitionTags = "";
@@ -52,14 +53,14 @@ namespace VNTags.Tags
 #if UNITY_EDITOR
             SetNone();
 #endif 
-            if ((parameters != null) && (parameters.Length > 0))
+            if ((parameters != null) && (parameters.Length >= 2))
             {
-                MidTransitionTags = StringUtils.Unescape(parameters[0], EscapeCharacters);
+                MidTransitionTags = StringUtils.Unescape(parameters[1], EscapeCharacters);
+                Transition        = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[0]);
             }
-            
-            if ((parameters != null) && (parameters.Length > 1))
+            else if ((parameters != null) && (parameters.Length == 1))
             {
-                Transition = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[1]);
+                Transition = VNTagsConfig.GetConfig().GetTransitionByNameOrAlias(parameters[0]);
             }
 
             return true;
@@ -72,8 +73,8 @@ namespace VNTags.Tags
                 return "";
             }
 
-            return Transition.IsNone() ? SerializeHelper(GetTagName(), StringUtils.Escape(MidTransitionTags, EscapeCharacters)) 
-                : SerializeHelper(GetTagName(), Transition.Name, StringUtils.Escape(MidTransitionTags, EscapeCharacters));
+            return Transition.IsNone() ? SerializeHelper(GetTagName(), DefaultTransitionName, StringUtils.Escape(MidTransitionTags, EscapeCharacters)) 
+                : SerializeHelper(GetTagName(),                        Transition.Name,       StringUtils.Escape(MidTransitionTags, EscapeCharacters));
         }
 
 #if UNITY_EDITOR

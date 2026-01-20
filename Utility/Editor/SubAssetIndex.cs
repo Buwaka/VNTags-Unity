@@ -14,7 +14,7 @@ namespace VNTags.Utility
         {
             var newArr = new List<(string path, Object reference)>();
 
-            if ((Entries != null) && (Entries.Length > 0))
+            if (Entries != null && Entries.Length > 0)
             {
                 newArr.AddRange(Entries);
             }

@@ -6,17 +6,16 @@ namespace VNTags.ScriptAnimations
     [CreateAssetMenu(menuName = "ScriptAnimation/HorizontalFadeOut", fileName = "HorizontalFadeOut")]
     public class HorizontalFadeOut : ScriptAnimation
     {
-        public float relativeDistance = 3.0f;
-        public float animetionTime    = 1.0f;
-        
-        private GameObject _target;
+        public  float         relativeDistance = 3.0f;
+        public  float         animetionTime    = 1.0f;
+        private bool          _paused;
         private MonoBehaviour _runner;
-        private Vector3  _targetlocation;
-        private bool _paused = false;
-        private bool _skip = false;
-        
-        
-        
+        private bool          _skip;
+
+        private GameObject _target;
+        private Vector3    _targetlocation;
+
+
         public override void Init(GameObject targetObject, MonoBehaviour runner)
         {
             _target = targetObject;
@@ -26,12 +25,12 @@ namespace VNTags.ScriptAnimations
                 Debug.LogError("SimpleMoveIn: Init: targetObject is null");
             }
         }
-        
+
         public override void Play(bool instant = false)
         {
             if (!instant)
             {
-                _targetlocation = (Vector3.left * relativeDistance) + _target.transform.position;
+                _targetlocation = Vector3.left * relativeDistance + _target.transform.position;
                 _runner.StartCoroutine(Animationcoroutine());
             }
         }
@@ -51,11 +50,11 @@ namespace VNTags.ScriptAnimations
             OnStop?.Invoke();
         }
 
-        IEnumerator Animationcoroutine()
+        private IEnumerator Animationcoroutine()
         {
             Onstart?.Invoke();
-            var sprites = _target.GetComponentsInChildren<SpriteRenderer>(true);
-            float time = 0.0f;
+            var     sprites  = _target.GetComponentsInChildren<SpriteRenderer>(true);
+            float   time     = 0.0f;
             Vector3 startPos = _target.transform.position;
             while (time < animetionTime && !_skip)
             {
@@ -63,19 +62,19 @@ namespace VNTags.ScriptAnimations
                 {
                     yield return null;
                 }
-                
+
                 float progress = time / animetionTime;
 
-                foreach (var sprite in sprites)
+                foreach (SpriteRenderer sprite in sprites)
                 {
                     sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, 1 - progress);
                 }
-                
-                _target.transform.position = Vector3.Lerp(startPos, _targetlocation, progress);
-                time += Time.deltaTime;
+
+                _target.transform.position =  Vector3.Lerp(startPos, _targetlocation, progress);
+                time                       += Time.deltaTime;
                 yield return null;
             }
-            _target.transform.position =  _targetlocation;
+            _target.transform.position = _targetlocation;
             OnStop?.Invoke();
         }
     }

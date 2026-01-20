@@ -2,5 +2,7 @@
 
 namespace VNTags
 {
-    public class VNTagEditorAttribute : PropertyAttribute { }
+    public class VNTagEditorAttribute : PropertyAttribute
+    {
+    }
 }

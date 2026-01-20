@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 using VNTags.Tags;
 using VNTags.Utility;
 
@@ -10,19 +9,21 @@ namespace VNTags.Editor
 {
     public class VNTagSceneSetupLine : VNTagScriptLine_base
     {
+        private const string NullTransition = "No Transition";
+        
         public int           BackgroundIndex;
         public BackgroundTag BackgroundTag;
         public int           BGMIndex;
 
         public int               CharacterMask;
         public MultiCharacterTag CharacterTag;
-        
+
+        public bool SceneResetFlag = true;
+        public bool ToggleVNUIFlag = true;
+
 
         public string        TransitionName;
         public TransitionTag TransitionTag;
-
-        public bool          SceneResetFlag = true;
-        public bool          ToggleVNUIFlag = true;
 
         public VNTagSceneSetupLine(string rawLine, ushort lineNumber) : base(rawLine, lineNumber)
         {
@@ -61,13 +62,13 @@ namespace VNTags.Editor
 
             if (TransitionTag == null)
             {
-                TransitionTag                    = ScriptableObject.CreateInstance<TransitionTag>();
+                TransitionTag = ScriptableObject.CreateInstance<TransitionTag>();
                 TransitionTag.SetNone();
             }
             else
             {
                 var midTransitionTags = VNTagDeserializer.ParseLine(TransitionTag.MidTransitionTags, 0);
-                foreach (var tag in midTransitionTags)
+                foreach (VNTag tag in midTransitionTags)
                 {
                     switch (tag)
                     {
@@ -81,7 +82,7 @@ namespace VNTags.Editor
                 }
                 Tags.Remove(TransitionTag);
             }
-            
+
             if (BackgroundTag == null)
             {
                 BackgroundTag = ScriptableObject.CreateInstance<BackgroundTag>();
@@ -91,7 +92,7 @@ namespace VNTags.Editor
             {
                 Tags.Remove(BackgroundTag);
             }
-            
+
             if (CharacterTag == null)
             {
                 CharacterTag = ScriptableObject.CreateInstance<MultiCharacterTag>();
@@ -105,7 +106,7 @@ namespace VNTags.Editor
             {
                 Tags.RemoveofType(typeof(ToggleVNUI));
             }
-            
+
             if (SceneResetFlag)
             {
                 Tags.RemoveofType(typeof(SceneResetTag));
@@ -130,7 +131,7 @@ namespace VNTags.Editor
 
             // Character Mask
             CharacterMask = LayoutHelpers.ValueArrayToMask(CharacterTag.Characters, VNTagsConfig.GetConfig().AllCharacters);
-            
+
             // BackgroundIndex
             BackgroundIndex = 0;
             if (BackgroundTag != null && BackgroundTag.Background != null)
@@ -145,14 +146,14 @@ namespace VNTags.Editor
                     }
                 }
             }
-            
+
             // test out the setup and transitiontag ingame
 
-            
+
             // TransitionIndex
-            if (TransitionTag != null )
+            if (TransitionTag != null)
             {
-                if (TransitionTag.Transition.IsNone())
+                if (TransitionTag.Transition.IsNone() || TransitionTag.Transition == null)
                 {
                     TransitionName = IVNData.DefaultKeyword;
                 }
@@ -169,21 +170,21 @@ namespace VNTags.Editor
 
         public override string Serialize()
         {
-            VNTagQueue tempTags = new VNTagQueue();
-            
-            if (TransitionTag.Transition != null)
+            var tempTags = new VNTagQueue();
+
+            if (!TransitionName.Equals(NullTransition, StringComparison.OrdinalIgnoreCase))
             {
                 //insert background tag into transition
-                List<VNTag> transitionTags = new List<VNTag>();
+                var transitionTags = new List<VNTag>();
                 if (SceneResetFlag)
                 {
                     transitionTags.Add(ScriptableObject.CreateInstance<SceneResetTag>());
                 }
                 tempTags.RemoveofType(typeof(SceneResetTag));
-                
+
                 transitionTags.Add(BackgroundTag);
                 transitionTags.Add(CharacterTag);
-                
+
                 TransitionTag.MidTransitionTags = VNTagSerializer.SerializeLine(transitionTags);
                 tempTags.AddFirst(TransitionTag);
             }
@@ -201,9 +202,9 @@ namespace VNTags.Editor
                     tempTags.RemoveofType(typeof(SceneResetTag));
                 }
             }
-            
 
-            
+
+
             if (ToggleVNUIFlag)
             {
                 tempTags.AddUnique(ScriptableObject.CreateInstance<ToggleVNUI>(), false);
@@ -212,8 +213,8 @@ namespace VNTags.Editor
             {
                 tempTags.RemoveofType(typeof(ToggleVNUI));
             }
-            
-            
+
+
             return VNTagSerializer.SerializeLine(tempTags) + base.Serialize();
         }
 
@@ -225,28 +226,28 @@ namespace VNTags.Editor
 
             EditorGUILayout.BeginVertical();
             LayoutHelpers.RenderPopup("Background",
-                VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background"),
-                ref BackgroundIndex,
-                VNTagsConfig.GetConfig().GetBackgroundByIndex,
-                ref BackgroundTag.GetBackgroundRef(),
-                Invalidate);
+                                      VNTagsConfig.GetConfig().GetBackgroundNamesGUI("No Background"),
+                                      ref BackgroundIndex,
+                                      VNTagsConfig.GetConfig().GetBackgroundByIndex,
+                                      ref BackgroundTag.GetBackgroundRef(),
+                                      Invalidate);
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
             LayoutHelpers.RenderMaskMultiSelectPopup("Character(s)",
-                VNTagsConfig.GetConfig().GetCharacterNamesGUI(),
-                ref CharacterMask, mask => LayoutHelpers.MaskToValueArray(mask, VNTagsConfig.GetConfig().AllCharacters),
-                ref CharacterTag.GetCharacterRef(),
-                Invalidate);
+                                                     VNTagsConfig.GetConfig().GetCharacterNamesGUI(),
+                                                     ref CharacterMask, mask => LayoutHelpers.MaskToValueArray(mask, VNTagsConfig.GetConfig().AllCharacters),
+                                                     ref CharacterTag.GetCharacterRef(),
+                                                     Invalidate);
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
             LayoutHelpers.RenderPopup("Transition",
-                VNTagsConfig.GetConfig().GetTransitionNamesGUI("No Transition"),
-                ref TransitionName,
-                VNTagsConfig.GetConfig().GetTransitionByNameOrAlias,
-                ref TransitionTag.GetTransitionRef(),
-                Invalidate);
+                                      VNTagsConfig.GetConfig().GetTransitionNamesGUI(NullTransition),
+                                      ref TransitionName,
+                                      VNTagsConfig.GetConfig().GetTransitionByNameOrAlias,
+                                      ref TransitionTag.GetTransitionRef(),
+                                      Invalidate);
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndHorizontal();
@@ -257,28 +258,29 @@ namespace VNTags.Editor
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndHorizontal();
-            
+
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             SceneResetFlag = EditorGUILayout.Toggle("Reset Scene", SceneResetFlag);
             EditorGUILayout.EndVertical();
             EditorGUILayout.BeginVertical();
-            ToggleVNUIFlag =  EditorGUILayout.Toggle("Toggle Textbox", ToggleVNUIFlag);;
+            ToggleVNUIFlag = EditorGUILayout.Toggle("Toggle Textbox", ToggleVNUIFlag);
+            ;
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             EditorGUI.BeginDisabledGroup(true);
-            
+
             EditorGUILayout.LabelField("Preview");
-            EditorGUILayout.SelectableLabel(this.SerializedPreview, new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true});
-            
+            EditorGUILayout.SelectableLabel(SerializedPreview, new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true });
+
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUILayout.Separator();
         }
     }

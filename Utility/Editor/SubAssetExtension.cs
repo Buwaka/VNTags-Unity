@@ -77,7 +77,7 @@ namespace VNTags.Utility
         {
             SubAssetIndex index = GetIndex(property);
 
-            if ((index == null) || (index.Entries == null))
+            if (index == null || index.Entries == null)
             {
                 return null;
             }

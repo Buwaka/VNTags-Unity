@@ -1,4 +1,5 @@
 ﻿using VNTags.Components;
+using VNTags.SceneFlowControl;
 using VNTags.Tags;
 
 namespace VNTags
@@ -16,6 +17,14 @@ namespace VNTags
     /// </summary>
     public static class VNTagEventAnnouncer
     {
+        // FLOW events
+        public static FlowNewHandler         onNewFlow;
+        public static SceneGenericHandler  onPreSceneStart;
+        public static ScenePostLoadHandler onPostSceneStart;
+        public static SceneGenericHandler  onSceneEnd;
+        
+        // TAG events
+        public static SceneHandler           onSceneTag;
         public static BackgroundHandler      onBackgroundTag;
         public static CharacterHandler       onCharacterTag;
         public static CharacterMoveHandler   onCharacterMoveTag;

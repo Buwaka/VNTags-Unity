@@ -5,10 +5,10 @@ using VNTags.Utility;
 
 namespace VNTags
 {
-    [Serializable]
-    public class VNTransitionData : IVNData
+    [CreateAssetMenu(fileName = "NewTransitionData", menuName = "VNTags/Data/Transition Data")]
+    public class VNTransitionData : ScriptableObject, IVNData
     {
-        [SerializeField] private string  name;
+        [SerializeField] private string name;
 
         [SerializeField] private string[] alias;
 
@@ -34,8 +34,20 @@ namespace VNTags
                 return None;
             }
         }
-        
-        public static           IVNData    None = new VNTransitionData();
+
+        private static VNTransitionData _none;
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNTransitionData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
+        }
 
         public void Play() { }
 

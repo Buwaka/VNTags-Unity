@@ -10,7 +10,7 @@ namespace VNTags.Editor
         {
             return TextAreaWithTagCreationDropDown(null, tag, line);
         }
-        
+
         public static string TextAreaWithTagCreationDropDown(string label, IEditorTag tag, VNTagScriptLine_base line = null)
         {
             EditorGUILayout.BeginHorizontal();
@@ -24,18 +24,18 @@ namespace VNTags.Editor
 
             if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
             {
-                ShowTextBoxContextMenu((t) => tag.SetValue(t), tag.GetValue(), tag,  line);
+                ShowTextBoxContextMenu(t => tag.SetValue(t), tag.GetValue(), tag, line);
             }
 
             EditorGUILayout.EndHorizontal();
             return result;
         }
-        
+
         public static void TextAreaWithTagCreationDropDown(Action<string> target, string current)
         {
             TextAreaWithTagCreationDropDown(null, target, current);
         }
-        
+
         public static void TextAreaWithTagCreationDropDown(string label, Action<string> target, string current)
         {
             EditorGUILayout.BeginHorizontal();
@@ -43,9 +43,9 @@ namespace VNTags.Editor
             {
                 EditorGUILayout.LabelField(label, GUILayout.Width(100));
             }
-            
+
             string newValue = EditorGUILayout.TextArea(current);
-            
+
             if (newValue != current)
             {
                 target.Invoke(newValue);
@@ -58,10 +58,10 @@ namespace VNTags.Editor
 
             EditorGUILayout.EndHorizontal();
         }
-        
-        private static  void ShowTextBoxContextMenu(Action<string> target, string current, IEditorTag tag = null, VNTagScriptLine_base line = null)
+
+        private static void ShowTextBoxContextMenu(Action<string> target, string current, IEditorTag tag = null, VNTagScriptLine_base line = null)
         {
-            var menu                 = new GenericMenu();
+            var menu = new GenericMenu();
 
             var serializationContext   = new VNTagSerializationContext();
             var deserializationContext = new VNTagDeserializationContext();

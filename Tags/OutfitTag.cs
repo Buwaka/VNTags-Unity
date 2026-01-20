@@ -52,7 +52,7 @@ namespace VNTags.Tags
                 TargetCharacter = context.GetMainCharacter();
             }
 
-            return (_outfit != null) && !_outfit.IsNone() && (TargetCharacter != null) && !TargetCharacter.IsNone()
+            return _outfit != null && !_outfit.IsNone() && TargetCharacter != null && !TargetCharacter.IsNone()
                 ? SerializeHelper(GetTagName(), TargetCharacter.Name, Outfit.Name)
                 : "";
         }
@@ -71,7 +71,7 @@ namespace VNTags.Tags
                                                         false,
                                                         null,
                                                         VNTagsConfig.GetConfig().GetCharacterNames());
-            currentParameters.TryGetValue(characterParameter, out var character);
+            currentParameters.TryGetValue(characterParameter, out string character);
 
             var outfitParameter = new VNTagParameter(2,
                                                      "Outfit",

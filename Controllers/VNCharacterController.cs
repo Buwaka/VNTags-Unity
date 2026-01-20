@@ -87,7 +87,7 @@ public class VNCharacterController : MonoBehaviour
                 }
                 charaComp.Hide(animationInstance);
             }
-            
+
             charaComp.Reset();
 
             foreach (var pair in _instance._scenePositionComposition)
@@ -100,7 +100,7 @@ public class VNCharacterController : MonoBehaviour
             }
         }
     }
-    
+
     public static void HideAllCharacters(bool instant = false)
     {
         foreach (var character in _instance._characters)
@@ -148,7 +148,7 @@ public class VNCharacterController : MonoBehaviour
         VNCharacterComponent charaComp;
         if (!_instance._characters.TryGetValue(character, out charaComp))
         {
-            CreateCharacterComponent(character, out charaComp,  position.Layer.Name);
+            CreateCharacterComponent(character, out charaComp, position.Layer.Name);
         }
 
         obj = charaComp.gameObject;
@@ -165,10 +165,10 @@ public class VNCharacterController : MonoBehaviour
             // renderer.sortingLayerID   = position.Layer.id;
             renderer.sortingLayerName = position.Layer.Name;
         }
-        
+
         if (instant)
         {
-            charaComp.Show(true);
+            charaComp.Show();
         }
         else
         {
@@ -182,10 +182,10 @@ public class VNCharacterController : MonoBehaviour
             {
                 Debug.LogWarning("VNCharacterPositionController: ShowCharacter: Default entrance animation not found");
             }
-            
-            charaComp.Show(true,  animationInstance);
+
+            charaComp.Show(true, animationInstance);
         }
-        
+
         _instance._scenePositionComposition.Add(position, charaComp);
         _instance._characters.TryAdd(character, charaComp);
         onCharacterAdded?.Invoke(charaComp, obj, position);

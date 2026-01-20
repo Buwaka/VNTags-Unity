@@ -27,7 +27,7 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            if ((parameters == null) || (parameters.Length <= 0))
+            if (parameters == null || parameters.Length <= 0)
             {
                 Debug.LogError("DialogueTag: Deserialize: No parameters provided '" + context + "'");
                 return false;

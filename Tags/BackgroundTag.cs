@@ -17,7 +17,7 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            if ((parameters == null) || (parameters.Length <= 0))
+            if (parameters == null || parameters.Length <= 0)
             {
                 Debug.LogError("BackgroundTag: Deserialize: No parameters provided '" + context + "'");
                 return false;
@@ -39,7 +39,7 @@ namespace VNTags.Tags
             {
                 return "";
             }
-            return (Background != null) && !Background.IsNone() ? SerializeHelper(GetTagName(), Background.Name) : "";
+            return Background != null && !Background.IsNone() ? SerializeHelper(GetTagName(), Background.Name) : "";
         }
 
         public override string GetTagName()
@@ -71,10 +71,10 @@ namespace VNTags.Tags
         {
             return ref _background;
         }
-        
+
         public void SetNone()
         {
-            _background = (VNBackgroundData) VNBackgroundData.None;
+            _background = (VNBackgroundData)VNBackgroundData.None;
         }
 #endif
     }

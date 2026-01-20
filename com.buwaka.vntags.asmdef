@@ -3,7 +3,8 @@
   "rootNamespace": "",
   "references": [
     "Unity.InputSystem",
-    "Eflatun.SceneReference"
+    "Eflatun.SceneReference",
+    "Core.NeatoTags.CharlieMadeAThing"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

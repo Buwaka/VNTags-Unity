@@ -7,8 +7,9 @@ namespace VNTags
     ///     Name for the expression, to be used as a case-insensitive ID,
     ///     Outfit gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
+    [CreateAssetMenu(fileName = "VNOutfit", menuName = "VNTags/Data/VNOutfit")]
     [Serializable]
-    public class VNOutfitData : IVNData
+    public class VNOutfitData : ScriptableObject, IVNData
     {
         [SerializeField] private string  name;
 
@@ -34,6 +35,7 @@ namespace VNTags
 
         public string DataType { get; } = "Outfit";
 
+        private static VNOutfitData _none;
         public IVNData NoneData
         {
             get
@@ -42,6 +44,17 @@ namespace VNTags
             }
         }
         
-        public static           IVNData    None = new VNOutfitData();
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNOutfitData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
+        }
     }
 }

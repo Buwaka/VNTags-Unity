@@ -60,7 +60,7 @@ namespace VNTags
 
         public void AddUnique(VNTag tag, bool first = true)
         {
-            foreach (var ctag in GetCollection())
+            foreach (VNTag ctag in GetCollection())
             {
                 if (ctag.GetType() == tag.GetType())
                 {
@@ -82,10 +82,10 @@ namespace VNTags
         {
             RemoveofType(tag.GetType());
         }
-        
+
         public void RemoveofType(Type type)
         {
-            LinkedListNode<VNTag> currentNode = First;
+            var currentNode = First;
             while (currentNode != null)
             {
                 var next = currentNode.Next;
@@ -93,7 +93,7 @@ namespace VNTags
                 {
                     Remove(currentNode);
                 }
-                
+
                 currentNode = next;
             }
         }
@@ -116,11 +116,11 @@ namespace VNTags
 
         public bool ExecuteAll(VNTagContext context, int retries = 3)
         {
-            if ((Count <= 0) || (First.Value == null))
+            if (Count <= 0 || First.Value == null)
             {
                 return true;
             }
-            
+
             VNTag tag = First.Value;
             context.SetMainCharacter(_currentCharacter);
             context.Instant = true;
@@ -134,7 +134,7 @@ namespace VNTags
                 {
                     RemoveFirst();
                     tries = 0;
-                    tag = First?.Value;
+                    tag   = First?.Value;
                 }
                 else
                 {
@@ -157,13 +157,13 @@ namespace VNTags
                 Tick(context);
                 yield return null;
             }
-            
+
             onComplete?.Invoke();
         }
 
         public void Tick(VNTagContext context)
         {
-            if ((Count <= 0) || (First.Value == null))
+            if (Count <= 0 || First.Value == null)
             {
                 return;
             }
@@ -177,6 +177,25 @@ namespace VNTags
             {
                 RemoveFirst();
             }
+        }
+
+        public void MoveTo(VNTagContext context, VNTag tag, bool execute = true, bool instant = true)
+        {
+            MoveTo(context, tag.ID, execute, instant);
+        }
+
+        public void MoveTo(VNTagContext context, VNTagID tagID, bool execute = true, bool instant = true)
+        {
+            // TODO
+        }
+        public bool IsEmpty()
+        {
+            if (Count <= 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

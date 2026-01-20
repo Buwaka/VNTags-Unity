@@ -59,7 +59,7 @@ namespace VNTags.Utility
 
             postPopupAction();
         }
-        
+
         /// <summary>
         ///     Renders a generic Unity Editor GUI popup (dropdown) control.
         ///     This function handles the display of the popup, updates a reference index based on user selection,
@@ -96,7 +96,12 @@ namespace VNTags.Utility
 
             int newIndex = EditorGUILayout.Popup(lastIndex, options);
 
-            if (lastIndex == newIndex)
+            // if (lastIndex == newIndex)
+            // {
+            //     return;
+            // }
+
+            if (options.Length <= 0)
             {
                 return;
             }

@@ -8,9 +8,12 @@ namespace VNTags
     ///     Expression gameobject will be attached as a child object to the VNCharacter object
     /// </summary>
     [Serializable]
-    public class VNExpressionData : IVNData
+    [CreateAssetMenu(fileName = "VNExpression", menuName = "VNTags/Data/VNExpression")]
+    public class VNExpressionData : ScriptableObject, IVNData
     {
-        [SerializeField] private string  name;
+
+        private static           VNExpressionData _none;
+        [SerializeField] private string           name;
 
         [Tooltip("Alternative names for writing convenience, case insensitive")] [SerializeField]
         private string[] alias;
@@ -20,6 +23,19 @@ namespace VNTags
         public GameObject Prefab
         {
             get { return prefab; }
+        }
+
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNExpressionData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
         }
 
         public string Name
@@ -33,7 +49,6 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Expression";
-
         public IVNData NoneData
         {
             get
@@ -41,7 +56,5 @@ namespace VNTags
                 return None;
             }
         }
-        
-        public static           IVNData    None = new VNExpressionData();
     }
 }

@@ -257,7 +257,7 @@ namespace VNTags.Utility
                     i++;
                     continue;
                 }
-                
+
                 if (c == openingBracket)
                 {
                     depth++;
@@ -284,7 +284,7 @@ namespace VNTags.Utility
 
             // Build a character class pattern with each char individually escaped
             string pattern = "[" + string.Join("", escapeChars.Select(c => "\\" + c)) + "]";
-            
+
             return Regex.Replace(input, pattern, @"\$&");
         }
 
@@ -297,7 +297,7 @@ namespace VNTags.Utility
 
             // Build a pattern that matches backslash followed by any of the escape chars
             string pattern = @"\\" + "[" + string.Join("", escapeChars.Select(c => "\\" + c)) + "]";
-            
+
             return Regex.Replace(input, pattern, m => m.Value.Substring(1));
         }
 
@@ -312,7 +312,7 @@ namespace VNTags.Utility
                     i++;
                     continue;
                 }
-                
+
                 if (c == chr)
                 {
                     return true;

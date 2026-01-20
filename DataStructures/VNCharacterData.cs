@@ -10,8 +10,12 @@ namespace VNTags
     ///     please use the functions to get the data rather than directly accessing the fields
     /// </summary>
     [Serializable]
-    public class VNCharacterData : IVNData
+    [CreateAssetMenu(fileName = "VNCharacter", menuName = "VNTags/Data/VNCharacter")]
+    public class VNCharacterData : ScriptableObject, IVNData
     {
+
+        private static VNCharacterData _none;
+
         [Tooltip("Name that will be rendered, case insensitive")] [SerializeField]
         private string name;
 
@@ -46,7 +50,7 @@ namespace VNTags
         {
             get
             {
-                if ((_defaultExpression == null) && (expressions[0] != null))
+                if (_defaultExpression == null && expressions[0] != null)
                 {
                     _defaultExpression = expressions[0];
                 }
@@ -60,7 +64,7 @@ namespace VNTags
         {
             get
             {
-                if ((_defaultOutfit == null) && (outfits[0] != null))
+                if (_defaultOutfit == null && outfits[0] != null)
                 {
                     _defaultOutfit = outfits[0];
                 }
@@ -75,19 +79,32 @@ namespace VNTags
             get { return mainColor; }
         }
 
-
-        public string Name
-        {
-            get { return name; }
-        }
-
         public string NameProcessed
         {
             get
             {
-                var pName = TextProcessors.TextProcessors.PreProcessDialogue(name);
+                string pName = TextProcessors.TextProcessors.PreProcessDialogue(name);
                 return TextProcessors.TextProcessors.PostProcessDialogue(pName);
             }
+        }
+
+        public static IVNData None
+        {
+            get
+            {
+                if (_none == null)
+                {
+                    _none = CreateInstance<VNCharacterData>();
+                    //_none.name = "None";
+                }
+                return _none;
+            }
+        }
+
+
+        public string Name
+        {
+            get { return name; }
         }
 
         public string[] Alias
@@ -96,7 +113,6 @@ namespace VNTags
         }
 
         public string DataType { get; } = "Character";
-
         public IVNData NoneData
         {
             get
@@ -104,24 +120,22 @@ namespace VNTags
                 return None;
             }
         }
-        
-        public static           IVNData    None = new VNCharacterData();
 
         public static VNCharacterData BlankCharacter(string name)
         {
-            var chara = new VNCharacterData();
+            var chara = ScriptableObject.CreateInstance<VNCharacterData>();
             chara.name = name;
             return chara;
         }
 
         public bool IsBlankCharacter()
         {
-            return (Expressions == null) && (Outfits == null);
+            return Expressions == null && Outfits == null;
         }
 
         public VNExpressionData GetExpressionByIndex(int index)
         {
-            if ((index > 0) && (index <= expressions.Length))
+            if (index > 0 && index <= expressions.Length)
             {
                 return expressions[index - 1];
             }
@@ -133,7 +147,7 @@ namespace VNTags
         {
             foreach (VNExpressionData expression in expressions)
             {
-                if ((expression != null) && string.Equals(expression.Name, name, StringComparison.OrdinalIgnoreCase))
+                if (expression != null && string.Equals(expression.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
                     return expression;
                 }
@@ -144,7 +158,7 @@ namespace VNTags
 
         public VNOutfitData GetOutfitByIndex(int index)
         {
-            if ((index > 0) && (index <= outfits.Length))
+            if (index > 0 && index <= outfits.Length)
             {
                 return outfits[index - 1];
             }
@@ -156,7 +170,7 @@ namespace VNTags
         {
             foreach (VNOutfitData outfit in outfits)
             {
-                if ((outfit != null) && string.Equals(outfit.Name, name, StringComparison.OrdinalIgnoreCase))
+                if (outfit != null && string.Equals(outfit.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
                     return outfit;
                 }

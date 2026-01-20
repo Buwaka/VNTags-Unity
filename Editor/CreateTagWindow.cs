@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using VNTags.Utility;
 
 namespace VNTags.Editor
 {
@@ -19,7 +18,7 @@ namespace VNTags.Editor
         private          VNTagDeserializationContext                  _deserializationContext;
 
         private int                       _lastIndex;
-        private bool _parameterChanged;
+        private bool                      _parameterChanged;
         private VNTagParameters           _parameters = new();
         private VNTagSerializationContext _serializationContext;
         private string                    _serializedTag;
@@ -50,26 +49,26 @@ namespace VNTags.Editor
 
                 _parameters = _currentSelectedTag.GetParameters(_parameters);
 
-                if ((_parameters != null) && (_parameters.Count > 0))
+                if (_parameters != null && _parameters.Count > 0)
                 {
                     _parameterChanged = false;
 
                     var keys = new List<VNTagParameter>(_parameters.Keys);
                     foreach (VNTagParameter parameter in keys)
                     {
-                        var currentValue = _parameters[parameter];
-                        var thisWindow = this;
+                        string          currentValue = _parameters[parameter];
+                        CreateTagWindow thisWindow   = this;
                         RenderParameterField(
-                            parameter,
-                            currentValue,
-                            newValue =>
-                            {
-                                _parameterChanged |= _parameters.UpdateParameter(parameter, newValue);
-                                if (_parameterChanged)
-                                {
-                                    RefreshTagSerialization();
-                                }
-                            });
+                                             parameter,
+                                             currentValue,
+                                             newValue =>
+                                             {
+                                                 _parameterChanged |= _parameters.UpdateParameter(parameter, newValue);
+                                                 if (_parameterChanged)
+                                                 {
+                                                     RefreshTagSerialization();
+                                                 }
+                                             });
                         EditorGUILayout.Separator();
                     }
                 }
@@ -83,7 +82,7 @@ namespace VNTags.Editor
 
             EditorGUILayout.LabelField("Dialogue", EditorStyles.boldLabel);
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.TextArea(_current.Insert(_cursor, "▾"), new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true});
+            EditorGUILayout.TextArea(_current.Insert(_cursor, "▾"), new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true });
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.LabelField("Position", EditorStyles.boldLabel);
@@ -94,15 +93,15 @@ namespace VNTags.Editor
 
 
             RefreshTagSerialization();
-            
-            EditorGUILayout.TextArea(CreateNewLine(), new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true});
+
+            EditorGUILayout.TextArea(CreateNewLine(), new GUIStyle(EditorStyles.textArea) { wordWrap = true, stretchHeight = true });
 
 
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Separator();
 
-            EditorGUI.BeginDisabledGroup((_currentSelectedTag == null) || string.IsNullOrEmpty(_serializedTag));
+            EditorGUI.BeginDisabledGroup(_currentSelectedTag == null || string.IsNullOrEmpty(_serializedTag));
             if (GUILayout.Button("Save"))
             {
                 Save();
@@ -113,7 +112,7 @@ namespace VNTags.Editor
             if (GUILayout.Button("Close Window"))
             {
                 Close();
-                
+
             }
         }
 
@@ -121,12 +120,12 @@ namespace VNTags.Editor
         {
             if (_currentSelectedTag != null)
             {
-                if (_parameterChanged || (_serializedTag == null))
+                if (_parameterChanged || _serializedTag == null)
                 {
                     Debug.unityLogger.logEnabled = false;
                     // re-serialize tag
                     _currentSelectedTag.Deserialize(_deserializationContext, _parameters.Select(t => t.Value.ToString()).ToArray());
-                    _serializedTag = _currentSelectedTag.Serialize(_serializationContext);
+                    _serializedTag               = _currentSelectedTag.Serialize(_serializationContext);
                     Debug.unityLogger.logEnabled = true;
                 }
             }
@@ -152,7 +151,7 @@ namespace VNTags.Editor
             foreach (Type tagType in tags)
             {
                 var tag = (VNTag)CreateInstance(tagType);
-                if ((tag != null) && tag.EditorVisible())
+                if (tag != null && tag.EditorVisible())
                 {
                     _tags.Add(tag.GetTagName(), tag);
                 }
@@ -187,7 +186,7 @@ namespace VNTags.Editor
             string current = value;
             EditorGUILayout.BeginFoldoutHeaderGroup(true, parameter.Name + (parameter.Optional ? "" : "*"));
 
-            if ((parameter.EnumType != null) && parameter.EnumType.IsEnum)
+            if (parameter.EnumType != null && parameter.EnumType.IsEnum)
             {
                 bool isFlags = parameter.EnumType.GetCustomAttribute<FlagsAttribute>() != null;
 
@@ -216,7 +215,7 @@ namespace VNTags.Editor
                 }
                 setValue(value);
             }
-            else if ((parameter.Options != null) && (parameter.Options.Length > 0))
+            else if (parameter.Options != null && parameter.Options.Length > 0)
             {
                 int index = parameter.Number;
                 _popupIndex.TryAdd(parameter.Number, new ValueTuple<int, bool>(index, false));
@@ -262,15 +261,15 @@ namespace VNTags.Editor
             switch (parameter.Type)
             {
                 case TypeCode.Boolean:
-                    if (!bool.TryParse(value, out var boolResult)) boolResult = false;
+                    if (!bool.TryParse(value, out bool boolResult)) boolResult = false;
                     setValue(EditorGUILayout.Toggle(boolResult).ToString());
                     break;
                 case TypeCode.Byte:
-                    if (!byte.TryParse(value, out var byteResult)) byteResult = 0;
+                    if (!byte.TryParse(value, out byte byteResult)) byteResult = 0;
                     setValue(((byte)Mathf.Clamp(EditorGUILayout.IntField(byteResult), byte.MinValue, byte.MaxValue)).ToString());
                     break;
                 case TypeCode.Char:
-                    var charResult = EditorGUILayout.TextField(value);
+                    string charResult = EditorGUILayout.TextField(value);
                     setValue(string.IsNullOrEmpty(charResult) ? string.Empty : charResult[0].ToString());
                     break;
                 case TypeCode.DateTime:
@@ -280,58 +279,58 @@ namespace VNTags.Editor
                     Debug.LogWarning("CreateTagWindow: OnGUI: Not sure what this is or what you're trying to do, " + parameter);
                     break;
                 case TypeCode.Decimal:
-                    if (!decimal.TryParse(value, out var decimalResult)) decimalResult = 0;
+                    if (!decimal.TryParse(value, out decimal decimalResult)) decimalResult = 0;
                     setValue(EditorGUILayout.DoubleField((double)decimalResult).ToString());
                     break;
                 case TypeCode.Double:
-                    if (!double.TryParse(value, out var doubleResult)) doubleResult = 0;
+                    if (!double.TryParse(value, out double doubleResult)) doubleResult = 0;
                     setValue(EditorGUILayout.DoubleField(doubleResult).ToString());
                     break;
                 case TypeCode.Empty:
                     Debug.LogWarning("CreateTagWindow: OnGUI: Not sure what you're trying to do, parameter type is empty, " + parameter);
                     break;
                 case TypeCode.Int16:
-                    if (!short.TryParse(value, out var int16Result)) int16Result = 0;
+                    if (!short.TryParse(value, out short int16Result)) int16Result = 0;
                     setValue(((short)Mathf.Clamp(EditorGUILayout.IntField(int16Result), short.MinValue, short.MaxValue)).ToString());
                     break;
                 case TypeCode.Int32:
-                    if (!int.TryParse(value, out var int32Result)) int32Result = 0;
+                    if (!int.TryParse(value, out int int32Result)) int32Result = 0;
                     setValue(EditorGUILayout.IntField(int32Result).ToString());
                     break;
                 case TypeCode.Int64:
-                    if (!long.TryParse(value, out var int64Result)) int64Result = 0;
+                    if (!long.TryParse(value, out long int64Result)) int64Result = 0;
                     setValue(EditorGUILayout.LongField(int64Result).ToString());
                     break;
                 case TypeCode.Object:
                     // Uses action instead of relying on the return value
                     VNTagTextArea.TextAreaWithTagCreationDropDown(
-                        setValue,
-                        value
-                    );
+                                                                  setValue,
+                                                                  value
+                                                                 );
                     break;
                 case TypeCode.SByte:
-                    if (!sbyte.TryParse(value, out var sbyteResult)) sbyteResult = 0;
+                    if (!sbyte.TryParse(value, out sbyte sbyteResult)) sbyteResult = 0;
                     setValue(((sbyte)Mathf.Clamp(EditorGUILayout.IntField(sbyteResult), sbyte.MinValue, sbyte.MaxValue)).ToString());
                     break;
                 case TypeCode.Single:
-                    if (!float.TryParse(value, out var singleResult)) singleResult = 0;
+                    if (!float.TryParse(value, out float singleResult)) singleResult = 0;
                     setValue(EditorGUILayout.FloatField(singleResult).ToString());
                     break;
                 case TypeCode.String:
                     setValue(EditorGUILayout.TextField(value));
                     break;
                 case TypeCode.UInt16:
-                    if (!ushort.TryParse(value, out var uint16Result)) uint16Result = 0;
+                    if (!ushort.TryParse(value, out ushort uint16Result)) uint16Result = 0;
                     setValue(((ushort)Mathf.Clamp(EditorGUILayout.IntField(uint16Result), ushort.MinValue, ushort.MaxValue)).ToString());
                     break;
                 case TypeCode.UInt32:
-                    if (!uint.TryParse(value, out var uint32Result)) uint32Result = 0;
+                    if (!uint.TryParse(value, out uint uint32Result)) uint32Result = 0;
                     setValue(((uint)Mathf.Clamp(EditorGUILayout.LongField(uint32Result), uint.MinValue, uint.MaxValue)).ToString());
                     break;
                 case TypeCode.UInt64:
-                    if (!ulong.TryParse(value, out var uint64Result)) uint64Result = 0;
-                    var ulongString = EditorGUILayout.TextField(uint64Result.ToString());
-                    if (ulong.TryParse(ulongString, out var newUlong))
+                    if (!ulong.TryParse(value, out ulong uint64Result)) uint64Result = 0;
+                    string ulongString                                               = EditorGUILayout.TextField(uint64Result.ToString());
+                    if (ulong.TryParse(ulongString, out ulong newUlong))
                     {
                         setValue(newUlong.ToString());
                     }

@@ -28,7 +28,7 @@ namespace VNTags.Utility
 
         private void OnGUI()
         {
-            if ((_foundTypes == null) || (_baseType == null))
+            if (_foundTypes == null || _baseType == null)
             {
                 EditorGUILayout.HelpBox("Window not initialized. Please open it from a valid property drawer.", MessageType.Error);
                 return;
@@ -65,9 +65,9 @@ namespace VNTags.Utility
             _typesProperty = typesProperty;
             _baseType      = baseType;
             _foundTypes = AppDomain.CurrentDomain.GetAssemblies()
-                                   .SelectMany(assembly => assembly.GetTypes())
-                                   .Where(type => type.IsClass && !type.IsAbstract && _baseType.IsAssignableFrom(type))
-                                   .ToList();
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.IsClass && !type.IsAbstract && _baseType.IsAssignableFrom(type))
+                .ToList();
 
             // Initialize selection states based on current property values
             var currentTypes = ((IEnumerable<Type>)typesProperty.managedReferenceValue).ToList();

@@ -20,7 +20,7 @@ namespace VNTags
         /// <returns></returns>
         public static bool IsSignificant(string text)
         {
-            return !string.IsNullOrEmpty(text) && (text.Trim(' ').Length > 0);
+            return !string.IsNullOrEmpty(text) && text.Trim(' ').Length > 0;
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace VNTags
                     }
 
                     // look for the closing bracket
-                    int endBracketIndex = StringUtils.FindClosingBracket(line, index, '{', '}');
+                    int endBracketIndex = line.FindClosingBracket(index, '{', '}');
 
                     // if not closing bracket is found
                     if (endBracketIndex == -1)
@@ -199,7 +199,7 @@ namespace VNTags
                         int closingQuoteIndex = token.LastIndexOf('\"');
 
                         // if not closing bracket is found or it is from before the current quote
-                        if ((closingQuoteIndex == -1) || (closingQuoteIndex <= i))
+                        if (closingQuoteIndex == -1 || closingQuoteIndex <= i)
                         {
                             Debug.LogError("VNTagParser: ExtractToken: did not find closing bracket for bracket at position "
                                          + i
@@ -235,7 +235,7 @@ namespace VNTags
                 int    semicolonIndex = workLine.IndexOf(";", StringComparison.OrdinalIgnoreCase);
                 string token          = ExtractToken(workLine.Substring(0, semicolonIndex));
                 tokens.Add(token);
-                if (semicolonIndex + 1 >= workLine.Length)
+                if ((semicolonIndex + 1) >= workLine.Length)
                 {
                     workLine = null;
                     break;

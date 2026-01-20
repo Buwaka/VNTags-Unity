@@ -2,4 +2,6 @@ using UnityEngine.Scripting;
 
 [assembly: Preserve]
 
-namespace VNTags { }
+namespace VNTags
+{
+}

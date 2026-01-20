@@ -33,16 +33,17 @@ namespace VNTags.Components
         [SerializeField]
         private string EVENTS = "Read Above";
 
-        private Animator     _animator;
-        private VNTagQueue   _midTransitionTags = null;
-        private VNTagContext _context           = new VNTagContext();
+        private readonly VNTagContext _context = new();
+
+        private Animator   _animator;
+        private VNTagQueue _midTransitionTags;
 
 
         private void Start()
         {
             _animator = GetComponent<Animator>();
         }
-        
+
         public void StartAnimation()
         {
             VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Start, null);
@@ -62,10 +63,10 @@ namespace VNTags.Components
             else
             {
                 StartCoroutine(_midTransitionTags.ExecuteAsync(_context,
-                                                () =>
-                                                {
-                                                    VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Reveal, null);
-                                                }));
+                                                               () =>
+                                                               {
+                                                                   VNTagEventAnnouncer.onTransitionEvent?.Invoke(this, VNTransitionEvent.Reveal, null);
+                                                               }));
             }
 
         }

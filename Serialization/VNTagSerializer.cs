@@ -25,7 +25,7 @@ namespace VNTags
                     continue;
                 }
 
-                if (tag is CharacterTag cTag && (cTag.Character != null) && (mainCharacter == null))
+                if (tag is CharacterTag cTag && cTag.Character != null && mainCharacter == null)
                 {
                     mainCharacter = cTag;
                 }
@@ -41,7 +41,7 @@ namespace VNTags
             }
 
             // special notation for the character
-            if ((mainCharacter != null) && (mainCharacter.Character != null))
+            if (mainCharacter != null && mainCharacter.Character != null)
             {
                 outLine.Insert(0, mainCharacter.Character.Name + ";");
             }

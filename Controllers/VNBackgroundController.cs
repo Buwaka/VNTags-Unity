@@ -118,7 +118,7 @@ namespace VNTags.Controllers
                     transitionable.Start();
                 }
 
-                while ((_timer < _transitionTime / 2) && !_skipTransition)
+                while (_timer < (_transitionTime / 2) && !_skipTransition)
                 {
                     foreach (IVNTransitionable transitionable in _backgrounds[_currentBackground])
                     {
@@ -147,13 +147,13 @@ namespace VNTags.Controllers
                     transitionable.Start();
                 }
 
-                while ((_timer < _transitionTime) && !_skipTransition)
+                while (_timer < _transitionTime && !_skipTransition)
                 {
                     foreach (IVNTransitionable transitionable in _backgrounds[_targetBackground])
                     {
-                        float total    = (_transitionTime / 2);
+                        float total    = _transitionTime / 2;
                         float current  = _timer;
-                        float progress = Mathf.Clamp( current / total, 0, 1.0f);
+                        float progress = Mathf.Clamp(current / total, 0, 1.0f);
                         transitionable.FadeIn(progress);
                     }
 

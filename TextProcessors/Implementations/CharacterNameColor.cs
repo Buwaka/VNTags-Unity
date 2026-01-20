@@ -5,7 +5,7 @@ using VNTags.Utility;
 
 namespace VNTags.TextProcessors
 {
-    [CreateAssetMenu(fileName = "CharacterNameColor", menuName = "ScriptableObjects/TextProcessors/CharacterNameColor")]
+    [CreateAssetMenu(fileName = "CharacterNameColor", menuName = "VNTags/TextProcessors/CharacterNameColor")]
     public class CharacterNameColor : BaseTextProcessor
     {
         // private static readonly List<(string SearchWord, string OpeningTag, string ClosingTag)> _characterNames = new();

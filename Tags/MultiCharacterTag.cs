@@ -18,7 +18,7 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            if ((parameters == null) || (parameters.Length <= 0))
+            if (parameters == null || parameters.Length <= 0)
             {
                 Debug.LogError("CharacterTag: Deserialize: No parameters provided '" + context + "'");
                 return false;
@@ -26,7 +26,7 @@ namespace VNTags.Tags
 
             int index      = 0;
             var characters = new List<VNCharacterData>();
-            while ((parameters.Length > index) && VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[index]) is VNCharacterData character)
+            while (parameters.Length > index && VNTagsConfig.GetConfig().GetCharacterByNameOrAlias(parameters[index]) is VNCharacterData character)
             {
                 characters.Add(character);
                 index++;
@@ -54,7 +54,7 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return (_characters != null) && (_characters.Length > 0) ? SerializeHelper(GetTagName(), _characters.Select(t => t.Name), _action) : "";
+            return _characters != null && _characters.Length > 0 ? SerializeHelper(GetTagName(), _characters.Select(t => t.Name), _action) : "";
         }
 
         public override string GetTagName()

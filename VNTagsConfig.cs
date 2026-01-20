@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using VNTags.TextProcessors;
 using VNTags.ScriptAnimations;
+using VNTags.TextProcessors;
 
 namespace VNTags
 {
@@ -13,7 +13,7 @@ namespace VNTags
     ///     found,
     ///     this implicitly means you can only have 1 config per project!
     /// </summary>
-    [CreateAssetMenu(fileName = "VNTagsConfig", menuName = "ScriptableObjects/VNTagsConfig")]
+    [CreateAssetMenu(fileName = "VNTagsConfig", menuName = "VNTags/VNTagsConfig")]
     public class VNTagsConfig : ScriptableObject
     {
         private const  string       ConfigName = "VNTagsConfig";
@@ -30,12 +30,14 @@ namespace VNTags
 
         [SerializeField] private VNTransitionData[] Transitions;
 
-        [SerializeField] private VNScene[] Scenes;
+        [SerializeReference] private VNScene[] Scenes;
+
+        [SerializeReference] private VNChapter[] Chapters;
 
         [SerializeReference] public BaseTextProcessor[] TextProcessors; // do mind this is a SerializeReference, which is necessary for polymorphism
-        
+
         [SerializeReference] public ScriptAnimation DefaultEntranceAnimation;
-        
+
         [SerializeReference] public ScriptAnimation DefaultExitAnimation;
 
 
@@ -97,7 +99,7 @@ namespace VNTags
         private T GetDataByIndex<T>(IReadOnlyList<T> arr, int index)
             where T : IVNData, new()
         {
-            if ((index > 0) && (index <= arr.Count))
+            if (index > 0 && index <= arr.Count)
             {
                 return arr[index - 1];
             }
@@ -132,7 +134,7 @@ namespace VNTags
         }
 
         /// <summary>
-        /// !!!!unsafe since default also occupies an index
+        ///     !!!!unsafe since default also occupies an index
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -231,6 +233,11 @@ namespace VNTags
         public string[] GetBackgroundNames()
         {
             return Backgrounds.Select(t => t.Name).ToArray();
+        }
+
+        public string[] GetSceneNames()
+        {
+            return Scenes.Select(t => t.Name).ToArray();
         }
 
 #if UNITY_EDITOR

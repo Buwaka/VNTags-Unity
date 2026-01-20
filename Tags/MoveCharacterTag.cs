@@ -39,7 +39,7 @@ namespace VNTags.Tags
 
         public override bool Deserialize(VNTagDeserializationContext context, params string[] parameters)
         {
-            if ((parameters == null) || (parameters.Length <= 1))
+            if (parameters == null || parameters.Length <= 1)
             {
                 Debug.LogError("MoveCharacterTag: Deserialize: Not enough parameters provided '" + context + "'");
                 return false;
@@ -65,7 +65,7 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return (_character != null) && !_character.IsNone() ? SerializeHelper(GetTagName(), _character.Name, _namedPosition) : "";
+            return _character != null && !_character.IsNone() ? SerializeHelper(GetTagName(), _character.Name, _namedPosition) : "";
         }
     }
 }

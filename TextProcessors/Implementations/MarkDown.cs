@@ -3,7 +3,7 @@ using VNTags.Utility;
 
 namespace VNTags.TextProcessors
 {
-    [CreateAssetMenu(fileName = "MarkDown", menuName = "ScriptableObjects/TextProcessors/MarkDown")]
+    [CreateAssetMenu(fileName = "MarkDown", menuName = "VNTags/TextProcessors/MarkDown")]
     public class MarkDown : BaseTextProcessor
     {
         [SerializeField] private string header1Style       = "H1";
