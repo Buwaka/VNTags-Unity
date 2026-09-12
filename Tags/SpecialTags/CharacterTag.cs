@@ -58,7 +58,9 @@ namespace VNTags.Tags
 
         public override string Serialize(VNTagSerializationContext context)
         {
-            return (Character != null) && !Character.IsNone() ? SerializeHelper(GetTagName(), Character.Name, _action) : "";
+            return (Character == null) || Character.IsNone() ? 
+                SerializeHelper(GetTagName(), "", _action) : 
+                SerializeHelper(GetTagName(), Character.Name, _action);
         }
 
         public override string GetTagName()

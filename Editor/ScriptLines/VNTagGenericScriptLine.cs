@@ -98,8 +98,7 @@ namespace VNTags.Editor
             // we have to keep track of the iterator so we don't include the starter tags
 
             // starter tags
-            LinkedList<VNTag>.Enumerator iterator = Tags.GetEnumerator();
-            VNTag                        current  = null;
+
 
             _characterChangeTag = GetMainCharacter();
             if (_characterChangeTag != null)
@@ -109,7 +108,13 @@ namespace VNTags.Editor
                     Preview += _characterChangeTag.Character.Name + ": ";
                 }
             }
-
+            else
+            {
+                Preview += CharacterChangeTag.name + ": ";
+            }
+            
+            LinkedList<VNTag>.Enumerator iterator = Tags.GetEnumerator();
+            VNTag                        current  = null;
 
             while (iterator.MoveNext())
             {
