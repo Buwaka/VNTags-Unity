@@ -99,9 +99,9 @@ namespace VNTags
         }
 
 
-        private bool OnCharacterTag(VNTagContext context, VNCharacterData character, CharacterAction action)
+        private bool OnCharacterTag(VNTagContext context, VNCharacterData character, CharacterAction action, bool nameOnly = false)
         {
-            if (action == CharacterAction.AddedToScene)
+            if (action == CharacterAction.AddedToScene || nameOnly)
             {
                 _currentCharacter = character;
             }

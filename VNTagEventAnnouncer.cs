@@ -37,5 +37,6 @@ namespace VNTags
         public static TransitionEventHandler onTransitionEvent;
         public static SceneResetHandler      onSceneReset;
         public static ToggleVNUIHandler      onToggleUI;
+        public static WaitHandler            onWaitTag;
     }
 }

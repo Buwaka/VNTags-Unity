@@ -18,6 +18,7 @@ namespace VNTags.Controllers
 
         private float _transitionTime;
 
+        public VNBackgroundData CurrentBackground => _currentBackground;
 
         private void Start()
         {

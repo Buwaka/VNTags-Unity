@@ -38,20 +38,27 @@ namespace VNTags.Editor
 
         public static void TextAreaWithTagCreationDropDown(string label, Action<string> target, string current)
         {
+            TextAreaWithTagCreationDropDown(label, target, current, Array.Empty<GUILayoutOption>());
+        }
+
+        /// <summary>Overload letting a caller size the text area itself (e.g. taller, for a longer script).</summary>
+        public static void TextAreaWithTagCreationDropDown
+            (string label, Action<string> target, string current, params GUILayoutOption[] textAreaOptions)
+        {
             EditorGUILayout.BeginHorizontal();
             if (label != null)
             {
                 EditorGUILayout.LabelField(label, GUILayout.Width(100));
             }
 
-            string newValue = EditorGUILayout.TextArea(current);
+            string newValue = EditorGUILayout.TextArea(current, textAreaOptions);
 
             if (newValue != current)
             {
                 target.Invoke(newValue);
             }
 
-            if (EditorGUILayout.DropdownButton(new GUIContent("test"), FocusType.Passive, GUILayout.Width(20)))
+            if (EditorGUILayout.DropdownButton(new GUIContent("Insert Tag"), FocusType.Passive, GUILayout.Width(80)))
             {
                 ShowTextBoxContextMenu(target, current);
             }

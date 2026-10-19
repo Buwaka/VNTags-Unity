@@ -24,14 +24,20 @@ namespace VNTags
         }
 
         /// <summary>
-        ///     The primary function to process pure text into VNTags,
-        ///     note: adds a confirm and EoL tag to the end of every line
-        ///     todo: make it possible to decide if and what gets added at the end.
+        ///     The primary function to process pure text into VNTags.
+        ///     note: every line with dialogue gets an EoL tag, plus either a Confirm tag (the regular,
+        ///     player-paced default) or — when <paramref name="autoPaceLines" /> is true — a Wait tag, for
+        ///     content that should pace itself without the player clicking through it (flow-graph nodes).
+        ///     A line that already writes its own explicit {Wait;...} is left alone — it already has one.
         /// </summary>
         /// <param name="text">The whole markdown based script</param>
+        /// <param name="autoPaceLines">
+        ///     Append an auto Wait tag instead of Confirm to every dialogue line (used for flow-graph node
+        ///     scripts, which shouldn't wait on player input).
+        /// </param>
         /// <returns>a queue containing all the tags for this script</returns>
         [NotNull]
-        public static VNTagQueue Parse(string text)
+        public static VNTagQueue Parse(string text, bool autoPaceLines = false)
         {
             var      tagQueue = new VNTagQueue();
             string[] lines    = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
@@ -47,19 +53,36 @@ namespace VNTags
                 string processedLine = TextProcessors.TextProcessors.PreProcessRawScript(line);
                 processedLine = TextProcessors.TextProcessors.PostProcessRawScript(processedLine);
 
-                bool hasDialogue = false;
+                bool hasDialogue   = false;
+                bool hasExplicitWait = false;
                 foreach (VNTag tag in ParseLine(processedLine, (ushort)(lineIndex + 1)))
                 {
                     if (tag is DialogueTag)
                     {
                         hasDialogue = true;
                     }
+                    else if (tag is WaitTag)
+                    {
+                        hasExplicitWait = true;
+                    }
+
                     tagQueue.AddLast(tag);
                 }
 
                 if (hasDialogue)
                 {
-                    tagQueue.AddLast(ScriptableObject.CreateInstance<ConfirmTag>());
+                    if (autoPaceLines)
+                    {
+                        if (!hasExplicitWait)
+                        {
+                            tagQueue.AddLast(ScriptableObject.CreateInstance<WaitTag>());
+                        }
+                    }
+                    else
+                    {
+                        tagQueue.AddLast(ScriptableObject.CreateInstance<ConfirmTag>());
+                    }
+
                     tagQueue.AddLast(ScriptableObject.CreateInstance<EndOfLineTag>());
                 }
             }
